@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using SL.App.Account;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 using SL.App.Themes;
 
 namespace SL.App.Pages;
@@ -94,6 +95,22 @@ public sealed partial class SettingsPage : Page
 
         ConcurrencyBox.Value = c.TransferConcurrency;
 
+        LanguageBox.ItemsSource = Loc.Languages
+            .Select(l => l.Code == Loc.AutoCode
+                ? $"{l.Name} ({Loc.DisplayName(Loc.DetectSystem())})"
+                : l.Name)
+            .ToList();
+        var langIndex = 0;
+        for (var i = 0; i < Loc.Languages.Count; i++)
+        {
+            if (Loc.Languages[i].Code == c.Language)
+            {
+                langIndex = i;
+                break;
+            }
+        }
+        LanguageBox.SelectedIndex = langIndex;
+
         TermsStateText.Text = c.TermsAccepted
             ? "已阅读并同意"
             : "尚未同意 · 点击右侧按钮查看并确认";
@@ -171,6 +188,19 @@ public sealed partial class SettingsPage : Page
     }
 
     private void OnOpenWorkshop(object sender, RoutedEventArgs e) => AppServices.Nav.Navigate("st.theme");
-
     private void OnOpenTerms(object sender, RoutedEventArgs e) => AppServices.Nav.Navigate("st.terms");
+
+    /// <summary>切换界面语言:保存设置并就地刷新整棵树(菜单/页面/提示)。</summary>
+    private void OnLanguageChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || LanguageBox.SelectedIndex < 0 || LanguageBox.SelectedIndex >= Loc.Languages.Count)
+            return;
+
+        var code = Loc.Languages[LanguageBox.SelectedIndex].Code;
+        if (code == AppServices.Settings.Current.Language)
+            return;
+
+        AppServices.Settings.Update(c => c.Language = code);
+        Loc.SwitchTo(code, App.Window.Content as DependencyObject);
+    }
 }

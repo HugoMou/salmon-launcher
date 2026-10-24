@@ -11,6 +11,17 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!-- 主题壁纸(铺满窗口,标题栏下也可见) -->
+        <Grid x:Name="WallpaperLayer"
+              Grid.RowSpan="2"
+              Visibility="Collapsed"
+              IsHitTestVisible="False">
+            <Grid.Background>
+                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.85" />
+            </Grid.Background>
+            <Border x:Name="WallpaperScrim" />
+        </Grid>
+
         <!-- 标题栏拖拽区(ExtendsContentIntoTitleBar) -->
         <Grid x:Name="AppTitleBar" Height="48" Background="Transparent">
             <StackPanel Orientation="Horizontal"
@@ -34,8 +45,8 @@
         <NavigationView x:Name="NavView"
                         Grid.Row="1"
                         PaneDisplayMode="Auto"
-                        CompactModeThresholdWidth="1000"
-                        ExpandedModeThresholdWidth="1200"
+                        CompactModeThresholdWidth="900"
+                        ExpandedModeThresholdWidth="1100"
                         IsPaneToggleButtonVisible="True"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
@@ -81,7 +92,7 @@
                     </StackPanel>
 
                     <!-- 页面宿主 -->
-                    <Border Grid.Row="1" Background="{ThemeResource Brush.PageBg}">
+                    <Border x:Name="PageHost" Grid.Row="1" Background="{ThemeResource Brush.PageBg}">
                         <Frame x:Name="NavFrame" />
                     </Border>
                 </Grid>

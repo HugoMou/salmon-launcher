@@ -60,6 +60,7 @@ public sealed class SettingsService : ISettingsService
         GameHeight = Math.Clamp(s.GameHeight, 240, 4320),
         DownloadSource = s.DownloadSource == "bmclapi" ? "bmclapi" : "auto",
         TermsAccepted = s.TermsAccepted,
+        Language = string.IsNullOrWhiteSpace(s.Language) ? "auto" : s.Language,
     };
 
     private static Data.Settings.AppSettings Map(AppConfig c) => new()
@@ -81,6 +82,7 @@ public sealed class SettingsService : ISettingsService
         GameHeight = Math.Clamp(c.GameHeight, 240, 4320),
         DownloadSource = c.DownloadSource,
         TermsAccepted = c.TermsAccepted,
+        Language = c.Language,
     };
 
     private static AppConfig Clone(AppConfig c) => new()
@@ -98,6 +100,7 @@ public sealed class SettingsService : ISettingsService
         GameHeight = c.GameHeight,
         DownloadSource = c.DownloadSource,
         TermsAccepted = c.TermsAccepted,
+        Language = c.Language,
     };
 
     private static bool ConfigEquals(AppConfig a, AppConfig b)
@@ -112,5 +115,6 @@ public sealed class SettingsService : ISettingsService
            && a.GameWidth == b.GameWidth
            && a.GameHeight == b.GameHeight
            && a.DownloadSource == b.DownloadSource
-           && a.TermsAccepted == b.TermsAccepted;
+           && a.TermsAccepted == b.TermsAccepted
+           && a.Language == b.Language;
 }

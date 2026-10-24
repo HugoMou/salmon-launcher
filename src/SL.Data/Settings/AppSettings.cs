@@ -40,6 +40,9 @@ public class AppSettings
 
     /// <summary>是否已阅读并同意用户协议</summary>
     public bool TermsAccepted { get; set; }
+
+    /// <summary>界面语言:"auto"(跟随系统)或 zh-Hans / zh-Hant / en / ja</summary>
+    public string Language { get; set; } = "auto";
 }
 
 /// <summary>设置文件的读写入口(原子落盘)。</summary>

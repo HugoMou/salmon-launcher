@@ -23,11 +23,24 @@ public sealed class NavService
 
     private void OnNavigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
+        if (e.Content is Microsoft.UI.Xaml.FrameworkElement view)
+        {
+            view.Loaded += (_, _) => Localization.Loc.ApplyTo(view);
+            Localization.Loc.ApplyTo(view);
+        }
+
         if (e.Parameter is string key && PageCatalog.All.ContainsKey(key) && CurrentKey != key)
         {
             CurrentKey = key;
             CurrentChanged?.Invoke();
         }
+    }
+
+    /// <summary>按当前语言重新加载当前页(语言切换后调用)。</summary>
+    public void ReloadCurrent()
+    {
+        if (PageCatalog.All.TryGetValue(CurrentKey, out var spec) && _frame.Content is not null)
+            _frame.Navigate(spec.PageType, CurrentKey);
     }
 
     public void Navigate(string key)

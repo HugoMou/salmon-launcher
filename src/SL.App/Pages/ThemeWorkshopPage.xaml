@@ -7,11 +7,11 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="1080" HorizontalAlignment="Left">
+        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="1120" HorizontalAlignment="Left">
             <TextBlock Text="主题工坊"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
-            <TextBlock Text="从 Minecraft 方块纹理里取色,自动推导出一整套界面配色与强调色;点一张方块卡即可换肤。"
+            <TextBlock Text="用 Minecraft 风格的游戏画面做壁纸,配色自动从画面里取,连同背景一起应用成整套主题。"
                        Foreground="{ThemeResource Brush.FgDim}"
                        TextWrapping="Wrap"
                        Margin="0,-12,0,4" />
@@ -29,54 +29,62 @@
                     <StackPanel Spacing="6" VerticalAlignment="Center">
                         <TextBlock x:Name="StatusText"
                                    FontSize="13"
+                                   TextWrapping="Wrap"
                                    Foreground="{ThemeResource Brush.Fg}" />
-                        <TextBlock Text="优先读取已安装客户端里的原始贴图;没有安装游戏时自动改为从在线材质镜像下载。"
+                        <TextBlock x:Name="CurrentText"
                                    FontSize="11.5"
-                                   Foreground="{ThemeResource Brush.FgFaint}"
-                                   TextWrapping="Wrap" />
+                                   TextWrapping="Wrap"
+                                   Foreground="{ThemeResource Brush.FgFaint}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Button x:Name="RefreshButton" Click="OnRefresh">
+                        <Button Click="OnPickImage">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE722;" FontSize="14" />
+                                <TextBlock Text="选择图片" />
+                            </StackPanel>
+                        </Button>
+                        <Button Click="OnClearWallpaper">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE72C;" FontSize="14" />
-                                <TextBlock Text="刷新纹理" />
+                                <TextBlock Text="清除壁纸" />
                             </StackPanel>
                         </Button>
-                        <Button Click="OnResetTheme">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE777;" FontSize="14" />
-                                <TextBlock Text="恢复默认配色" />
-                            </StackPanel>
-                        </Button>
+                        <Button Click="OnResetTheme" Content="恢复默认配色" />
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <GridView x:Name="BlockGrid"
+            <TextBlock Text="内置场景"
+                       FontSize="12"
+                       Foreground="{ThemeResource Brush.FgDim}"
+                       Margin="0,4,0,-4" />
+
+            <GridView x:Name="SceneGrid"
                       IsItemClickEnabled="True"
-                      ItemClick="OnBlockClick"
+                      ItemClick="OnSceneClick"
                       SelectionMode="None"
                       ScrollViewer.VerticalScrollMode="Disabled"
                       ScrollViewer.VerticalScrollBarVisibility="Disabled"
                       ScrollViewer.IsVerticalRailEnabled="False"
-                      Padding="0,4,0,24">
+                      Padding="0,0,0,24">
                 <GridView.ItemTemplate>
-                    <DataTemplate x:DataType="local:BlockCard">
+                    <DataTemplate x:DataType="local:WallpaperCard">
                         <Border Background="{ThemeResource Brush.Card}"
                                 BorderBrush="{ThemeResource Brush.Border}"
                                 BorderThickness="1"
                                 CornerRadius="12"
-                                Padding="10"
-                                Width="150">
+                                Padding="8"
+                                Width="252">
                             <StackPanel Spacing="8">
-                                <Border CornerRadius="8" Background="{ThemeResource Brush.PageBg}">
+                                <Border CornerRadius="8"
+                                        Height="132"
+                                        Background="{ThemeResource Brush.PageBg}">
                                     <Image Source="{x:Bind Thumb, Mode=OneWay}"
-                                           Width="128"
-                                           Height="128"
-                                           Stretch="Uniform" />
+                                           Stretch="UniformToFill" />
                                 </Border>
                                 <StackPanel Orientation="Horizontal" Spacing="7">
-                                    <Border Width="11" Height="11" CornerRadius="5.5" Background="{x:Bind Dot, Mode=OneWay}" />
+                                    <Border Width="11" Height="11" CornerRadius="5.5"
+                                            Background="{x:Bind Dot, Mode=OneWay}" />
                                     <TextBlock Text="{x:Bind Name}"
                                                FontSize="12.5"
                                                FontWeight="SemiBold"

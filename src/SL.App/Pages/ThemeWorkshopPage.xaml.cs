@@ -7,35 +7,31 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 using SL.App.Notify;
 using SL.App.Themes;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI;
 
 namespace SL.App.Pages;
 
-/// <summary>一张方块卡(纹理、主色与状态可增量更新)。</summary>
-public sealed class BlockCard : INotifyPropertyChanged
+/// <summary>一张壁纸场景卡。</summary>
+public sealed class WallpaperCard : INotifyPropertyChanged
 {
     private ImageSource? _thumb;
     private Brush _dot = new SolidColorBrush(Colors.Gray);
     private string _hex = "取色中…";
-    private string _state = "正在获取纹理…";
+    private bool _ready;
 
-    public required BlockSource Source { get; init; }
+    public required WallpaperScene Scene { get; init; }
 
-    public string Name => Source.Name;
+    public string Name => Loc.T(Scene.Name);
 
     public string Hex
     {
         get => _hex;
         set => Set(ref _hex, value);
-    }
-
-    public string State
-    {
-        get => _state;
-        set => Set(ref _state, value);
     }
 
     public ImageSource? Thumb
@@ -50,10 +46,13 @@ public sealed class BlockCard : INotifyPropertyChanged
         set => Set(ref _dot, value);
     }
 
-    public byte R { get; set; }
-    public byte G { get; set; }
-    public byte B { get; set; }
-    public bool Ready { get; set; }
+    public bool Ready
+    {
+        get => _ready;
+        set => Set(ref _ready, value);
+    }
+
+    public string? Path { get; set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -66,78 +65,74 @@ public sealed class BlockCard : INotifyPropertyChanged
     }
 }
 
-/// <summary>主题工坊:方块纹理取色 → 生成并应用主题。</summary>
+/// <summary>主题工坊:游戏画面壁纸 + 自动取色,一起做成整套主题。</summary>
 public sealed partial class ThemeWorkshopPage : Page
 {
-    private readonly List<BlockCard> _cards = [];
+    private readonly List<WallpaperCard> _cards = [];
     private bool _loaded;
 
     public ThemeWorkshopPage()
     {
         InitializeComponent();
-        StatusText.Text = "准备中…";
+        StatusText.Text = Loc.T("正在准备壁纸…");
 
-        foreach (var block in BlockTheme.Blocks)
-            _cards.Add(new BlockCard { Source = block });
+        foreach (var scene in WallpaperFactory.Scenes)
+            _cards.Add(new WallpaperCard { Scene = scene });
 
-        BlockGrid.ItemsSource = _cards;
+        SceneGrid.ItemsSource = _cards;
+        SyncCurrent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+        SyncCurrent();
         if (_loaded)
             return;
         _loaded = true;
         _ = LoadAllAsync();
     }
 
+    private void SyncCurrent()
+    {
+        var current = ThemeManager.Palettes.FirstOrDefault(p => p.Id == ThemeManager.PaletteId);
+        var wallpaper = ThemeManager.BackgroundImage;
+        CurrentText.Text = wallpaper is null
+            ? Loc.T("当前壁纸") + ":—"
+            : Loc.T("当前壁纸") + ":" + (current?.Name ?? System.IO.Path.GetFileName(wallpaper));
+    }
+
     private async Task LoadAllAsync()
     {
-        RefreshButton.IsEnabled = false;
-        StatusText.Text = "正在读取方块纹理(优先已安装客户端的原始贴图)…";
-
+        StatusText.Text = Loc.T("正在生成内置场景…");
         await Task.WhenAll(_cards.Select(LoadCardAsync)).ConfigureAwait(true);
 
         var ready = _cards.Count(c => c.Ready);
         StatusText.Text = ready == 0
-            ? "没有取到纹理:请检查网络,或先安装任意一个游戏版本后重试"
-            : $"共 {_cards.Count} 个方块可用,已就绪 {ready} 个 · 点卡片即换肤";
-        RefreshButton.IsEnabled = true;
+            ? Loc.T("场景生成失败,请稍后重试")
+            : string.Format(Loc.T("共 {0} 张场景,点击任意一张即可套用壁纸与配色"), ready);
     }
 
-    private static async Task LoadCardAsync(BlockCard card)
+    private static async Task LoadCardAsync(WallpaperCard card)
     {
         try
         {
-            var path = await BlockTheme.EnsureTextureAsync(card.Source).ConfigureAwait(true);
-            if (path is null)
-            {
-                card.State = "无纹理";
-                card.Hex = "—";
-                return;
-            }
-
+            var path = await WallpaperFactory.EnsureAsync(card.Scene);
+            card.Path = path;
             card.Thumb = await LoadBitmapAsync(path);
 
-            var color = await BlockTheme.AverageColorAsync(path).ConfigureAwait(true);
-            if (color is null)
-            {
-                card.State = "无法取色";
-                card.Hex = "—";
+            var pixels = await ImageTheme.ReadPixelsAsync(path);
+            if (pixels is null)
                 return;
-            }
 
-            card.R = color.Value.R;
-            card.G = color.Value.G;
-            card.B = color.Value.B;
+            var (r, g, b) = ImageTheme.Dominant(pixels.Value.Pixels);
+            card.Hex = $"#{r:X2}{g:X2}{b:X2}";
+            card.Dot = new SolidColorBrush(Color.FromArgb(255, r, g, b));
             card.Ready = true;
-            card.Hex = $"#{card.R:X2}{card.G:X2}{card.B:X2}";
-            card.Dot = new SolidColorBrush(Color.FromArgb(255, card.R, card.G, card.B));
         }
         catch
         {
-            card.State = "读取失败";
+            card.Hex = "—";
         }
     }
 
@@ -157,19 +152,54 @@ public sealed partial class ThemeWorkshopPage : Page
         }
     }
 
-    // ---------------------------------------------------------- 交互
+    // ---------------------------------------------------------- 应用主题
 
-    private void OnBlockClick(object sender, ItemClickEventArgs e)
+    private async void OnSceneClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is not BlockCard card)
-            return;
-        if (!card.Ready)
+        if (e.ClickedItem is not WallpaperCard card || !card.Ready || card.Path is null)
         {
-            AppServices.Notify.Publish(NotifyKind.Warning, "这块纹理还没准备好,稍后再试");
+            AppServices.Notify.Publish(NotifyKind.Warning, Loc.T("这张场景还没准备好,稍后再试"));
             return;
         }
 
-        var result = BlockTheme.Build(card.Source.Id, card.Source.Name, card.R, card.G, card.B);
+        await ApplyAsync($"wp-{card.Scene.Id}", Loc.T(card.Scene.Name), card.Path, Loc.T("内置场景")).ConfigureAwait(true);
+    }
+
+    private async void OnPickImage(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new FileOpenPicker();
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.Window);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            foreach (var ext in new[] { ".png", ".jpg", ".jpeg", ".bmp", ".webp" })
+                picker.FileTypeFilter.Add(ext);
+
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+                return;
+
+            var local = await WallpaperFactory.ImportAsync(file.Path);
+            await ApplyAsync($"wp-{System.IO.Path.GetFileNameWithoutExtension(local)}",
+                System.IO.Path.GetFileNameWithoutExtension(file.Name), local, Loc.T("从图片创建"))
+                .ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            AppServices.Notify.Publish(NotifyKind.Error, ex.Message);
+        }
+    }
+
+    private async Task ApplyAsync(string id, string name, string imagePath, string hint)
+    {
+        var result = await ImageTheme.BuildAsync(id, name, imagePath, hint).ConfigureAwait(true);
+        if (result is null)
+        {
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("这张图片无法读取,换一张试试"));
+            return;
+        }
+
         ThemeManager.RegisterPalette(result.Palette);
         ThemeManager.RegisterAccent(result.Accent);
         ThemeManager.SaveCustom(Core.Boot.Runtime.Root);
@@ -180,7 +210,16 @@ public sealed partial class ThemeWorkshopPage : Page
             c.Accent = result.Accent.Id;
         });
 
-        AppServices.Notify.Publish(NotifyKind.Success, $"已应用「{card.Name}」主题 · 主色 {result.DominantHex}");
+        SyncCurrent();
+        AppServices.Notify.Publish(NotifyKind.Success,
+            string.Format(Loc.T("已应用「{0}」主题 · 主色 {1}"), name, result.DominantHex));
+    }
+
+    private void OnClearWallpaper(object sender, RoutedEventArgs e)
+    {
+        AppServices.Settings.Update(c => c.Palette = "salmon");
+        SyncCurrent();
+        AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已清除壁纸,恢复默认配色"));
     }
 
     private void OnResetTheme(object sender, RoutedEventArgs e)
@@ -190,8 +229,7 @@ public sealed partial class ThemeWorkshopPage : Page
             c.Palette = "salmon";
             c.Accent = "coral";
         });
-        AppServices.Notify.Publish(NotifyKind.Info, "已恢复默认配色");
+        SyncCurrent();
+        AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已恢复默认配色"));
     }
-
-    private void OnRefresh(object sender, RoutedEventArgs e) => _ = LoadAllAsync();
 }

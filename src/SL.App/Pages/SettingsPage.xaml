@@ -297,6 +297,39 @@
                 </StackPanel>
             </Border>
 
+            <!-- 语言 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22"
+                    HorizontalAlignment="Stretch">
+                <StackPanel Spacing="14">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE774;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
+                        <TextBlock Text="语言与区域" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <Grid ColumnSpacing="18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="界面语言" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
+                        <ComboBox x:Name="LanguageBox"
+                                  Grid.Column="1"
+                                  MinWidth="220"
+                                  HorizontalAlignment="Left"
+                                  SelectionChanged="OnLanguageChanged" />
+                    </Grid>
+
+                    <TextBlock Text="切换后界面立即生效,无需重启。"
+                               FontSize="11.5"
+                               Foreground="{ThemeResource Brush.FgFaint}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
             <!-- 协议 -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"

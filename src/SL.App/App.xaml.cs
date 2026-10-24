@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 using SL.App.Themes;
 
 namespace SL.App;
@@ -49,6 +50,7 @@ public partial class App : Application
         Core.Logging.AppLog.Info("Boot", "2 服务组合根就绪");
 
         var cfg = AppServices.Settings.Current;
+        Loc.Initialize(cfg.Language);
         ThemeManager.LoadCustom(Core.Boot.Runtime.Root);
         ThemeManager.Apply(cfg.Theme, cfg.Palette, cfg.Accent);
         Core.Logging.AppLog.Info("Boot", "3 主题已应用");
