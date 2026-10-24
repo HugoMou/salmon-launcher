@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using SL.App.Infrastructure;
 using SL.App.Notify;
 
 namespace SL.App.Navigation;
