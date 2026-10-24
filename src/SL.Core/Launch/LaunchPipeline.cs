@@ -305,6 +305,10 @@ public static class LaunchPipeline
                 => u.Replace("launcher.mojang.com", "bmclapi2.bangbang93.com", StringComparison.Ordinal),
             var u when u.Contains("libraries.minecraft.net", StringComparison.Ordinal)
                 => u.Replace("https://libraries.minecraft.net", "https://bmclapi2.bangbang93.com/maven", StringComparison.Ordinal),
+            var u when u.Contains("maven.minecraftforge.net/", StringComparison.Ordinal)
+                => u.Replace("https://maven.minecraftforge.net/", "https://bmclapi2.bangbang93.com/maven/", StringComparison.Ordinal),
+            var u when u.Contains("maven.neoforged.net/releases/", StringComparison.Ordinal)
+                => u.Replace("https://maven.neoforged.net/releases/", "https://bmclapi2.bangbang93.com/maven/", StringComparison.Ordinal),
             var u when u.Contains("resources.download.minecraft.net", StringComparison.Ordinal)
                 => u.Replace("https://resources.download.minecraft.net", "https://bmclapi2.bangbang93.com/assets", StringComparison.Ordinal),
             _ => null,

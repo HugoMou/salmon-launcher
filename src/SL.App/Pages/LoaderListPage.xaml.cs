@@ -1,4 +1,5 @@
 using System.IO;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.App.Dialogs;
@@ -34,6 +35,7 @@ public sealed class LoaderRow
 /// <summary>加载器选择页:原版直接进入安装概览;Fabric / Quilt 可一键生成加载器实例。</summary>
 public sealed partial class LoaderListPage : Page
 {
+    private readonly DispatcherQueue _ui = DispatcherQueue.GetForCurrentThread();
     private bool _busy;
 
     public LoaderListPage()
@@ -61,10 +63,10 @@ public sealed partial class LoaderListPage : Page
             () => InstallLoaderAsync("Fabric")),
         new("Quilt", "模组", "Fabric 衍生加载器:同样走官方 profile 一键生成实例。", "\uE7B8", true,
             () => InstallLoaderAsync("Quilt")),
-        new("Forge", "需安装器", "需要运行官方安装器并交互,当前版本不提供一键安装。", "\uE7B8", false,
-            () => { }),
-        new("NeoForge", "需安装器", "需要运行官方安装器并交互,当前版本不提供一键安装。", "\uE7B8", false,
-            () => { }),
+        new("Forge", "模组", "老牌模组加载器:自动下载并运行官方安装器,完成后直接可启动。", "\uE7B8", true,
+            () => InstallLoaderAsync("Forge")),
+        new("NeoForge", "模组", "1.20.2 起的 Forge 分支:自动运行官方安装器并生成实例。", "\uE7B8", true,
+            () => InstallLoaderAsync("NeoForge")),
     ];
 
     private void ChooseVanilla()
@@ -78,7 +80,7 @@ public sealed partial class LoaderListPage : Page
         AppServices.Nav.Navigate("dl.install");
     }
 
-    /// <summary>Fabric / Quilt:生成实例元数据并提交加载器库下载。</summary>
+    /// <summary>Fabric / Quilt / Forge / NeoForge:生成实例元数据并提交加载器库下载。</summary>
     private async void InstallLoaderAsync(string loader)
     {
         if (_busy)
@@ -103,17 +105,21 @@ public sealed partial class LoaderListPage : Page
         }
 
         _busy = true;
-        UpdateSummary();
-        SummaryText.Text = $"正在获取 {loader} 官方 profile…";
+        var started = DateTimeOffset.Now;
+        SummaryText.Text = $"正在准备 {loader}…";
         try
         {
-            var plan = await LoaderInstall.BuildPlanAsync(loader, game, null, vanillaJson, vanillaJar, CancellationToken.None)
+            var plan = await LoaderInstall.BuildPlanAsync(loader, game, null, vanillaJson, vanillaJar,
+                    CancellationToken.None,
+                    step => _ui.TryEnqueue(() => SummaryText.Text = step))
                 .ConfigureAwait(true);
             var count = InstallWizard.SubmitLoaderFiles(plan.Files);
 
+            var seconds = (int)(DateTimeOffset.Now - started).TotalSeconds;
             AppServices.Notify.Publish(NotifyKind.Success,
                 $"{loader} 实例 {plan.InstanceId} 已创建,开始下载 {count} 个库文件");
-            SummaryText.Text = $"{loader} 实例已创建 · 下载完成后可在「实例 → 概览」启动";
+            SummaryText.Text =
+                $"{loader} 实例已创建({seconds}s)· 下载完成后可在「实例 → 概览」启动";
             AppServices.Nav.Navigate("launch.tasks");
         }
         catch (Exception ex)

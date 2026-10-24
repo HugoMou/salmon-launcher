@@ -94,6 +94,7 @@ public sealed partial class SettingsPage : Page
             .ToList();
 
         ConcurrencyBox.Value = c.TransferConcurrency;
+        MirrorToggle.IsOn = c.ModrinthMirror;
 
         LanguageBox.ItemsSource = Loc.Languages
             .Select(l => l.Code == Loc.AutoCode
@@ -189,6 +190,13 @@ public sealed partial class SettingsPage : Page
 
     private void OnOpenWorkshop(object sender, RoutedEventArgs e) => AppServices.Nav.Navigate("st.theme");
     private void OnOpenTerms(object sender, RoutedEventArgs e) => AppServices.Nav.Navigate("st.terms");
+
+    private void OnMirrorToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading)
+            return;
+        AppServices.Settings.Update(c => c.ModrinthMirror = MirrorToggle.IsOn);
+    }
 
     /// <summary>切换界面语言:保存设置并就地刷新整棵树(菜单/页面/提示)。</summary>
     private void OnLanguageChanged(object sender, SelectionChangedEventArgs e)

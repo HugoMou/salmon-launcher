@@ -59,6 +59,7 @@ public sealed class SettingsService : ISettingsService
         GameWidth = Math.Clamp(s.GameWidth, 320, 7680),
         GameHeight = Math.Clamp(s.GameHeight, 240, 4320),
         DownloadSource = s.DownloadSource == "bmclapi" ? "bmclapi" : "auto",
+        ModrinthMirror = s.ModrinthMirror,
         TermsAccepted = s.TermsAccepted,
         Language = string.IsNullOrWhiteSpace(s.Language) ? "auto" : s.Language,
     };
@@ -81,6 +82,7 @@ public sealed class SettingsService : ISettingsService
         GameWidth = Math.Clamp(c.GameWidth, 320, 7680),
         GameHeight = Math.Clamp(c.GameHeight, 240, 4320),
         DownloadSource = c.DownloadSource,
+        ModrinthMirror = c.ModrinthMirror,
         TermsAccepted = c.TermsAccepted,
         Language = c.Language,
     };
@@ -99,6 +101,7 @@ public sealed class SettingsService : ISettingsService
         GameWidth = c.GameWidth,
         GameHeight = c.GameHeight,
         DownloadSource = c.DownloadSource,
+        ModrinthMirror = c.ModrinthMirror,
         TermsAccepted = c.TermsAccepted,
         Language = c.Language,
     };
@@ -115,6 +118,7 @@ public sealed class SettingsService : ISettingsService
            && a.GameWidth == b.GameWidth
            && a.GameHeight == b.GameHeight
            && a.DownloadSource == b.DownloadSource
+           && a.ModrinthMirror == b.ModrinthMirror
            && a.TermsAccepted == b.TermsAccepted
            && a.Language == b.Language;
 }

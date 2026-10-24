@@ -42,11 +42,16 @@ public static class InstallWizard
         Detail = null;
     }
 
-    /// <summary>官方域 → BMCLAPI 镜像映射(仅在下载源为「镜像优先」或主源失败时使用)。</summary>
+    /// <summary>官方域 → BMCLAPI / Modrinth 镜像映射(仅在主源失败或镜像优先时使用)。</summary>
     public static string? MirrorOf(string? url)
     {
         if (string.IsNullOrEmpty(url))
             return null;
+
+        var modrinth = Modrinth.MirrorOf(url);
+        if (modrinth is not null)
+            return modrinth;
+
         return url switch
         {
             var u when u.Contains("piston-meta.mojang.com", StringComparison.Ordinal)
@@ -57,6 +62,10 @@ public static class InstallWizard
                 => u.Replace("launchermeta.mojang.com", "bmclapi2.bangbang93.com", StringComparison.Ordinal),
             var u when u.Contains("libraries.minecraft.net", StringComparison.Ordinal)
                 => u.Replace("https://libraries.minecraft.net", "https://bmclapi2.bangbang93.com/maven", StringComparison.Ordinal),
+            var u when u.Contains("maven.minecraftforge.net/", StringComparison.Ordinal)
+                => u.Replace("https://maven.minecraftforge.net/", "https://bmclapi2.bangbang93.com/maven/", StringComparison.Ordinal),
+            var u when u.Contains("maven.neoforged.net/releases/", StringComparison.Ordinal)
+                => u.Replace("https://maven.neoforged.net/releases/", "https://bmclapi2.bangbang93.com/maven/", StringComparison.Ordinal),
             var u when u.Contains("resources.download.minecraft.net", StringComparison.Ordinal)
                 => u.Replace("https://resources.download.minecraft.net", "https://bmclapi2.bangbang93.com/assets", StringComparison.Ordinal),
             _ => null,
@@ -131,7 +140,10 @@ public static class InstallWizard
     {
         var sources = new List<TransferSourceSpec>();
         var mirror = MirrorOf(url);
-        if (MirrorFirst && mirror is not null)
+        // Modrinth 走镜像时同样镜像优先
+        var mirrorFirst = MirrorFirst
+                          || (mirror is not null && Modrinth.MirrorOf(url) is not null && Modrinth.PreferMirror);
+        if (mirrorFirst && mirror is not null)
         {
             sources.Add(new(mirror, isMirror: false));
             sources.Add(new(url, isMirror: true));

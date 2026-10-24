@@ -75,6 +75,8 @@ public sealed class RepoVM : VmBase, IRefreshable
     public string TargetText { get; private set; } = "";
 
     private string _targetInstance = "";
+    private string _gameVersion = "";
+    private string _loader = "fabric";
 
     public string SearchHint => _category switch
     {
@@ -113,15 +115,32 @@ public sealed class RepoVM : VmBase, IRefreshable
     {
         var latest = InstanceRegistry.Latest();
         _targetInstance = latest?.InstanceId ?? "";
+        (_gameVersion, _loader) = SplitInstance(_targetInstance);
         TargetText = latest is null
             ? "尚未安装实例 · 下载后将保存到实例目录,请先安装一个版本"
-            : $"安装目标:实例 {latest.InstanceId} → {SubDir}";
+            : $"安装目标:实例 {latest.InstanceId}({_gameVersion} · {_loader})→ {SubDir}";
+        On(nameof(TargetText));
 
         if (!_loadedOnce)
         {
             _loadedOnce = true;
             _ = SearchAsync();
         }
+    }
+
+    /// <summary>实例 id → (游戏版本, 加载器)。加载器实例按 {版本}-{加载器} 命名。</summary>
+    private static (string Version, string Loader) SplitInstance(string instanceId)
+    {
+        if (instanceId.Length == 0)
+            return ("1.21.4", "fabric");
+        foreach (var loader in new[] { "neoforge", "forge", "quilt", "fabric" })
+        {
+            var suffix = "-" + loader;
+            if (instanceId.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                return (instanceId[..^suffix.Length], loader);
+        }
+        // 原版实例没有加载器:默认按 Fabric 找模组(否则检索不到可装内容)
+        return (instanceId, "fabric");
     }
 
     private async Task SearchAsync()
@@ -132,14 +151,12 @@ public sealed class RepoVM : VmBase, IRefreshable
         Status = "正在检索 Modrinth…";
         try
         {
-            var gameVersion = _targetInstance.Length > 0
-                ? _targetInstance
-                : "1.21.4";
+            var gameVersion = _gameVersion.Length > 0 ? _gameVersion : "1.21.4";
 
             IReadOnlyList<Modrinth.ProjectHit> hits;
             if (_category == ModrinthCategory.Mods)
             {
-                var facets = $"[[\"versions:{gameVersion}\"]]";
+                var facets = $"[[\"versions:{gameVersion}\"],[\"categories:{_loader}\"]]";
                 hits = await Modrinth.SearchByFacetsAsync(_keyword, facets, CancellationToken.None).ConfigureAwait(true);
             }
             else
@@ -155,7 +172,7 @@ public sealed class RepoVM : VmBase, IRefreshable
 
             Status = hits.Count == 0
                 ? "没有匹配结果 · 换个关键词或确认实例版本"
-                : $"共 {hits.Count} 个结果 · 版本过滤 {gameVersion}";
+                : $"共 {hits.Count} 个结果 · {gameVersion} · {_loader}";
         }
         catch (Exception ex)
         {
@@ -183,13 +200,13 @@ public sealed class RepoVM : VmBase, IRefreshable
         {
             Status = $"正在解析 {row.Title} 的最新文件…";
             var file = _category == ModrinthCategory.Mods
-                ? await Modrinth.LatestVersionFileAsync(row.Hit.Slug, _targetInstance, "fabric", CancellationToken.None)
+                ? await Modrinth.LatestVersionFileAsync(row.Hit.Slug, _gameVersion, _loader, CancellationToken.None)
                     .ConfigureAwait(true)
                 : await Modrinth.LatestVersionFileAsync(row.Hit.Slug, CancellationToken.None).ConfigureAwait(true);
 
             if (file is null)
             {
-                Status = $"{row.Title} 没有适用于 {_targetInstance} 的文件";
+                Status = $"{row.Title} 没有适用于 {_gameVersion} / {_loader} 的文件";
                 AppServices.Notify.Publish(NotifyKind.Warning, $"{row.Title} 没有适用于当前版本的文件");
                 return;
             }

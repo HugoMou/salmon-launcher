@@ -34,6 +34,41 @@ public static class Modrinth
         return client;
     }
 
+    /// <summary>镜像优先(国内网络)。由设置项 ModrinthMirror 驱动。</summary>
+    public static bool PreferMirror { get; set; } = true;
+
+    private const string OfficialApi = "https://api.modrinth.com/v2";
+    private const string MirrorApi = "https://mod.mcimirror.top/modrinth/v2";
+    private const string OfficialCdn = "https://cdn.modrinth.com";
+    private const string MirrorCdn = "https://mod.mcimirror.top";
+
+    private static IEnumerable<string> ApiOrder()
+        => PreferMirror ? [MirrorApi, OfficialApi] : [OfficialApi, MirrorApi];
+
+    /// <summary>按当前偏好顺序尝试官方接口与镜像,任一成功即返回。</summary>
+    private static async Task<JsonDocument> GetJsonAsync(string pathAndQuery, CancellationToken cancellation)
+    {
+        Exception? last = null;
+        foreach (var baseUrl in ApiOrder())
+        {
+            try
+            {
+                var text = await Client.GetStringAsync(baseUrl + pathAndQuery, cancellation).ConfigureAwait(false);
+                return JsonDocument.Parse(text);
+            }
+            catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                last = ex;
+                Logging.AppLog.Warn("Modrinth", $"{baseUrl} 不可用:{ex.Message}");
+            }
+        }
+        throw new InvalidOperationException("Modrinth 接口不可达(网络受限时可切换镜像或稍后重试)", last);
+    }
+
     /// <summary>搜索结果行。</summary>
     /// <param name="Slug">项目标识(下载文件时再查 versions)</param>
     /// <param name="Title">显示名</param>
@@ -65,10 +100,10 @@ public static class Modrinth
     public static async Task<IReadOnlyList<ProjectHit>> SearchByFacetsAsync(
         string query, string facets, CancellationToken cancellation)
     {
-        var url = "https://api.modrinth.com/v2/search?limit=20&index=relevance&display=irrelevant"
+        var url = "/search?limit=20&index=relevance&display=irrelevant"
                   + $"&query={Uri.EscapeDataString(query)}&facets={Uri.EscapeDataString(facets)}";
 
-        using var doc = JsonDocument.Parse(await Client.GetStringAsync(url, cancellation).ConfigureAwait(false));
+        using var doc = await GetJsonAsync(url, cancellation).ConfigureAwait(false);
         var list = new List<ProjectHit>();
         foreach (var hit in doc.RootElement.GetProperty("hits").EnumerateArray())
         {
@@ -97,8 +132,8 @@ public static class Modrinth
     /// <summary>取 {slug} 的最新主文件(不过滤版本/加载器 —— 光影、资源包等通用资源使用)。</summary>
     public static async Task<VersionFile?> LatestVersionFileAsync(string slug, CancellationToken cancellation)
     {
-        var url = $"https://api.modrinth.com/v2/project/{Uri.EscapeDataString(slug)}/version";
-        using var doc = JsonDocument.Parse(await Client.GetStringAsync(url, cancellation).ConfigureAwait(false));
+        var url = $"/project/{Uri.EscapeDataString(slug)}/version";
+        using var doc = await GetJsonAsync(url, cancellation).ConfigureAwait(false);
         return FirstPrimaryFile(doc);
     }
 
@@ -106,9 +141,9 @@ public static class Modrinth
     public static async Task<VersionFile?> LatestVersionFileAsync(
         string slug, string gameVersion, string loader, CancellationToken cancellation)
     {
-        var url = $"https://api.modrinth.com/v2/project/{Uri.EscapeDataString(slug)}/version"
+        var url = $"/project/{Uri.EscapeDataString(slug)}/version"
                   + $"?game_versions=[\"{Uri.EscapeDataString(gameVersion)}\"]&loaders=[\"{Uri.EscapeDataString(loader)}\"]";
-        using var doc = JsonDocument.Parse(await Client.GetStringAsync(url, cancellation).ConfigureAwait(false));
+        using var doc = await GetJsonAsync(url, cancellation).ConfigureAwait(false);
         return FirstPrimaryFile(doc);
     }
 
@@ -134,6 +169,9 @@ public static class Modrinth
         return null;
     }
 
-    /// <summary>BMCLAPI 不代理 Modrinth;cdn.modrinth.com 直连为主。预留镜像接口(阶段六扩展)。</summary>
-    public static string? MirrorOf(string url) => null;
+    /// <summary>Modrinth CDN 的镜像地址(下载时作为第二来源);非 CDN 链接返回 null。</summary>
+    public static string? MirrorOf(string url)
+        => url.StartsWith(OfficialCdn + "/", StringComparison.OrdinalIgnoreCase)
+            ? MirrorCdn + url[OfficialCdn.Length..]
+            : null;
 }

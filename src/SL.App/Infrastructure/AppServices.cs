@@ -37,11 +37,13 @@ public static class AppServices
         TaskCenter = new TaskCenterVM();
         Nav = new NavService();
 
-        // 配置变更联动:引擎并发数 + 主题(配色/强调色/深浅)
+        // 配置变更联动:引擎并发数 + 主题(配色/强调色/深浅) + Modrinth 镜像
+        Core.Net.Modrinth.PreferMirror = Settings.Current.ModrinthMirror;
         Settings.Changed += cfg =>
         {
             Transfers.Options.MaxConcurrency = cfg.TransferConcurrency;
             ThemeManager.Apply(cfg.Theme, cfg.Palette, cfg.Accent);
+            Core.Net.Modrinth.PreferMirror = cfg.ModrinthMirror;
         };
     }
 }

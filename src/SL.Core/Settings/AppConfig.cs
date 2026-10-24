@@ -45,6 +45,9 @@ public sealed class AppConfig
     /// <summary>下载源:"auto"(官方主源+镜像回退) / "bmclapi"(镜像优先)</summary>
     public string DownloadSource { get; set; } = "auto";
 
+    /// <summary>Modrinth 走国内镜像(检索与文件下载)</summary>
+    public bool ModrinthMirror { get; set; } = true;
+
     /// <summary>是否已阅读并同意用户协议</summary>
     public bool TermsAccepted { get; set; }
 

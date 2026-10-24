@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="SL.App.Pages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -6,7 +6,8 @@
     xmlns:local="using:SL.App.Pages">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Disabled">
+                  HorizontalScrollBarVisibility="Disabled"
+                  HorizontalScrollMode="Disabled">
         <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
             <TextBlock Text="外观与设置"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
@@ -57,6 +58,10 @@
                                 <TextBlock Text="添加离线账户" />
                             </StackPanel>
                         </Button>
+                        <HyperlinkButton Command="{Binding LoginDeviceCodeCommand}"
+                                         Style="{StaticResource Style.Link}"
+                                         Content="设备码登录(备用)"
+                                         VerticalAlignment="Center" />
                     </StackPanel>
 
                     <ItemsControl ItemsSource="{Binding Accounts}">
@@ -120,7 +125,7 @@
                                FontSize="11.5"
                                LineHeight="19"
                                TextWrapping="Wrap"
-                               Text="支持保存多个正版与离线账户并随时切换。正版登录使用内置浏览器完成微软授权(令牌只保存在本机),无需复制任何链接或设备码。" />
+                               Text="支持保存多个正版与离线账户并随时切换。正版登录优先用内置浏览器完成微软授权;若浏览器受限,可改用设备码登录(复制一次性代码到 microsoft.com/link)。令牌只保存在本机。" />
                 </StackPanel>
             </Border>
 
@@ -184,6 +189,8 @@
                                   ItemClick="OnPaletteClick"
                                   ScrollViewer.VerticalScrollMode="Disabled"
                                   ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                  ScrollViewer.HorizontalScrollMode="Disabled"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                   ScrollViewer.IsVerticalRailEnabled="False"
                                   Padding="0">
                             <GridView.ItemTemplate>
@@ -288,6 +295,28 @@
                                    FontSize="12"
                                    Foreground="{ThemeResource Brush.FgFaint}" />
                     </StackPanel>
+
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="模组镜像" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="Modrinth 使用国内镜像"
+                                       Foreground="{ThemeResource Brush.Fg}" />
+                            <TextBlock Text="检索与文件下载优先走镜像,失败时自动回退官方源;国内网络建议开启。"
+                                       FontSize="11.5"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource Brush.FgFaint}" />
+                        </StackPanel>
+                        <ToggleSwitch x:Name="MirrorToggle"
+                                      Grid.Column="2"
+                                      OnContent="开"
+                                      OffContent="关"
+                                      Toggled="OnMirrorToggled" />
+                    </Grid>
                 </StackPanel>
             </Border>
 
