@@ -24,8 +24,29 @@ public sealed class AppConfig
     /// <summary>阶段五:当前离线账户名(游戏内玩家名)。</summary>
     public string AccountName { get; set; } = "Rio";
 
-    /// <summary>账户类型:"offline"(离线)或 "msa"(微软正版,取 accounts\msa.json 会话)。</summary>
+    /// <summary>账户类型:"offline"(离线)或 "msa"(微软正版,会话在 accounts\accounts.json 仓库)。</summary>
     public string AccountType { get; set; } = "offline";
+
+    /// <summary>多账户:活动账户 Id("msa:&lt;uuid&gt;" / "offline:&lt;名字&gt;");空串表示未选择。</summary>
+    public string ActiveAccountId { get; set; } = "";
+
+    /// <summary>游戏内存分配(MB),范围 512–32768</summary>
+    public int MemoryMb { get; set; } = 4096;
+
+    /// <summary>附加 JVM 参数(空格分隔,插在主类之前)</summary>
+    public string JvmExtraArgs { get; set; } = "";
+
+    /// <summary>游戏窗口宽度(像素)</summary>
+    public int GameWidth { get; set; } = 854;
+
+    /// <summary>游戏窗口高度(像素)</summary>
+    public int GameHeight { get; set; } = 480;
+
+    /// <summary>下载源:"auto"(官方主源+镜像回退) / "bmclapi"(镜像优先)</summary>
+    public string DownloadSource { get; set; } = "auto";
+
+    /// <summary>是否已阅读并同意用户协议</summary>
+    public bool TermsAccepted { get; set; }
 }
 
 public interface ISettingsService

@@ -9,7 +9,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace SL.App.Dialogs;
 
-/// <summary>PCL 式设备码登录:大字展示 user_code,复制后到 microsoft.com/link 粘贴;对话框内轮询至授权完成并续跑全链路。</summary>
+/// <summary>设备码登录:大字展示 user_code,复制后到 microsoft.com/link 粘贴;对话框内轮询至授权完成并续跑全链路。</summary>
 public sealed partial class DeviceCodeLoginDialog : ContentDialog
 {
     private readonly CancellationTokenSource _cts = new();
@@ -47,11 +47,12 @@ public sealed partial class DeviceCodeLoginDialog : ContentDialog
             var session = await MsAuth.LoginAsync(deviceCode, interval, 900,
                 step => _ui.TryEnqueue(() => SetStatus(step, working: true)), _cts.Token);
 
-            MsAuth.SaveSession(session);
+            var entry = AccountStore.UpsertMsa(session);
             AppServices.Settings.Update(c =>
             {
                 c.AccountType = "msa";
                 c.AccountName = session.Name;
+                c.ActiveAccountId = entry.Id;
             });
             AppLog.Info("Account", $"正版登录成功:{session.Name}");
             AppServices.Notify.Publish(NotifyKind.Success, $"正版登录成功:{session.Name}");

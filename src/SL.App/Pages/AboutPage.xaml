@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SL.App.Pages.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer>
+        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="820" HorizontalAlignment="Left">
+            <TextBlock Text="关于"
+                       Style="{ThemeResource TitleLargeTextBlockStyle}"
+                       Foreground="{ThemeResource Brush.Fg}" />
+
+            <!-- 品牌卡 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="26">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <Border Width="60" Height="60" CornerRadius="15" Background="{ThemeResource Brush.AccentSoft}">
+                            <FontIcon Glyph="&#xE768;" FontSize="27" Foreground="{ThemeResource Brush.Accent}" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="3">
+                            <TextBlock Text="Salmon Launcher"
+                                       FontSize="21"
+                                       FontWeight="Bold"
+                                       Foreground="{ThemeResource Brush.Fg}" />
+                            <TextBlock x:Name="VersionText"
+                                       FontSize="12"
+                                       Foreground="{ThemeResource Brush.FgDim}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="一个把「装得上、启动得了、出问题查得到」做扎实的 Minecraft 启动器:官方元数据直连、逐文件校验、正版与离线账户并存、模组与光影一键安装、崩溃诊断与日志检索内置。"
+                               FontSize="12.5"
+                               TextWrapping="Wrap"
+                               LineHeight="21"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Click="OnOpenRoot">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8B7;" FontSize="14" />
+                                <TextBlock Text="打开数据目录" />
+                            </StackPanel>
+                        </Button>
+                        <Button Click="OnOpenLogs">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8A5;" FontSize="14" />
+                                <TextBlock Text="打开日志目录" />
+                            </StackPanel>
+                        </Button>
+                        <Button Click="OnOpenTerms">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8A5;" FontSize="14" />
+                                <TextBlock Text="用户协议" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 运行信息 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="运行信息" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <Grid ColumnSpacing="18" RowSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="96" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="版本" Foreground="{ThemeResource Brush.FgFaint}" FontSize="12.5" />
+                        <TextBlock x:Name="VersionRowText" Grid.Column="1" FontSize="12.5" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+
+                        <TextBlock Grid.Row="1" Text="运行环境" Foreground="{ThemeResource Brush.FgFaint}" FontSize="12.5" />
+                        <TextBlock x:Name="RuntimeText" Grid.Row="1" Grid.Column="1" FontSize="12.5" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+
+                        <TextBlock Grid.Row="2" Text="数据目录" Foreground="{ThemeResource Brush.FgFaint}" FontSize="12.5" />
+                        <TextBlock x:Name="RootText" Grid.Row="2" Grid.Column="1" FontSize="12.5" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+
+                        <TextBlock Grid.Row="3" Text="协议状态" Foreground="{ThemeResource Brush.FgFaint}" FontSize="12.5" />
+                        <TextBlock x:Name="TermsStateText" Grid.Row="3" Grid.Column="1" FontSize="12.5" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 能力一览 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="能做些什么" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <Grid ColumnSpacing="20" RowSpacing="9">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 版本安装:官方清单、多源回退、断点续传与完整性校验" />
+                        <TextBlock Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 实例隔离:每个版本独立的模组、存档、日志与配置" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 内容仓库:模组 / 光影 / 资源包检索并安装到对应实例" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 账户:微软正版两种登录方式 + 无限量离线账户切换" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 联机:自建中继、局域网发现与手动中继三种接入" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 排障:崩溃诊断建议、日志检索与主题工坊换肤" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 致谢 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="致谢" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· Mojang Studios:版本清单与资源元数据" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· BMCLAPI:官方源不可达时的镜像回退" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· Modrinth:模组、光影与资源包检索" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· Eclipse Temurin:按需获取的 Java 运行时" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· Windows App SDK:界面框架与窗口合成" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="Salmon Launcher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。"
+                       FontSize="11.5"
+                       TextWrapping="Wrap"
+                       Foreground="{ThemeResource Brush.FgFaint}"
+                       Margin="0,4,0,0" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

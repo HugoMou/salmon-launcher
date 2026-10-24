@@ -13,7 +13,7 @@
                    Text="第 1 步:点击「打开登录页」,浏览器将转到 microsoft.com/link;" />
         <TextBlock Foreground="{ThemeResource Brush.FgDim}"
                    TextWrapping="Wrap"
-                   Text="第 2 步:登录微软账户,粘贴下面的设备码(与 PCL 一致,全程无需复制地址栏内容)。" />
+                   Text="第 2 步:登录微软账户,粘贴下面的设备码(全程无需复制地址栏内容)。" />
 
         <Border Background="{ThemeResource Brush.Card}"
                 BorderBrush="{ThemeResource Brush.Border}"

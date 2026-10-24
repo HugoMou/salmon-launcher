@@ -2,16 +2,17 @@
 <Page
     x:Class="SL.App.Pages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SL.App.Pages">
 
     <ScrollViewer>
-        <StackPanel Margin="36,28,36,28" Spacing="16" MaxWidth="960" HorizontalAlignment="Stretch">
+        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
             <TextBlock Text="外观与设置"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
-            <TextBlock Text="账户、主题外观与下载参数;所有改动立即生效并自动落盘。"
+            <TextBlock Text="账户、主题外观与下载参数;所有改动立即生效并自动保存。"
                        Foreground="{ThemeResource Brush.FgDim}"
-                       Margin="0,-12,0,8" />
+                       Margin="0,-12,0,4" />
 
             <!-- 账户 -->
             <Border Background="{ThemeResource Brush.Card}"
@@ -28,7 +29,7 @@
 
                     <StackPanel Orientation="Horizontal" Spacing="16">
                         <Border Width="52" Height="52" CornerRadius="26" Background="{ThemeResource Brush.AccentSoft}">
-                            <FontIcon Glyph="&#xE77B;" FontSize="24" Foreground="{ThemeResource Brush.Accent}" />
+                            <FontIcon Glyph="{Binding ActiveGlyph}" FontSize="24" Foreground="{ThemeResource Brush.Accent}" />
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="2">
                             <TextBlock Text="{Binding Summary}"
@@ -42,27 +43,89 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Command="{Binding LoginCommand}"
+                        <Button Command="{Binding LoginDeviceCodeCommand}"
                                 Style="{ThemeResource AccentButtonStyle}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE8FA;" FontSize="14" />
-                                <TextBlock Text="正版登录(设备码)" />
+                                <TextBlock Text="设备码登录" />
                             </StackPanel>
                         </Button>
-                        <Button Command="{Binding LogoutCommand}"
-                                Visibility="{Binding LogoutVisibility}">
+                        <Button Command="{Binding LoginBrowserCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE8AB;" FontSize="14" />
-                                <TextBlock Text="退出正版登录" />
+                                <FontIcon Glyph="&#xE774;" FontSize="14" />
+                                <TextBlock Text="浏览器授权登录" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding AddOfflineCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE710;" FontSize="14" />
+                                <TextBlock Text="添加离线账户" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
+
+                    <ItemsControl ItemsSource="{Binding Accounts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{ThemeResource Brush.Border}"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="14,10"
+                                        Margin="0,0,0,8">
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{ThemeResource Brush.AccentSoft}">
+                                            <FontIcon Glyph="{Binding KindGlyph}" FontSize="18" Foreground="{ThemeResource Brush.Accent}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{ThemeResource Brush.Fg}" />
+                                                <Border Background="{ThemeResource Brush.AccentSoft}"
+                                                        CornerRadius="6"
+                                                        Padding="6,1"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding KindText}"
+                                                               FontSize="10.5"
+                                                               Foreground="{ThemeResource Brush.Accent}" />
+                                                </Border>
+                                                <FontIcon Glyph="&#xE73E;"
+                                                          FontSize="13"
+                                                          Foreground="{ThemeResource Brush.Accent}"
+                                                          Visibility="{Binding ActiveVisibility}"
+                                                          VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Detail}"
+                                                       FontSize="11.5"
+                                                       Foreground="{ThemeResource Brush.FgDim}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                            <Button Command="{Binding UseCommand}"
+                                                    IsEnabled="{Binding Inactive}"
+                                                    Padding="14,5">
+                                                <TextBlock Text="使用" />
+                                            </Button>
+                                            <Button Command="{Binding DeleteCommand}"
+                                                    Padding="14,5">
+                                                <TextBlock Text="删除" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                     <TextBlock Foreground="{ThemeResource Brush.FgFaint}"
                                FontSize="11.5"
                                LineHeight="19"
                                TextWrapping="Wrap"
-                               Text="正版登录采用 PCL 式设备码流程:启动器给出一组大字代码,你复制到 microsoft.com/link 粘贴完成授权;全程无需在浏览器地址栏复制任何内容。" />
+                               Text="支持保存多个正版与离线账户并随时切换。设备码登录:启动器给出一组大字代码,到 microsoft.com/link 输入即可;浏览器授权:在启动器内置窗口里直接登录。" />
                 </StackPanel>
             </Border>
 
@@ -73,41 +136,120 @@
                     CornerRadius="10"
                     Padding="22"
                     HorizontalAlignment="Stretch">
-                <StackPanel Spacing="16">
+                <StackPanel Spacing="18">
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <FontIcon Glyph="&#xE790;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
                         <TextBlock Text="外观" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="16">
-                        <TextBlock Text="深浅色" Width="92" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
-                        <RadioButtons x:Name="ThemeMode" SelectionChanged="OnThemeChanged">
-                            <RadioButton Content="跟随系统" />
-                            <RadioButton Content="浅色" />
-                            <RadioButton Content="深色" />
-                        </RadioButtons>
+                    <!-- 深浅色:分段控件 -->
+                    <Grid ColumnSpacing="18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="深浅色" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
+                        <Border Grid.Column="1" Style="{StaticResource Style.SegmentHost}">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <RadioButton x:Name="ModeSystem"
+                                             GroupName="ThemeMode"
+                                             Content="跟随系统"
+                                             Style="{StaticResource Style.Segment}"
+                                             Checked="OnModeChecked" />
+                                <RadioButton x:Name="ModeLight"
+                                             GroupName="ThemeMode"
+                                             Content="浅色"
+                                             Style="{StaticResource Style.Segment}"
+                                             Checked="OnModeChecked" />
+                                <RadioButton x:Name="ModeDark"
+                                             GroupName="ThemeMode"
+                                             Content="深色"
+                                             Style="{StaticResource Style.Segment}"
+                                             Checked="OnModeChecked" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- 配色方案:可换肤卡片 -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="配色方案" Foreground="{ThemeResource Brush.FgDim}" />
+                        <GridView x:Name="PaletteGrid"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="OnPaletteClick"
+                                  Padding="0">
+                            <GridView.ItemTemplate>
+                                <DataTemplate x:DataType="local:PaletteCardVM">
+                                    <Border Background="{ThemeResource Brush.Card}"
+                                            BorderBrush="{ThemeResource Brush.Border}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="11,10"
+                                            Width="158">
+                                        <StackPanel Spacing="9">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <Border Width="34" Height="9" CornerRadius="4.5" Background="{x:Bind Swatch1}" />
+                                                <Border Width="34" Height="9" CornerRadius="4.5" Background="{x:Bind Swatch2}" />
+                                                <Border Width="34" Height="9" CornerRadius="4.5" Background="{x:Bind Swatch3}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{x:Bind Name}"
+                                                           FontSize="12"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Foreground="{ThemeResource Brush.Fg}" />
+                                                <FontIcon Glyph="&#xE73E;"
+                                                          FontSize="11"
+                                                          Foreground="{ThemeResource Brush.Accent}"
+                                                          Visibility="{x:Bind CheckVisibility}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="16">
-                        <TextBlock Text="配色" Width="92" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
-                        <RadioButtons x:Name="PaletteList" SelectionChanged="OnPaletteChanged" MaxColumns="4">
-                            <RadioButton Content="鲑鱼粉" />
-                            <RadioButton Content="水墨" />
-                            <RadioButton Content="沙金" />
-                            <RadioButton Content="岩灰" />
-                        </RadioButtons>
+                    <!-- 强调色 -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="强调色" Foreground="{ThemeResource Brush.FgDim}" />
+                        <ItemsControl x:Name="AccentList">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="local:AccentCardVM">
+                                    <StackPanel Tapped="OnAccentTapped"
+                                                ToolTipService.ToolTip="{x:Bind Name}"
+                                                Spacing="5"
+                                                Width="56">
+                                        <Grid Width="34" Height="34" HorizontalAlignment="Center">
+                                            <Border CornerRadius="17"
+                                                    BorderThickness="2"
+                                                    BorderBrush="{ThemeResource Brush.Accent}"
+                                                    Visibility="{x:Bind RingVisibility}" />
+                                            <Border Width="22" Height="22"
+                                                    CornerRadius="11"
+                                                    Background="{x:Bind Fill}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                        </Grid>
+                                        <TextBlock Text="{x:Bind Name}"
+                                                   FontSize="10.5"
+                                                   TextAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{ThemeResource Brush.FgFaint}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="16">
-                        <TextBlock Text="强调色" Width="92" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
-                        <RadioButtons x:Name="AccentList" SelectionChanged="OnAccentChanged" MaxColumns="5">
-                            <RadioButton Content="珊瑚" />
-                            <RadioButton Content="海洋" />
-                            <RadioButton Content="森林" />
-                            <RadioButton Content="紫罗兰" />
-                            <RadioButton Content="琥珀" />
-                        </RadioButtons>
-                    </StackPanel>
+                    <HyperlinkButton Content="用方块纹理生成新配色 →"
+                                     Style="{StaticResource Style.Link}"
+                                     Click="OnOpenWorkshop"
+                                     HorizontalAlignment="Left" />
                 </StackPanel>
             </Border>
 
@@ -125,7 +267,7 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="16">
-                        <TextBlock Text="下载并发" Width="92" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
+                        <TextBlock Text="下载并发" Width="88" VerticalAlignment="Center" Foreground="{ThemeResource Brush.FgDim}" />
                         <NumberBox x:Name="ConcurrencyBox"
                                    Minimum="2"
                                    Maximum="16"
@@ -139,6 +281,30 @@
                                    Foreground="{ThemeResource Brush.FgFaint}" />
                     </StackPanel>
                 </StackPanel>
+            </Border>
+
+            <!-- 协议 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22"
+                    HorizontalAlignment="Stretch">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xE8A5;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="用户协议与免责声明" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                        <TextBlock x:Name="TermsStateText" FontSize="11.5" Foreground="{ThemeResource Brush.FgDim}" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Click="OnOpenTerms" VerticalAlignment="Center">
+                        <TextBlock Text="查看协议" />
+                    </Button>
+                </Grid>
             </Border>
         </StackPanel>
     </ScrollViewer>

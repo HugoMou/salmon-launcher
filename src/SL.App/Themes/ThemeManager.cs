@@ -87,7 +87,7 @@ public static class ThemeManager
 
     // ---------------------------------------------------------- 配色方案(覆盖 salmon 基础色板)
 
-    public static IReadOnlyList<ThemePalette> Palettes { get; } =
+    private static readonly ThemePalette[] BuiltIn =
     [
         new("salmon", "鲑鱼暖橙", "中性灰底 + 珊瑚强调,默认配色",
             new Dictionary<string, string>(),
@@ -151,7 +151,82 @@ public static class ThemeManager
             }),
     ];
 
-    public static IReadOnlyList<AccentChoice> Accents { get; } =
+    /// <summary>主题工坊生成的配色(按需注册,持久化在 themes.json)。</summary>
+    private static readonly List<ThemePalette> Custom = [];
+
+    /// <summary>全部配色(内置 + 工坊生成)。</summary>
+    public static IReadOnlyList<ThemePalette> Palettes => [.. BuiltIn, .. Custom];
+
+    /// <summary>注册(或覆盖)一套自定义配色。</summary>
+    public static void RegisterPalette(ThemePalette palette)
+    {
+        Custom.RemoveAll(p => p.Id == palette.Id);
+        Custom.Add(palette);
+    }
+
+    /// <summary>配色预览用的三个代表色(底色 / 卡片 / 边框)。</summary>
+    public static IReadOnlyList<string> PreviewColors(ThemePalette palette)
+    {
+        string Pick(string key)
+        {
+            if (palette.Dark.TryGetValue(key, out var v))
+                return v;
+            return BaseDark.TryGetValue(key, out var b) ? b : "#7A7A7A";
+        }
+        return [Pick("Brush.PageBg"), Pick("Brush.Card"), Pick("Brush.BorderStrong")];
+    }
+
+    private static string CustomPath(string root) => Path.Combine(root, "themes.json");
+
+    /// <summary>工坊主题的落盘结构。</summary>
+    private sealed record ThemeCache(List<ThemePalette> Palettes, List<AccentChoice> Accents);
+
+    /// <summary>从磁盘恢复工坊生成的主题(启动时调用,失败静默)。</summary>
+    public static void LoadCustom(string root)
+    {
+        try
+        {
+            var path = CustomPath(root);
+            if (!File.Exists(path))
+                return;
+            var cache = System.Text.Json.JsonSerializer.Deserialize<ThemeCache>(File.ReadAllText(path));
+            if (cache is null)
+                return;
+            foreach (var p in cache.Palettes ?? [])
+            {
+                if (string.IsNullOrWhiteSpace(p.Id) || p.Dark.Count == 0)
+                    continue;
+                RegisterPalette(p);
+            }
+            foreach (var a in cache.Accents ?? [])
+            {
+                if (!string.IsNullOrWhiteSpace(a.Id))
+                    RegisterAccent(a);
+            }
+        }
+        catch
+        {
+            // 主题缓存损坏不影响启动
+        }
+    }
+
+    /// <summary>把工坊生成的主题写回磁盘。</summary>
+    public static void SaveCustom(string root)
+    {
+        try
+        {
+            var path = CustomPath(root);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var cache = new ThemeCache([.. Custom], [.. CustomAccents]);
+            File.WriteAllText(path, System.Text.Json.JsonSerializer.Serialize(cache));
+        }
+        catch
+        {
+            // 写盘失败不打断使用
+        }
+    }
+
+    private static readonly AccentChoice[] BuiltInAccents =
     [
         new("coral", "珊瑚橙", "#FA8072", "#E2604B"),
         new("ocean", "海洋蓝", "#4CC2FF", "#0078D4"),
@@ -159,6 +234,17 @@ public static class ThemeManager
         new("violet", "薰衣紫", "#B68CFF", "#7B3FE4"),
         new("amber", "琥珀金", "#E8B14C", "#B7791F"),
     ];
+
+    private static readonly List<AccentChoice> CustomAccents = [];
+
+    public static IReadOnlyList<AccentChoice> Accents => [.. BuiltInAccents, .. CustomAccents];
+
+    /// <summary>注册(或覆盖)一个由主题工坊生成的强调色。</summary>
+    public static void RegisterAccent(AccentChoice accent)
+    {
+        CustomAccents.RemoveAll(a => a.Id == accent.Id);
+        CustomAccents.Add(accent);
+    }
 
     // ---------------------------------------------------------- 应用
 
@@ -328,6 +414,9 @@ public static class ThemeManager
             ? Argb(R(0), R(2), R(4), R(6))
             : Rgb(R(0), R(2), R(4));
     }
+
+    /// <summary>把 "#RRGGBB"/"#AARRGGBB" 转成颜色(供页面预览色块使用)。</summary>
+    public static Color FromHex(string hex) => Parse(hex);
 
     private static Color Rgb(byte r, byte g, byte b) => new() { A = 255, R = r, G = g, B = b };
 

@@ -1,0 +1,118 @@
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.Web.WebView2.Core;
+using SL.Core.Account;
+using SL.Core.Logging;
+using SL.App.Infrastructure;
+using SL.App.Notify;
+
+namespace SL.App.Dialogs;
+
+/// <summary>
+/// 内置浏览器正版登录:WebView2 直接打开微软授权页(PKCE),登录完成后回跳到
+/// oauth20_desktop.srf 的瞬间就地截获授权码并续跑全链路,全程无需复制粘贴。
+/// </summary>
+public sealed partial class BrowserLoginDialog : ContentDialog
+{
+    private readonly CancellationTokenSource _cts = new();
+    private readonly DispatcherQueue _ui;
+    private string _verifier = "";
+    private bool _handled;
+    private bool _closed;
+
+    public BrowserLoginDialog()
+    {
+        InitializeComponent();
+        _ui = DispatcherQueue.GetForCurrentThread();
+        Opened += async (_, _) => await StartAsync();
+        Closed += (_, _) =>
+        {
+            _closed = true;
+            _cts.Cancel();
+        };
+    }
+
+    private async Task StartAsync()
+    {
+        try
+        {
+            SetStatus("正在打开微软登录页;登录完成后本窗口会自动继续…", working: true);
+            var req = MsAuth.BeginInteractive();
+            _verifier = req.Verifier;
+            Web.CoreWebView2Initialized += OnWebInitialized;
+            Web.NavigationStarting += OnNavigationStarting;
+            Web.Source = new Uri(req.Url);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Account", ex);
+            SetStatus("无法打开内置浏览器:" + ex.Message, working: false, error: true);
+        }
+    }
+
+    private void OnWebInitialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
+    {
+        if (args.Exception is null)
+            return;
+        _ui.TryEnqueue(() => SetStatus(
+            "WebView2 运行时初始化失败(" + args.Exception.Message + ");请改用设备码登录。",
+            working: false, error: true));
+    }
+
+    private void OnNavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
+    {
+        var url = args.Uri ?? "";
+        if (!url.StartsWith("https://login.live.com/oauth20_desktop.srf", StringComparison.OrdinalIgnoreCase))
+            return;
+        args.Cancel = true;
+        if (_handled)
+            return;
+        _handled = true;
+        _ = FinishAsync(url);
+    }
+
+    private async Task FinishAsync(string callbackUrl)
+    {
+        try
+        {
+            _ui.TryEnqueue(() => SetStatus("授权完成,正在换取令牌并读取档案…", working: true));
+            var code = MsAuth.ExtractAuthorizationCode(callbackUrl);
+            var session = await MsAuth.CompleteInteractiveAsync(code, _verifier,
+                step => _ui.TryEnqueue(() => SetStatus(step, working: true)), _cts.Token).ConfigureAwait(true);
+
+            var entry = AccountStore.UpsertMsa(session);
+            AppServices.Settings.Update(c =>
+            {
+                c.AccountType = "msa";
+                c.AccountName = session.Name;
+                c.ActiveAccountId = entry.Id;
+            });
+            AppLog.Info("Account", $"正版登录成功(内置浏览器):{session.Name}");
+            AppServices.Notify.Publish(NotifyKind.Success, $"正版登录成功:{session.Name}");
+            Hide();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            if (_closed)
+                return;
+            AppLog.Error("Account", ex);
+            _handled = false;
+            SetStatus(ex.Message, working: false, error: true);
+        }
+    }
+
+    private void SetStatus(string text, bool working, bool error = false)
+    {
+        BusyRing.Visibility = working ? Visibility.Visible : Visibility.Collapsed;
+        BusyRing.IsActive = working;
+        ErrorIcon.Visibility = error ? Visibility.Visible : Visibility.Collapsed;
+        StepText.Text = text;
+    }
+}

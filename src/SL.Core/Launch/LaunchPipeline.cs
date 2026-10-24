@@ -64,7 +64,10 @@ public static class LaunchPipeline
         string accountName,
         int memoryMb,
         CancellationToken cancellation,
-        LaunchIdentity? identity = null)
+        LaunchIdentity? identity = null,
+        string jvmExtraArgs = "",
+        int gameWidth = 0,
+        int gameHeight = 0)
     {
         var instanceDir = Path.Combine(Boot.Runtime.InstancesDir, instanceId);
         var metaFile = Path.Combine(instanceDir, "meta", instanceId + ".json");
@@ -186,6 +189,15 @@ public static class LaunchPipeline
         var classpath = BuildClasspath(detail, clientJar);
         var args = BuildArgs(root, detail, classpath, instanceId, instanceDir, nativesDir, accountName, memoryMb, identity);
         args.Insert(0, $"-Xmx{memoryMb}M");
+        foreach (var extra in jvmExtraArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            args.Insert(1, extra);
+        if (gameWidth > 0 && gameHeight > 0)
+        {
+            args.Add("--width");
+            args.Add(gameWidth.ToString());
+            args.Add("--height");
+            args.Add(gameHeight.ToString());
+        }
         var gameDir = instanceDir;
 
         // ============================== 进程启动 ==============================

@@ -1,16 +1,64 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
 using SL.App.Account;
 using SL.App.Infrastructure;
+using SL.App.Themes;
 
 namespace SL.App.Pages;
 
-/// <summary>外观与设置:账户(设备码正版登录)、主题(深浅/配色/强调)与下载并发。</summary>
+/// <summary>配色方案卡片。</summary>
+public sealed class PaletteCardVM
+{
+    public PaletteCardVM(ThemePalette palette, string currentId)
+    {
+        Palette = palette;
+        var colors = ThemeManager.PreviewColors(palette);
+        Swatch1 = Solid(colors[0]);
+        Swatch2 = Solid(colors[1]);
+        Swatch3 = Solid(colors[2]);
+        CheckVisibility = palette.Id == currentId ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public ThemePalette Palette { get; }
+
+    public string Name => Palette.Name;
+
+    public Brush Swatch1 { get; }
+
+    public Brush Swatch2 { get; }
+
+    public Brush Swatch3 { get; }
+
+    public Visibility CheckVisibility { get; }
+
+    private static Brush Solid(string hex) => new SolidColorBrush(ThemeManager.FromHex(hex));
+}
+
+/// <summary>强调色圆点。</summary>
+public sealed class AccentCardVM
+{
+    public AccentCardVM(AccentChoice accent, string currentId)
+    {
+        Accent = accent;
+        Fill = new SolidColorBrush(ThemeManager.FromHex(accent.Dark));
+        RingVisibility = accent.Id == currentId ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public AccentChoice Accent { get; }
+
+    public string Name => Accent.Name;
+
+    public Brush Fill { get; }
+
+    public Visibility RingVisibility { get; }
+}
+
+/// <summary>外观与设置:账户、主题(深浅/配色/强调)、下载并发与协议状态。</summary>
 public sealed partial class SettingsPage : Page
 {
-    private static readonly string[] PaletteIds = ["salmon", "ink", "sand", "slate"];
-    private static readonly string[] AccentIds = ["coral", "ocean", "forest", "violet", "amber"];
-
     private readonly AccountVM _account = new();
     private bool _loading;
 
@@ -21,54 +69,81 @@ public sealed partial class SettingsPage : Page
         LoadConfig();
     }
 
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        LoadConfig();
+    }
+
     private void LoadConfig()
     {
         _loading = true;
         var c = AppServices.Settings.Current;
-        ThemeMode.SelectedIndex = c.Theme switch
-        {
-            Core.Settings.ThemePref.Light => 1,
-            Core.Settings.ThemePref.Dark => 2,
-            _ => 0,
-        };
-        var pi = Array.IndexOf(PaletteIds, c.Palette);
-        PaletteList.SelectedIndex = pi < 0 ? 0 : pi;
-        var ai = Array.IndexOf(AccentIds, c.Accent);
-        AccentList.SelectedIndex = ai < 0 ? 0 : ai;
+
+        ModeSystem.IsChecked = c.Theme == SL.Core.Settings.ThemePref.FollowSystem;
+        ModeLight.IsChecked = c.Theme == SL.Core.Settings.ThemePref.Light;
+        ModeDark.IsChecked = c.Theme == SL.Core.Settings.ThemePref.Dark;
+
+        PaletteGrid.ItemsSource = ThemeManager.Palettes
+            .Select(p => new PaletteCardVM(p, c.Palette))
+            .ToList();
+
+        AccentList.ItemsSource = ThemeManager.Accents
+            .Select(a => new AccentCardVM(a, c.Accent))
+            .ToList();
+
         ConcurrencyBox.Value = c.TransferConcurrency;
+
+        TermsStateText.Text = c.TermsAccepted
+            ? "已阅读并同意"
+            : "尚未同意 · 点击右侧按钮查看并确认";
+
         _loading = false;
     }
 
-    private void OnThemeChanged(object sender, SelectionChangedEventArgs e)
+    private void OnModeChecked(object sender, RoutedEventArgs e)
     {
         if (_loading)
             return;
-        AppServices.Settings.Update(c => c.Theme = ThemeMode.SelectedIndex switch
-        {
-            1 => Core.Settings.ThemePref.Light,
-            2 => Core.Settings.ThemePref.Dark,
-            _ => Core.Settings.ThemePref.FollowSystem,
-        });
+        var pref = ReferenceEquals(sender, ModeLight) ? SL.Core.Settings.ThemePref.Light
+            : ReferenceEquals(sender, ModeDark) ? SL.Core.Settings.ThemePref.Dark
+            : SL.Core.Settings.ThemePref.FollowSystem;
+        AppServices.Settings.Update(c => c.Theme = pref);
     }
 
-    private void OnPaletteChanged(object sender, SelectionChangedEventArgs e)
+    private void OnPaletteClick(object sender, ItemClickEventArgs e)
     {
-        if (_loading)
+        if (e.ClickedItem is not PaletteCardVM card)
             return;
-        var i = PaletteList.SelectedIndex;
-        if (i < 0 || i >= PaletteIds.Length)
-            return;
-        AppServices.Settings.Update(c => c.Palette = PaletteIds[i]);
+        ApplyPalette(card.Palette.Id);
     }
 
-    private void OnAccentChanged(object sender, SelectionChangedEventArgs e)
+    private void OnAccentTapped(object sender, TappedRoutedEventArgs e)
     {
-        if (_loading)
+        if (sender is not FrameworkElement { DataContext: AccentCardVM card })
             return;
-        var i = AccentList.SelectedIndex;
-        if (i < 0 || i >= AccentIds.Length)
+        AppServices.Settings.Update(c => c.Accent = card.Accent.Id);
+        Rebuild();
+    }
+
+    private void ApplyPalette(string paletteId)
+    {
+        if (AppServices.Settings.Current.Palette == paletteId)
             return;
-        AppServices.Settings.Update(c => c.Accent = AccentIds[i]);
+        AppServices.Settings.Update(c => c.Palette = paletteId);
+        Rebuild();
+    }
+
+    /// <summary>配色变化后刷新卡片选中态(保持列表数据与主题同步)。</summary>
+    private void Rebuild()
+    {
+        var c = AppServices.Settings.Current;
+        PaletteGrid.ItemsSource = ThemeManager.Palettes
+            .Select(p => new PaletteCardVM(p, c.Palette))
+            .ToList();
+        AccentList.ItemsSource = ThemeManager.Accents
+            .Select(a => new AccentCardVM(a, c.Accent))
+            .ToList();
     }
 
     private void OnConcurrencyChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
@@ -77,4 +152,8 @@ public sealed partial class SettingsPage : Page
             return;
         AppServices.Settings.Update(c => c.TransferConcurrency = (int)Math.Clamp(args.NewValue, 2, 16));
     }
+
+    private void OnOpenWorkshop(object sender, RoutedEventArgs e) => AppServices.Nav.Navigate("st.theme");
+
+    private void OnOpenTerms(object sender, RoutedEventArgs e) => AppServices.Nav.Navigate("st.terms");
 }

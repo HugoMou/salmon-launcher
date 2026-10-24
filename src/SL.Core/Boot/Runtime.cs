@@ -1,4 +1,4 @@
-﻿namespace SL.Core.Boot;
+namespace SL.Core.Boot;
 
 /// <summary>
 /// 业务层对本地目录的统一入口。表示层只依赖本类型,
@@ -7,7 +7,7 @@
 public static class Runtime
 {
     public const string AppName = "Salmon Launcher";
-    public const string AppVersion = "0.2.0-alpha (阶段二)";
+    public const string AppVersion = "1.0.0";
 
     public static string Root => Data.AppPaths.Root;
     public static string LogDir => Data.AppPaths.LogDir;

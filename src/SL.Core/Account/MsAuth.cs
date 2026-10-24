@@ -365,7 +365,7 @@ public static class MsAuth
                 _ => "XSTS 授权失败(XErr " + code + ")。",
             });
         }
-        return root.GetProperty("Token").GetString() ?? "";
+        return Prop(root, "Token", "XSTS 授权失败");
     }
 
     private static async Task<string> MinecraftLoginAsync(string uhs, string xstsToken, CancellationToken ct)
@@ -430,6 +430,18 @@ public static class MsAuth
     public static string SessionPath() => Path.Combine(Boot.Runtime.Root, "accounts", "msa.json");
 
     // ------------------------------------------------------------ 基础设施
+
+    /// <summary>安全取字符串字段;缺失或为空时抛出带上下文的友好异常,避免原始 KeyNotFoundException 漏到 UI。</summary>
+    private static string Prop(JsonElement el, string name, string context)
+    {
+        if (el.ValueKind == JsonValueKind.Object && el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String)
+        {
+            var s = v.GetString();
+            if (!string.IsNullOrEmpty(s))
+                return s;
+        }
+        throw new MsAuthException(context + ":服务器响应缺少必要字段,请稍后重试;若反复出现,该账户可能无法完成此认证步骤。");
+    }
 
     private static FormUrlEncodedContent BuildForm(params (string Key, string Value)[] fields)
         => new(fields.Select(f => new KeyValuePair<string, string>(f.Key, f.Value)));

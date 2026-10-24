@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SL.App.Pages.InstanceLogsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="36,28,36,28" RowSpacing="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Spacing="4">
+                <TextBlock Text="实例日志"
+                           Style="{ThemeResource TitleLargeTextBlockStyle}"
+                           Foreground="{ThemeResource Brush.Fg}" />
+                <TextBlock x:Name="StatusText"
+                           FontSize="12"
+                           Foreground="{ThemeResource Brush.FgDim}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <ComboBox x:Name="InstanceBox" MinWidth="200" SelectionChanged="OnInstanceChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Id}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Content="刷新" Click="OnRefresh" />
+                <Button Content="到崩溃诊断" Click="OnOpenDiag" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBox x:Name="KeywordBox"
+                         PlaceholderText="关键词过滤(如 ERROR、Exception)"
+                         Width="280"
+                         TextChanged="OnKeywordChanged"
+                         VerticalAlignment="Center" />
+                <TextBlock Text="读取 instances/&lt;id&gt;/logs/latest.log 的尾部 2000 行"
+                           FontSize="11.5"
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource Brush.FgFaint}" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="6">
+            <ScrollViewer>
+                <TextBlock x:Name="LogText"
+                           FontFamily="Consolas"
+                           FontSize="12"
+                           IsTextSelectionEnabled="True"
+                           TextWrapping="NoWrap"
+                           Foreground="{ThemeResource Brush.FgDim}"
+                           Padding="10,8" />
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Page>

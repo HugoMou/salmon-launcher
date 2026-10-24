@@ -8,6 +8,88 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- 分段控件:横向排列的圆角选项,选中态用强调色文字 + 卡片底色 -->
+            <Style x:Key="Style.Segment" TargetType="RadioButton">
+                <Setter Property="MinWidth" Value="0" />
+                <Setter Property="MinHeight" Value="0" />
+                <Setter Property="Padding" Value="16,7" />
+                <Setter Property="FontSize" Value="12.5" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.FgDim}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Grid>
+                                <Border x:Name="SegmentRoot"
+                                        Background="Transparent"
+                                        CornerRadius="6"
+                                        Padding="{TemplateBinding Padding}" />
+                                <ContentPresenter x:Name="SegmentContent"
+                                                  Content="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Foreground="{TemplateBinding Foreground}" />
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="SegmentRoot.Background" Value="{ThemeResource Brush.CardHover}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="SegmentRoot.Background" Value="{ThemeResource Brush.CardPress}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="SegmentContent.Opacity" Value="0.4" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="CheckStates">
+                                        <VisualState x:Name="Checked">
+                                            <VisualState.Setters>
+                                                <Setter Target="SegmentRoot.Background" Value="{ThemeResource Brush.Card}" />
+                                                <Setter Target="SegmentContent.Foreground" Value="{ThemeResource Brush.Accent}" />
+                                                <Setter Target="SegmentContent.FontWeight" Value="SemiBold" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Unchecked" />
+                                        <VisualState x:Name="Indeterminate" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- 分段控件的容器底板 -->
+            <Style x:Key="Style.SegmentHost" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource Brush.PageBg}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="9" />
+                <Setter Property="Padding" Value="3" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+            </Style>
+
+            <!-- 文本链接按钮 -->
+            <Style x:Key="Style.Link" TargetType="HyperlinkButton">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="FontSize" Value="12.5" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.Accent}" />
+            </Style>
+
+            <!-- 协议正文段落 -->
+            <Style x:Key="Style.TermsBody" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12.5" />
+                <Setter Property="LineHeight" Value="21" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.FgDim}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SL.App.Pages.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer>
+        <StackPanel x:Name="Root" Margin="36,28,36,28" Spacing="16" MaxWidth="960" HorizontalAlignment="Stretch">
+
+            <TextBlock Text="欢迎回来"
+                       Style="{ThemeResource TitleLargeTextBlockStyle}"
+                       Foreground="{ThemeResource Brush.Fg}" />
+
+            <!-- 启动横幅 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    Padding="26">
+                <StackPanel Spacing="16">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="游戏实例"
+                                       FontSize="12"
+                                       Foreground="{ThemeResource Brush.FgDim}" />
+                            <ComboBox ItemsSource="{Binding Instances}"
+                                      SelectedItem="{Binding SelectedInstance}"
+                                      PlaceholderText="尚无实例 · 先去下载"
+                                      MinWidth="300"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Spacing="1" Padding="0,2">
+                                            <TextBlock Text="{Binding Id}" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Detail}"
+                                                       FontSize="11"
+                                                       Foreground="{ThemeResource Brush.FgDim}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <Button Command="{Binding OpenAccountCommand}"
+                                Grid.Column="1"
+                                VerticalAlignment="Bottom"
+                                Padding="12,8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="34" Height="34" CornerRadius="17" Background="{ThemeResource Brush.AccentSoft}">
+                                    <FontIcon Glyph="{Binding AccountGlyph}"
+                                              FontSize="16"
+                                              Foreground="{ThemeResource Brush.Accent}" />
+                                </Border>
+                                <StackPanel VerticalAlignment="Center" Spacing="1">
+                                    <TextBlock Text="{Binding AccountName}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding AccountDetail}"
+                                               FontSize="11"
+                                               Foreground="{ThemeResource Brush.FgDim}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <Button Command="{Binding LaunchCommand}"
+                            Style="{ThemeResource AccentButtonStyle}"
+                            Height="88"
+                            CornerRadius="12"
+                            HorizontalAlignment="Stretch">
+                        <StackPanel Spacing="3">
+                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                <FontIcon Glyph="&#xE768;" FontSize="22" />
+                                <TextBlock Text="启动 Minecraft"
+                                           FontSize="22"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding LaunchHint}" FontSize="11.5" Opacity="0.85" />
+                        </StackPanel>
+                    </Button>
+
+                    <ProgressBar IsIndeterminate="True"
+                                 Visibility="{Binding ProgressVisibility}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE946;"
+                                  FontSize="13"
+                                  Foreground="{ThemeResource Brush.FgDim}"
+                                  VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding StatusText}"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource Brush.FgDim}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding InstanceSummary}"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource Brush.FgDim}"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 快捷入口 -->
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Command="{Binding OpenDownloadCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,12"
+                        CornerRadius="10">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE896;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="下载游戏" FontWeight="SemiBold" />
+                            <TextBlock Text="安装新版本与补全文件"
+                                       FontSize="11"
+                                       Foreground="{ThemeResource Brush.FgDim}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding OpenMultiplayerCommand}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,12"
+                        CornerRadius="10">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE709;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="联机" FontWeight="SemiBold" />
+                            <TextBlock Text="与好友联机 · 三种接入方式"
+                                       FontSize="11"
+                                       Foreground="{ThemeResource Brush.FgDim}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding OpenDiagCommand}"
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,12"
+                        CornerRadius="10">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE7BA;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="崩溃诊断" FontWeight="SemiBold" />
+                            <TextBlock Text="游戏崩溃时自动分析日志"
+                                       FontSize="11"
+                                       Foreground="{ThemeResource Brush.FgDim}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding OpenLogsCommand}"
+                        Grid.Column="3"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="16,12"
+                        CornerRadius="10">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE8B7;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="应用日志" FontWeight="SemiBold" />
+                            <TextBlock Text="查看启动器运行记录"
+                                       FontSize="11"
+                                       Foreground="{ThemeResource Brush.FgDim}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- 公告 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <FontIcon Glyph="&#xE946;" FontSize="17" Foreground="{ThemeResource Brush.Accent}" />
+                        <TextBlock Text="开始之前" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="· 首次使用:先在「下载 → 游戏版本」安装一个实例,然后回到本页点击启动。"
+                               FontSize="12.5"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                    <TextBlock Text="· 正版账户支持设备码与内置浏览器两种登录方式;离线账户可随时添加并自由切换。"
+                               FontSize="12.5"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                    <TextBlock Text="· 联机提供自建中继、局域网直连与第三方中继三种接入方式,详见「工具 → 联机」。"
+                               FontSize="12.5"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

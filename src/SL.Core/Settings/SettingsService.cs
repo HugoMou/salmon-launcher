@@ -54,6 +54,12 @@ public sealed class SettingsService : ISettingsService
         AccountType = s.AccountType == "msa" ? "msa" : "offline",
         Palette = string.IsNullOrWhiteSpace(s.ThemePalette) ? "salmon" : s.ThemePalette,
         Accent = string.IsNullOrWhiteSpace(s.AccentColor) ? "coral" : s.AccentColor,
+        MemoryMb = Math.Clamp(s.MemoryMb, 512, 32768),
+        JvmExtraArgs = s.JvmExtraArgs ?? "",
+        GameWidth = Math.Clamp(s.GameWidth, 320, 7680),
+        GameHeight = Math.Clamp(s.GameHeight, 240, 4320),
+        DownloadSource = s.DownloadSource == "bmclapi" ? "bmclapi" : "auto",
+        TermsAccepted = s.TermsAccepted,
     };
 
     private static Data.Settings.AppSettings Map(AppConfig c) => new()
@@ -69,6 +75,12 @@ public sealed class SettingsService : ISettingsService
         AccountType = c.AccountType,
         ThemePalette = c.Palette,
         AccentColor = c.Accent,
+        MemoryMb = Math.Clamp(c.MemoryMb, 512, 32768),
+        JvmExtraArgs = c.JvmExtraArgs,
+        GameWidth = Math.Clamp(c.GameWidth, 320, 7680),
+        GameHeight = Math.Clamp(c.GameHeight, 240, 4320),
+        DownloadSource = c.DownloadSource,
+        TermsAccepted = c.TermsAccepted,
     };
 
     private static AppConfig Clone(AppConfig c) => new()
@@ -79,6 +91,13 @@ public sealed class SettingsService : ISettingsService
         AccountType = c.AccountType,
         Palette = c.Palette,
         Accent = c.Accent,
+        ActiveAccountId = c.ActiveAccountId,
+        MemoryMb = c.MemoryMb,
+        JvmExtraArgs = c.JvmExtraArgs,
+        GameWidth = c.GameWidth,
+        GameHeight = c.GameHeight,
+        DownloadSource = c.DownloadSource,
+        TermsAccepted = c.TermsAccepted,
     };
 
     private static bool ConfigEquals(AppConfig a, AppConfig b)
@@ -87,5 +106,11 @@ public sealed class SettingsService : ISettingsService
            && a.AccountName == b.AccountName
            && a.AccountType == b.AccountType
            && a.Palette == b.Palette
-           && a.Accent == b.Accent;
+           && a.Accent == b.Accent
+           && a.MemoryMb == b.MemoryMb
+           && a.JvmExtraArgs == b.JvmExtraArgs
+           && a.GameWidth == b.GameWidth
+           && a.GameHeight == b.GameHeight
+           && a.DownloadSource == b.DownloadSource
+           && a.TermsAccepted == b.TermsAccepted;
 }

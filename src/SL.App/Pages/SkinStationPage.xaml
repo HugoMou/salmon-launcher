@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SL.App.Pages.SkinStationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SL.App.Controls">
+
+    <Grid Margin="36,28,36,28" ColumnSpacing="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 侧边栏:用户列表 -->
+        <Border Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="12">
+            <Grid RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Spacing="2" Margin="6,4,0,0">
+                    <TextBlock Text="用户"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock Text="点击用户查看其保存的皮肤"
+                               FontSize="10.5"
+                               Foreground="{ThemeResource Brush.FgFaint}" />
+                </StackPanel>
+
+                <ListView x:Name="UserList"
+                          Grid.Row="1"
+                          SelectionMode="Single"
+                          SelectionChanged="OnUserChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnSpacing="10" Padding="0,7">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="34" Height="34" CornerRadius="17"
+                                        Background="{ThemeResource Brush.AccentSoft}">
+                                    <FontIcon Glyph="{Binding Glyph}" FontSize="15"
+                                              Foreground="{ThemeResource Brush.Accent}" />
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="12.5"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis"
+                                               Foreground="{ThemeResource Brush.Fg}" />
+                                    <TextBlock Text="{Binding Detail}"
+                                               FontSize="10.5"
+                                               Foreground="{ThemeResource Brush.FgFaint}" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Button Grid.Row="2"
+                        Content="管理账户"
+                        HorizontalAlignment="Stretch"
+                        Click="OnManageAccounts" />
+            </Grid>
+        </Border>
+
+        <!-- 右侧:皮肤列表 + 3D 预览 -->
+        <Grid Grid.Column="1" RowSpacing="14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="TitleText"
+                               Text="皮肤站"
+                               Style="{ThemeResource TitleLargeTextBlockStyle}"
+                               Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock x:Name="StatusText"
+                               FontSize="12"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                    <Button Content="添加本地皮肤" Click="OnImportSkin" />
+                    <Button Content="从网址添加" Click="OnDownloadSkin" />
+                    <Button Content="打开目录" Click="OnOpenDir" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Background="{ThemeResource Brush.Card}"
+                        BorderBrush="{ThemeResource Brush.Border}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="8">
+                    <Grid RowSpacing="6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="已保存的皮肤"
+                                   FontSize="11.5"
+                                   Margin="8,4,0,0"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+                        <ListView x:Name="SkinList"
+                                  Grid.Row="1"
+                                  SelectionMode="Single"
+                                  SelectionChanged="OnSkinChanged">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Spacing="2" Padding="0,6">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="12.5"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{ThemeResource Brush.Fg}" />
+                                        <TextBlock Text="{Binding Detail}"
+                                                   FontSize="10.5"
+                                                   Foreground="{ThemeResource Brush.FgFaint}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Background="{ThemeResource Brush.Card}"
+                        BorderBrush="{ThemeResource Brush.Border}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="16">
+                    <Grid RowSpacing="12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <controls:SkinPreview x:Name="Preview" />
+
+                        <Grid Grid.Row="1" ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="2" VerticalAlignment="Center">
+                                <TextBlock x:Name="SkinNameText"
+                                           Text="未选择皮肤"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="{ThemeResource Brush.Fg}" />
+                                <TextBlock x:Name="SkinMetaText"
+                                           FontSize="11"
+                                           Foreground="{ThemeResource Brush.FgDim}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button Content="重置视角" Click="OnResetView" />
+                                <Button Content="删除该皮肤" Click="OnDeleteSkin" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

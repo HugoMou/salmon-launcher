@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SL.App.Pages.MultiplayerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="36,28,36,28" RowSpacing="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Spacing="4">
+                <TextBlock Text="联机"
+                           Style="{ThemeResource TitleLargeTextBlockStyle}"
+                           Foreground="{ThemeResource Brush.Fg}" />
+                <TextBlock x:Name="StatusText"
+                           FontSize="12"
+                           Foreground="{ThemeResource Brush.FgDim}" />
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Content="断开连接"
+                    Click="OnDisconnect"
+                    VerticalAlignment="Center" />
+        </Grid>
+
+        <Border Grid.Row="1"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="16,10">
+            <Border Style="{StaticResource Style.SegmentHost}" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                    <RadioButton x:Name="ModeHost"
+                                 GroupName="MultiplayerMode"
+                                 Content="用自己的电脑当中继"
+                                 Style="{StaticResource Style.Segment}"
+                                 Checked="OnModeChecked" />
+                    <RadioButton x:Name="ModeLan"
+                                 GroupName="MultiplayerMode"
+                                 Content="局域网"
+                                 Style="{StaticResource Style.Segment}"
+                                 Checked="OnModeChecked" />
+                    <RadioButton x:Name="ModeManual"
+                                 GroupName="MultiplayerMode"
+                                 Content="添加中继服务器"
+                                 Style="{StaticResource Style.Segment}"
+                                 Checked="OnModeChecked" />
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- 模式一:自建中继 -->
+        <Border x:Name="HostPanel"
+                Grid.Row="2"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+            <StackPanel Spacing="14">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon Glyph="&#xE968;" FontSize="18" Foreground="{ThemeResource Brush.Accent}" />
+                    <TextBlock Text="本机作为中继服务器:好友填入下方地址与端口即可加入,无需公网穿透配置。"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBox x:Name="RoomNameBox"
+                             PlaceholderText="房间名(如 周末生存)"
+                             Width="220"
+                             VerticalAlignment="Center" />
+                    <TextBlock Text="端口" VerticalAlignment="Center" FontSize="12"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                    <NumberBox x:Name="HostPortBox"
+                               Minimum="0"
+                               Maximum="65535"
+                               SmallChange="1"
+                               Value="0"
+                               SpinButtonPlacementMode="Compact"
+                               Width="140"
+                               Header="" />
+                    <TextBlock Text="0 = 自动分配"
+                               VerticalAlignment="Center" FontSize="11"
+                               Foreground="{ThemeResource Brush.FgFaint}" />
+                    <Button x:Name="HostStartButton"
+                            Content="启动中继"
+                            Style="{ThemeResource AccentButtonStyle}"
+                            Click="OnStartHost" />
+                </StackPanel>
+
+                <Border Background="{ThemeResource Brush.AccentSoft}"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Visibility="Collapsed"
+                        x:Name="HostInfoPanel">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="把下面这行发给好友(局域网内可直接填 IP:端口)"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+                        <TextBlock x:Name="HostEndpointText"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   IsTextSelectionEnabled="True"
+                                   Foreground="{ThemeResource Brush.Fg}" />
+                        <TextBlock x:Name="HostMemberText"
+                                   FontSize="11.5"
+                                   Foreground="{ThemeResource Brush.FgDim}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- 模式二:局域网 -->
+        <Border x:Name="LanPanel"
+                Grid.Row="2"
+                Visibility="Collapsed"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+            <StackPanel Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon Glyph="&#xE701;" FontSize="18" Foreground="{ThemeResource Brush.Accent}" />
+                    <TextBlock Text="自动发现同一网段里正在广播的联机房间;选中后一键加入。"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                    <Button Content="重新扫描" Click="OnRescanLan" />
+                </StackPanel>
+
+                <Border BorderBrush="{ThemeResource Brush.Border}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        MinHeight="120"
+                        Padding="6">
+                    <ListView x:Name="LanList" SelectionMode="None">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnSpacing="12" Padding="0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding Room}" FontSize="12.5" FontWeight="SemiBold"
+                                                   Foreground="{ThemeResource Brush.Fg}" />
+                                        <TextBlock Text="{Binding Detail}" FontSize="11"
+                                                   Foreground="{ThemeResource Brush.FgFaint}" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Content="加入"
+                                            Command="{Binding JoinCommand}"
+                                            Padding="14,5"
+                                            VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- 模式三:手动添加中继 -->
+        <Border x:Name="ManualPanel"
+                Grid.Row="2"
+                Visibility="Collapsed"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+            <StackPanel Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon Glyph="&#xE774;" FontSize="18" Foreground="{ThemeResource Brush.Accent}" />
+                    <TextBlock Text="填入任意一台已运行 Salmon 中继的地址(公网或局域网),加入后可收藏复用。"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="{ThemeResource Brush.FgDim}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBox x:Name="ManualNameBox" PlaceholderText="备注名(可选)" Width="180" />
+                    <TextBox x:Name="ManualHostBox" PlaceholderText="地址,如 192.168.1.20 或 relay.example.com" Width="300" />
+                    <NumberBox x:Name="ManualPortBox"
+                               Minimum="1"
+                               Maximum="65535"
+                               Value="25565"
+                               SpinButtonPlacementMode="Compact"
+                               Width="130" />
+                    <Button Content="连接并收藏"
+                            Style="{ThemeResource AccentButtonStyle}"
+                            Click="OnConnectManual" />
+                </StackPanel>
+
+                <Border BorderBrush="{ThemeResource Brush.Border}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        MinHeight="90"
+                        Padding="6">
+                    <ListView x:Name="SavedList" SelectionMode="None">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnSpacing="12" Padding="0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Display}" FontSize="12.5" VerticalAlignment="Center"
+                                               Foreground="{ThemeResource Brush.Fg}" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                        <Button Content="连接" Command="{Binding ConnectCommand}" Padding="14,5" />
+                                        <Button Content="移除" Command="{Binding RemoveCommand}" Padding="14,5" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- 消息区 -->
+        <Border Grid.Row="3"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="12">
+            <Grid RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ScrollViewer x:Name="LogScroll">
+                    <ItemsControl x:Name="LogList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Margin="0,2"
+                                           Foreground="{ThemeResource Brush.FgDim}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Grid Grid.Row="1" ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="MessageBox"
+                             PlaceholderText="输入消息,回车发送"
+                             KeyDown="OnMessageKeyDown" />
+                    <Button Grid.Column="1"
+                            Content="发送"
+                            Click="OnSend"
+                            Style="{ThemeResource AccentButtonStyle}"
+                            Padding="20,6" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

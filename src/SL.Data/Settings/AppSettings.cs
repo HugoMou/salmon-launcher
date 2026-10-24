@@ -22,6 +22,24 @@ public class AppSettings
 
     /// <summary>账户类型:"offline"(离线)/ "msa"(微软正版)。</summary>
     public string AccountType { get; set; } = "offline";
+
+    /// <summary>游戏内存分配(MB)</summary>
+    public int MemoryMb { get; set; } = 4096;
+
+    /// <summary>附加 JVM 参数(空格分隔,插在主类之前)</summary>
+    public string JvmExtraArgs { get; set; } = "";
+
+    /// <summary>游戏窗口宽度(像素)</summary>
+    public int GameWidth { get; set; } = 854;
+
+    /// <summary>游戏窗口高度(像素)</summary>
+    public int GameHeight { get; set; } = 480;
+
+    /// <summary>下载源:"auto"(官方主源+镜像回退) / "bmclapi"(镜像优先)</summary>
+    public string DownloadSource { get; set; } = "auto";
+
+    /// <summary>是否已阅读并同意用户协议</summary>
+    public bool TermsAccepted { get; set; }
 }
 
 /// <summary>设置文件的读写入口(原子落盘)。</summary>
