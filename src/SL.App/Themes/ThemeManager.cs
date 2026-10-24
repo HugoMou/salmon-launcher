@@ -268,16 +268,30 @@ public static class ThemeManager
 
     private static (ResourceDictionary Light, ResourceDictionary Dark) EnsureThemeDictionaries(Application app)
     {
-        if (app.Resources.ThemeDictionaries["Light"] is not ResourceDictionary light)
+        var themes = app.Resources.ThemeDictionaries;
+
+        ResourceDictionary light;
+        if (themes.ContainsKey("Light") && themes["Light"] is ResourceDictionary l)
+        {
+            light = l;
+        }
+        else
         {
             light = new ResourceDictionary();
-            app.Resources.ThemeDictionaries["Light"] = light;
+            themes["Light"] = light;
         }
-        if (app.Resources.ThemeDictionaries["Default"] is not ResourceDictionary dark)
+
+        ResourceDictionary dark;
+        if (themes.ContainsKey("Default") && themes["Default"] is ResourceDictionary d)
+        {
+            dark = d;
+        }
+        else
         {
             dark = new ResourceDictionary();
-            app.Resources.ThemeDictionaries["Default"] = dark;
+            themes["Default"] = dark;
         }
+
         return (light, dark);
     }
 
