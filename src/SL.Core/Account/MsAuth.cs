@@ -152,10 +152,10 @@ public static class MsAuth
     private static string Base64Url(byte[] data)
         => Convert.ToBase64String(data).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 
-    // ------------------------------------------------------------ 设备码 + 轮询 (已被 PKCE 通道取代,保留备用)
+    // ------------------------------------------------------------ 设备码 + 轮询 (主通道:PCL 式大字设备码,无需复制回跳 URL)
 
-    /// <summary>设备码起步:返回 userCode 与 verificationUri,用户在浏览器完成登录。</summary>
-    public static async Task<(string UserCode, string VerificationUri, int IntervalSeconds)> StartAsync(CancellationToken ct)
+    /// <summary>设备码起步:返回 userCode/deviceCode/verificationUri;用户在 verificationUri 输入 userCode 完成授权后,由 LoginAsync 轮询收尾。</summary>
+    public static async Task<(string UserCode, string DeviceCode, string VerificationUri, int IntervalSeconds)> StartAsync(CancellationToken ct)
     {
         using var req = new HttpRequestMessage(HttpMethod.Post,
             "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode")
@@ -170,6 +170,7 @@ public static class MsAuth
         var interval = root.TryGetProperty("interval", out var it) ? it.GetInt32() : 5;
         return (
             root.GetProperty("user_code").GetString() ?? "",
+            root.GetProperty("device_code").GetString() ?? "",
             root.GetProperty("verification_uri").GetString() ?? "https://www.microsoft.com/link",
             Math.Clamp(interval, 3, 15));
     }
@@ -216,7 +217,19 @@ public static class MsAuth
         var deadline = DateTimeOffset.Now.AddSeconds(maxSeconds);
         while (DateTimeOffset.Now < deadline)
         {
-            (var state, msAccess, msRefresh) = await PollOnceAsync(deviceCode, ct).ConfigureAwait(false);
+            PollState state;
+            try
+            {
+                (state, msAccess, msRefresh) = await PollOnceAsync(deviceCode, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                state = PollState.Pending; // 轮询期网络抖动不中断等待,持续重试直到截止
+            }
             if (state == PollState.Done)
                 break;
             if (state == PollState.Denied)

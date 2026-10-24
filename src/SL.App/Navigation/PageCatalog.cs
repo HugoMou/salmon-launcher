@@ -15,7 +15,7 @@ public static class PageCatalog
         ["dl.pack"] = new("dl.pack", "模组仓库", "Modrinth 搜索、项目卡片与版本下载(图像走 ImageCacheService)。", typeof(SL.App.Pages.PlaceholderPage)),
         ["dl.shaders"] = new("dl.shaders", "光影仓库", "Modrinth shaders 分类检索与安装到当前实例。", typeof(SL.App.Pages.PlaceholderPage)),
         ["dl.packs"] = new("dl.packs", "资源包仓库", "Modrinth resource-packs 分类检索与安装。", typeof(SL.App.Pages.PlaceholderPage)),
-        ["st.launch"] = new("st.launch", "外观与设置", "深浅色(含跟随系统)、4 套配色、5 种强调色与下载并发设置(Settings.Changed 已联动 ThemeManager)。", typeof(SL.App.Pages.PlaceholderPage)),
+        ["st.launch"] = new("st.launch", "外观与设置", "账户(设备码正版登录/离线切换)、深浅色(含跟随系统)、4 套配色、5 种强调色与下载并发设置。", typeof(SL.App.Pages.SettingsPage)),
         ["st.global"] = new("st.global", "全局偏好", "窗口尺寸、代理与镜像源、界面语言、个人目录位置。", typeof(SL.App.Pages.PlaceholderPage)),
         ["st.about"] = new("st.about", "关于", "版本信息、开源许可与致谢。", typeof(SL.App.Pages.PlaceholderPage)),
         ["tools.online"] = new("tools.online", "联机", "联机(VoxLink):隧道创建、房间管理与延迟显示。", typeof(SL.App.Pages.PlaceholderPage)),

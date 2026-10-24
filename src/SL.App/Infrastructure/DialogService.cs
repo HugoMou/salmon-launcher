@@ -96,6 +96,25 @@ public sealed class DialogService
 
     // ============================== 构建与调度 ==============================
 
+    /// <summary>根 XamlRoot(MainWindow 注入;自绘对话框复用)。</summary>
+    public XamlRoot? Root => _root;
+
+    /// <summary>展示自定义 ContentDialog(与内置对话框共用排队,保证同根单例)。</summary>
+    public async Task<ContentDialogResult> ShowCustomAsync(ContentDialog dialog)
+    {
+        dialog.XamlRoot = dialog.XamlRoot ?? _root
+            ?? throw new InvalidOperationException("对话框服务尚未初始化(Attach 未调用)");
+        await _gate.WaitAsync().ConfigureAwait(true);
+        try
+        {
+            return await dialog.ShowAsync().AsTask().ConfigureAwait(true);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
     private static UIElement MessageContent(string message, MsgMark mark)
     {
         var glyph = mark switch
