@@ -90,6 +90,14 @@
                 <Setter Property="TextWrapping" Value="Wrap" />
                 <Setter Property="Foreground" Value="{ThemeResource Brush.FgDim}" />
             </Style>
+
+            <!-- 页面主标题:比系统 TitleLarge 小一号,避免高分屏下过大 -->
+            <Style x:Key="TitleLargeTextBlockStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.Fg}" />
+                <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

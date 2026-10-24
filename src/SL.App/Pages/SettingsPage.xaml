@@ -44,14 +44,8 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Command="{Binding LoginDeviceCodeCommand}"
+                        <Button Command="{Binding LoginBrowserCommand}"
                                 Style="{ThemeResource AccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE8FA;" FontSize="14" />
-                                <TextBlock Text="设备码登录" />
-                            </StackPanel>
-                        </Button>
-                        <Button Command="{Binding LoginBrowserCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE774;" FontSize="14" />
                                 <TextBlock Text="浏览器授权登录" />
@@ -126,7 +120,7 @@
                                FontSize="11.5"
                                LineHeight="19"
                                TextWrapping="Wrap"
-                               Text="支持保存多个正版与离线账户并随时切换。设备码登录:启动器给出一组大字代码,到 microsoft.com/link 输入即可;浏览器授权:在启动器内置窗口里直接登录。" />
+                               Text="支持保存多个正版与离线账户并随时切换。正版登录使用内置浏览器完成微软授权(令牌只保存在本机),无需复制任何链接或设备码。" />
                 </StackPanel>
             </Border>
 

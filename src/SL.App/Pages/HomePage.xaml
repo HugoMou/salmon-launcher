@@ -203,7 +203,7 @@
                     <TextBlock Text="· 首次使用:先在「下载 → 游戏版本」安装一个实例,然后回到本页点击启动。"
                                FontSize="12.5"
                                Foreground="{ThemeResource Brush.FgDim}" />
-                    <TextBlock Text="· 正版账户支持设备码与内置浏览器两种登录方式;离线账户可随时添加并自由切换。"
+                    <TextBlock Text="· 正版账户通过内置浏览器完成微软授权;离线账户可随时添加并自由切换。"
                                FontSize="12.5"
                                Foreground="{ThemeResource Brush.FgDim}" />
                     <TextBlock Text="· 联机提供自建中继、局域网直连与第三方中继三种接入方式,详见「工具 → 联机」。"

@@ -54,9 +54,7 @@
 
         <NavigationView x:Name="NavView"
                         Grid.Row="1"
-                        PaneDisplayMode="Auto"
-                        CompactModeThresholdWidth="860"
-                        ExpandedModeThresholdWidth="1000"
+                        PaneDisplayMode="Left"
                         IsPaneToggleButtonVisible="True"
                         IsPaneOpen="True"
                         IsBackButtonVisible="Collapsed"
@@ -68,7 +66,7 @@
             </NavigationView.Resources>
 
             <NavigationView.Content>
-                <Grid>
+                <Grid x:Name="ContentRoot">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -99,7 +97,7 @@
                     </StackPanel>
 
                     <!-- 页面宿主 -->
-                    <Border x:Name="PageHost" Grid.Row="1" Background="{ThemeResource Brush.PageBg}">
+                    <Border x:Name="PageHost" Grid.Row="1" Background="Transparent">
                         <Frame x:Name="NavFrame" />
                     </Border>
                 </Grid>

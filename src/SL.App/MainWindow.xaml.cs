@@ -157,7 +157,7 @@ public sealed partial class MainWindow : Window
         {
             WallpaperLayer.Visibility = Visibility.Collapsed;
             WallpaperBrush.ImageSource = null;
-            PageHost.Background = ThemedBrush("Brush.PageBg");
+            SetContentBackground(ThemedBrush("Brush.PageBg"));
             return;
         }
 
@@ -170,13 +170,20 @@ public sealed partial class MainWindow : Window
 
             WallpaperBrush.ImageSource = bitmap;
             WallpaperLayer.Visibility = Visibility.Visible;
-            PageHost.Background = ThemedBrush("Brush.PageBgTrans");
+            SetContentBackground(ThemedBrush("Brush.PageBgTrans"));
         }
         catch
         {
             WallpaperLayer.Visibility = Visibility.Collapsed;
-            PageHost.Background = ThemedBrush("Brush.PageBg");
+            SetContentBackground(ThemedBrush("Brush.PageBg"));
         }
+    }
+
+    /// <summary>顶部提示区与页面区共用一层底色,避免壁纸在标题下露出色带。</summary>
+    private void SetContentBackground(Brush? brush)
+    {
+        ContentRoot.Background = brush;
+        PageHost.Background = brush;
     }
 
     /// <summary>从当前主题字典取画刷。</summary>
