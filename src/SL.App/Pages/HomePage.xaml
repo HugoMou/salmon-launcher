@@ -5,8 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Auto">
-        <StackPanel x:Name="Root" Margin="36,28,36,32" Spacing="16" MinWidth="620" MaxWidth="960" HorizontalAlignment="Left">
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel x:Name="Root" Margin="36,28,36,32" Spacing="16" MaxWidth="960" HorizontalAlignment="Left">
 
             <TextBlock Text="欢迎回来"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
@@ -31,7 +31,7 @@
                             <ComboBox ItemsSource="{Binding Instances}"
                                       SelectedItem="{Binding SelectedInstance}"
                                       PlaceholderText="尚无实例 · 先去下载"
-                                      MinWidth="300"
+                                      MinWidth="200"
                                       HorizontalAlignment="Stretch">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -85,21 +85,30 @@
                     <ProgressBar IsIndeterminate="True"
                                  Visibility="{Binding ProgressVisibility}" />
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                         <FontIcon Glyph="&#xE946;"
                                   FontSize="13"
                                   Foreground="{ThemeResource Brush.FgDim}"
                                   VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding StatusText}"
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding StatusText}"
                                    FontSize="12"
+                                   TextWrapping="Wrap"
                                    Foreground="{ThemeResource Brush.FgDim}"
                                    VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding InstanceSummary}"
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding InstanceSummary}"
                                    FontSize="12"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Right"
                                    Foreground="{ThemeResource Brush.FgDim}"
-                                   VerticalAlignment="Center"
-                                   Margin="12,0,0,0" />
-                    </StackPanel>
+                                   VerticalAlignment="Center" />
+                    </Grid>
                 </StackPanel>
             </Border>
 

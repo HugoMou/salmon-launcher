@@ -31,7 +31,7 @@ public sealed partial class MainWindow : Window
             presenter.PreferredMinimumWidth = 980;
             presenter.PreferredMinimumHeight = 640;
         }
-        AppWindow.Resize(new SizeInt32(1240, 800));
+        AppWindow.Resize(new SizeInt32(1320, 860));
 
         BuildMenu();
         NotifyHost.ItemsSource = AppServices.Notify.Items;

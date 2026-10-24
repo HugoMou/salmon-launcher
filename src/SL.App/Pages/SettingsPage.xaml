@@ -6,8 +6,8 @@
     xmlns:local="using:SL.App.Pages">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Auto">
-        <StackPanel Margin="36,28,36,32" Spacing="16" MinWidth="640" MaxWidth="980" HorizontalAlignment="Left">
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
             <TextBlock Text="外观与设置"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />

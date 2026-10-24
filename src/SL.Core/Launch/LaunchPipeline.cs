@@ -91,6 +91,25 @@ public static class LaunchPipeline
         if (detail.Client is null || detail.MainClass.Length == 0)
             return new LaunchResult(false, 0, "版本 JSON 不完整(缺少 client 或 mainClass)");
 
+        // ============================== 客户端核心 jar 完整性 ==============================
+        // 下载中断或被杀进程都会留下"存在但不是有效 jar"的文件,直接启动只会得到
+        // ClassNotFoundException;这里先校验大小/SHA-1/zip 结构,不通过就自动重下。
+        if (!IsValidClientJar(clientJar, detail.Client.Sha1, detail.Client.Size))
+        {
+            Raise("游戏核心 jar 不完整,正在重新下载…");
+            var temp = clientJar + ".download";
+            var ok = await FetchToFileAsync(detail.Client.Url, temp, cancellation).ConfigureAwait(false)
+                     || await FetchToFileAsync(MirrorOf(detail.Client.Url), temp, cancellation).ConfigureAwait(false);
+            if (!ok || !IsValidClientJar(temp, detail.Client.Sha1, detail.Client.Size))
+            {
+                if (File.Exists(temp))
+                    File.Delete(temp);
+                return new LaunchResult(false, 0, "游戏核心 jar 校验失败(下载不完整,请检查网络后重试)");
+            }
+            File.Move(temp, clientJar, overwrite: true);
+            Raise("游戏核心 jar 已修复");
+        }
+
         // ============================== 库/依赖校验 ==============================
         Raise($"校验 {detail.Libraries.Count} 个库文件…");
         var missingLibs = detail.Libraries
@@ -215,9 +234,12 @@ public static class LaunchPipeline
             psi.ArgumentList.Add(a);
 
         Directory.CreateDirectory(Path.Combine(gameDir, "logs"));
+        // 不抢占游戏自己的 latest.log:控制台输出写到独立文件,
+        // 并允许共享读写,避免上一次进程尚未退出时无法启动。
+        var consoleLogPath = Path.Combine(gameDir, "logs", "launcher-console.log");
         var logStream = new StreamWriter(
-            new FileStream(Path.Combine(gameDir, "logs", "latest.log"),
-                FileMode.Create, FileAccess.Write, FileShare.Read, 1 << 14, FileOptions.Asynchronous))
+            new FileStream(consoleLogPath,
+                FileMode.Create, FileAccess.Write, FileShare.ReadWrite, 1 << 14, FileOptions.Asynchronous))
         { AutoFlush = true };
 
         Process? process;
@@ -295,6 +317,35 @@ public static class LaunchPipeline
             || url.Contains("api.adoptium.net", StringComparison.Ordinal)
             || url.Contains("github.com", StringComparison.Ordinal)
             || url.Contains("piston-meta", StringComparison.Ordinal));
+
+    /// <summary>客户端 jar 是否完整可用:大小、SHA-1 与 zip 结构(必须含主类)。</summary>
+    private static bool IsValidClientJar(string path, string? sha1, long size)
+    {
+        try
+        {
+            var info = new FileInfo(path);
+            if (!info.Exists || info.Length < 64 * 1024)
+                return false;
+            if (size > 0 && info.Length != size)
+                return false;
+            if (!string.IsNullOrWhiteSpace(sha1) && !string.Equals(Sha1Of(path), sha1, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            using var zip = System.IO.Compression.ZipFile.OpenRead(path);
+            return zip.Entries.Any(e => e.FullName.EndsWith("client/main/Main.class", StringComparison.Ordinal));
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static string Sha1Of(string path)
+    {
+        using var stream = File.OpenRead(path);
+        using var sha = System.Security.Cryptography.SHA1.Create();
+        return Convert.ToHexString(sha.ComputeHash(stream)).ToLowerInvariant();
+    }
 
     private static async Task<bool> FetchToFileAsync(string? url, string target, CancellationToken ct)
     {
