@@ -5,8 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SL.App.Pages">
 
-    <ScrollViewer>
-        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto">
+        <StackPanel Margin="36,28,36,32" Spacing="16" MinWidth="640" MaxWidth="980" HorizontalAlignment="Left">
             <TextBlock Text="外观与设置"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
@@ -137,10 +138,20 @@
                     Padding="22"
                     HorizontalAlignment="Stretch">
                 <StackPanel Spacing="18">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                         <FontIcon Glyph="&#xE790;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" />
-                        <TextBlock Text="外观" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    </StackPanel>
+                        <TextBlock Grid.Column="1" Text="外观" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock x:Name="ThemeCurrentText"
+                                   Grid.Column="2"
+                                   FontSize="11.5"
+                                   VerticalAlignment="Center"
+                                   Foreground="{ThemeResource Brush.FgFaint}" />
+                    </Grid>
 
                     <!-- 深浅色:分段控件 -->
                     <Grid ColumnSpacing="18">
@@ -177,6 +188,9 @@
                                   SelectionMode="None"
                                   IsItemClickEnabled="True"
                                   ItemClick="OnPaletteClick"
+                                  ScrollViewer.VerticalScrollMode="Disabled"
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                  ScrollViewer.IsVerticalRailEnabled="False"
                                   Padding="0">
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="local:PaletteCardVM">

@@ -8,7 +8,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="*" MinHeight="220" />
         </Grid.RowDefinitions>
 
         <Grid ColumnSpacing="12">
@@ -22,6 +22,7 @@
                            Foreground="{ThemeResource Brush.Fg}" />
                 <TextBlock Text="{Binding Summary}"
                            FontSize="12"
+                           TextWrapping="Wrap"
                            Foreground="{ThemeResource Brush.FgDim}" />
             </StackPanel>
             <StackPanel Grid.Column="1"
@@ -39,10 +40,16 @@
                 BorderThickness="1"
                 CornerRadius="10"
                 Padding="16,12">
-            <StackPanel Orientation="Horizontal" Spacing="12">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="180" />
+                    <ColumnDefinition Width="*" MinWidth="140" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <ComboBox ItemsSource="{Binding Files}"
                           SelectedItem="{Binding SelectedFile}"
-                          MinWidth="320"
+                          MinWidth="180"
+                          HorizontalAlignment="Stretch"
                           VerticalAlignment="Center">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -51,14 +58,16 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <TextBox x:Name="KeywordBox"
+                         Grid.Column="1"
                          PlaceholderText="关键词过滤(如 ERROR)"
-                         Width="240"
+                         MinWidth="140"
                          TextChanged="OnKeywordChanged"
                          VerticalAlignment="Center" />
-                <CheckBox Content="仅看错误"
+                <CheckBox Grid.Column="2"
+                          Content="仅看错误"
                           IsChecked="{Binding ErrorsOnly, Mode=TwoWay}"
                           VerticalAlignment="Center" />
-            </StackPanel>
+            </Grid>
         </Border>
 
         <Border Grid.Row="2"
@@ -67,7 +76,8 @@
                 BorderThickness="1"
                 CornerRadius="10"
                 Padding="6">
-            <ScrollViewer>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <TextBlock Text="{Binding LogText}"
                            FontFamily="Consolas"
                            FontSize="12"

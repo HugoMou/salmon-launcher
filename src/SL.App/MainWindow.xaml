@@ -33,7 +33,10 @@
 
         <NavigationView x:Name="NavView"
                         Grid.Row="1"
-                        PaneDisplayMode="Left"
+                        PaneDisplayMode="Auto"
+                        CompactModeThresholdWidth="1000"
+                        ExpandedModeThresholdWidth="1200"
+                        IsPaneToggleButtonVisible="True"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         OpenPaneLength="212"

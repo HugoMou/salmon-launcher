@@ -5,8 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:SL.App.Pages">
 
-    <ScrollViewer>
-        <StackPanel Margin="36,28,36,28" Spacing="16" MaxWidth="1080" HorizontalAlignment="Left">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="1080" HorizontalAlignment="Left">
             <TextBlock Text="主题工坊"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
@@ -55,6 +56,9 @@
                       IsItemClickEnabled="True"
                       ItemClick="OnBlockClick"
                       SelectionMode="None"
+                      ScrollViewer.VerticalScrollMode="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                      ScrollViewer.IsVerticalRailEnabled="False"
                       Padding="0,4,0,24">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="local:BlockCard">

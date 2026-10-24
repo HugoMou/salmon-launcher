@@ -6,9 +6,9 @@
 
     <Grid Margin="36,28,36,28" RowSpacing="14">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="240" />
+            </Grid.RowDefinitions>
 
         <Grid ColumnSpacing="12">
             <Grid.ColumnDefinitions>
@@ -21,6 +21,7 @@
                            Foreground="{ThemeResource Brush.Fg}" />
                 <TextBlock Text="{Binding Summary}"
                            FontSize="12"
+                           TextWrapping="Wrap"
                            Foreground="{ThemeResource Brush.FgDim}" />
             </StackPanel>
             <Button Grid.Column="1"
@@ -31,8 +32,8 @@
 
         <Grid Grid.Row="1" ColumnSpacing="14">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="0.3*" MinWidth="220" />
+                <ColumnDefinition Width="*" MinWidth="360" />
             </Grid.ColumnDefinitions>
 
             <Border Background="{ThemeResource Brush.Card}"

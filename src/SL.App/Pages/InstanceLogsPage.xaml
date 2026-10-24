@@ -8,7 +8,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="*" MinHeight="220" />
         </Grid.RowDefinitions>
 
         <Grid ColumnSpacing="12">
@@ -22,10 +22,11 @@
                            Foreground="{ThemeResource Brush.Fg}" />
                 <TextBlock x:Name="StatusText"
                            FontSize="12"
+                           TextWrapping="Wrap"
                            Foreground="{ThemeResource Brush.FgDim}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <ComboBox x:Name="InstanceBox" MinWidth="200" SelectionChanged="OnInstanceChanged">
+                <ComboBox x:Name="InstanceBox" MinWidth="150" SelectionChanged="OnInstanceChanged">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Id}" />
@@ -43,17 +44,23 @@
                 BorderThickness="1"
                 CornerRadius="10"
                 Padding="16,12">
-            <StackPanel Orientation="Horizontal" Spacing="12">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="180" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <TextBox x:Name="KeywordBox"
                          PlaceholderText="关键词过滤(如 ERROR、Exception)"
-                         Width="280"
+                         MinWidth="180"
                          TextChanged="OnKeywordChanged"
                          VerticalAlignment="Center" />
-                <TextBlock Text="读取 instances/&lt;id&gt;/logs/latest.log 的尾部 2000 行"
+                <TextBlock Grid.Column="1"
+                           Text="读取实例 logs/latest.log 尾部 2000 行"
                            FontSize="11.5"
                            VerticalAlignment="Center"
+                           TextWrapping="Wrap"
                            Foreground="{ThemeResource Brush.FgFaint}" />
-            </StackPanel>
+            </Grid>
         </Border>
 
         <Border Grid.Row="2"
@@ -62,7 +69,8 @@
                 BorderThickness="1"
                 CornerRadius="10"
                 Padding="6">
-            <ScrollViewer>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <TextBlock x:Name="LogText"
                            FontFamily="Consolas"
                            FontSize="12"

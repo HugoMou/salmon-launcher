@@ -98,7 +98,22 @@ public sealed partial class SettingsPage : Page
             ? "已阅读并同意"
             : "尚未同意 · 点击右侧按钮查看并确认";
 
+        UpdateThemeSummary(c);
         _loading = false;
+    }
+
+    /// <summary>显示当前生效的主题组合,便于确认切换结果。</summary>
+    private void UpdateThemeSummary(SL.Core.Settings.AppConfig c)
+    {
+        var palette = ThemeManager.Palettes.FirstOrDefault(p => p.Id == c.Palette)?.Name ?? "默认";
+        var accent = ThemeManager.Accents.FirstOrDefault(a => a.Id == c.Accent)?.Name ?? "默认";
+        var mode = c.Theme switch
+        {
+            SL.Core.Settings.ThemePref.Light => "浅色",
+            SL.Core.Settings.ThemePref.Dark => "深色",
+            _ => "跟随系统",
+        };
+        ThemeCurrentText.Text = $"当前:{palette} · {accent} · {mode}";
     }
 
     private void OnModeChecked(object sender, RoutedEventArgs e)
@@ -109,6 +124,7 @@ public sealed partial class SettingsPage : Page
             : ReferenceEquals(sender, ModeDark) ? SL.Core.Settings.ThemePref.Dark
             : SL.Core.Settings.ThemePref.FollowSystem;
         AppServices.Settings.Update(c => c.Theme = pref);
+        UpdateThemeSummary(AppServices.Settings.Current);
     }
 
     private void OnPaletteClick(object sender, ItemClickEventArgs e)
@@ -144,6 +160,7 @@ public sealed partial class SettingsPage : Page
         AccentList.ItemsSource = ThemeManager.Accents
             .Select(a => new AccentCardVM(a, c.Accent))
             .ToList();
+        UpdateThemeSummary(c);
     }
 
     private void OnConcurrencyChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)

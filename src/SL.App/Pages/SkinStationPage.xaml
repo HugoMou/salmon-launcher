@@ -7,8 +7,8 @@
 
     <Grid Margin="36,28,36,28" ColumnSpacing="16">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0.24*" MinWidth="190" />
+            <ColumnDefinition Width="*" MinWidth="440" />
         </Grid.ColumnDefinitions>
 
         <!-- 侧边栏:用户列表 -->
@@ -91,22 +91,23 @@
                                Foreground="{ThemeResource Brush.Fg}" />
                     <TextBlock x:Name="StatusText"
                                FontSize="12"
+                               TextWrapping="Wrap"
                                Foreground="{ThemeResource Brush.FgDim}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="8"
                             VerticalAlignment="Center">
-                    <Button Content="添加本地皮肤" Click="OnImportSkin" />
-                    <Button Content="从网址添加" Click="OnDownloadSkin" />
+                    <Button Content="本地添加" Click="OnImportSkin" />
+                    <Button Content="网址添加" Click="OnDownloadSkin" />
                     <Button Content="打开目录" Click="OnOpenDir" />
                 </StackPanel>
             </Grid>
 
             <Grid Grid.Row="1" ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="300" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.32*" MinWidth="200" />
+                    <ColumnDefinition Width="*" MinWidth="220" />
                 </Grid.ColumnDefinitions>
 
                 <Border Background="{ThemeResource Brush.Card}"

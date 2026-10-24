@@ -168,5 +168,10 @@ public sealed class TaskCenterVM : VmBase, IRefreshable
         foreach (var snap in AppServices.Transfers.Snapshots.Where(s => !s.Hidden))
             Rows.Add(new TaskRowVM(snap));
         On(nameof(Summary));
+        On(nameof(EmptyVisibility));
     }
+
+    /// <summary>列表为空时显示空状态卡。</summary>
+    public Microsoft.UI.Xaml.Visibility EmptyVisibility
+        => Rows.Count == 0 ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
 }
