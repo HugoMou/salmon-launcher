@@ -30,7 +30,7 @@ public sealed class MsAuthException(string message) : Exception(message);
 /// </summary>
 public static class MsAuth
 {
-    private const string ClientId = "00000000402b5328";
+    private const string ClientId = "0add8caf-2cc6-4546-b798-c3d171217dd9";
     private const string Scope = "XboxLive.signin offline_access";
 
     private static readonly HttpClient Client = CreateClient();
