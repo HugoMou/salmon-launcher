@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SL.Pres</RootNamespace>
+    <AssemblyName>SL</AssemblyName>
+    <Version>0.1.0</Version>
+    <UseLayoutRounding>true</UseLayoutRounding>
+  </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SL.Core\SL.Core.csproj" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Logo.webp" />
+  </ItemGroup>
+
+</Project>

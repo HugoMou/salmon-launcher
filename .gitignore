@@ -1,0 +1,30 @@
+# ---------- Visual Studio / IDE ----------
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.log
+
+# ---------- .NET 构建产物 ----------
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+Artifacts/
+*.binlog
+*. artifacts
+
+# ---------- WinUI 3 / Windows App SDK ----------
+*.g.cs
+*.g.i.cs
+*.xaml.isru
+*.pri
+Generated Files/
+
+# ---------- 本地运行数据 ----------
+minecraft-java.json
+
+# ---------- 其他 ----------
+Thumbs.db
+Desktop.ini

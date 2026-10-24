@@ -1,0 +1,55 @@
+<UserControl x:Class="SL.Pres.Pages.InstanceSavesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:SL.Pres.Controls">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{StaticResource Style.Card}" Margin="0,0,0,14" Padding="18,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="存档" Style="{StaticResource Style.Head}" />
+                    <TextBlock Text="{Binding SubTitle}" Style="{StaticResource Style.Sub}" Margin="0,4,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ctrls:MyButton Content="备份全部存档" MinWidth="130" MinHeight="36"
+                                    Command="{Binding BackupCommand}" />
+                    <ctrls:MyButton Content="打开存档目录" MinWidth="120" MinHeight="36" Margin="8,0,0,0"
+                                    Command="{Binding OpenSavesCommand}" />
+                    <ctrls:MyButton Content="打开备份目录" MinWidth="120" MinHeight="36" Margin="8,0,0,0"
+                                    Command="{Binding OpenBackupsCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Style="{StaticResource Style.Card}" Padding="10,8">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Rows}" Margin="0,0,4,8">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource Style.Card}" Padding="14,10" Margin="0,0,0,8">
+                                <Grid>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontSize="{DynamicResource Font.Body}"
+                                                   FontWeight="Medium" Foreground="{DynamicResource Brush.Fg}" />
+                                        <TextBlock Text="{Binding Meta}" Style="{StaticResource Style.Sub}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

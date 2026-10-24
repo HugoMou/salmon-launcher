@@ -1,0 +1,70 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ============================== 颜色 ============================== -->
+
+    <SolidColorBrush x:Key="Brush.PageBg" Color="#EDF1F2" />
+    <SolidColorBrush x:Key="Brush.PanelBg" Color="#E2E8EA" />
+    <SolidColorBrush x:Key="Brush.Card" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Brush.CardHover" Color="#F4F8F9" />
+    <SolidColorBrush x:Key="Brush.CardPress" Color="#E9EDEE" />
+
+    <SolidColorBrush x:Key="Brush.Border" Color="#D0D8DB" />
+    <SolidColorBrush x:Key="Brush.BorderStrong" Color="#AFC0C6" />
+
+    <SolidColorBrush x:Key="Brush.Fg" Color="#1B2A31" />
+    <SolidColorBrush x:Key="Brush.FgDim" Color="#5A6E78" />
+    <SolidColorBrush x:Key="Brush.FgFaint" Color="#90A2A9" />
+
+    <SolidColorBrush x:Key="Brush.Accent" Color="#E2604B" />
+    <SolidColorBrush x:Key="Brush.AccentHover" Color="#D5523E" />
+    <SolidColorBrush x:Key="Brush.AccentPress" Color="#BC4634" />
+    <SolidColorBrush x:Key="Brush.AccentFg" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Brush.AccentSoft" Color="#30E2604B" />
+
+    <SolidColorBrush x:Key="Brush.Success" Color="#2F9F63" />
+    <SolidColorBrush x:Key="Brush.SuccessSoft" Color="#262F9F63" />
+    <SolidColorBrush x:Key="Brush.Warning" Color="#BE7A19" />
+    <SolidColorBrush x:Key="Brush.WarningSoft" Color="#26BE7A19" />
+    <SolidColorBrush x:Key="Brush.Danger" Color="#C2463A" />
+    <SolidColorBrush x:Key="Brush.DangerSoft" Color="#26C2463A" />
+
+    <SolidColorBrush x:Key="Brush.Overlay" Color="#66000000" />
+
+    <!-- 云母背景：半透明窗口 / 导航底色 -->
+    <SolidColorBrush x:Key="Brush.WindowTint" Color="#D9F3F6F8" />
+    <SolidColorBrush x:Key="Brush.NavBg" Color="#B8E9EEF1" />
+    <SolidColorBrush x:Key="Brush.NavItemHover" Color="#0F000000" />
+    <SolidColorBrush x:Key="Brush.NavItemChecked" Color="#1FE2604B" />
+
+    <!-- ============================== 字体 ============================== -->
+
+    <FontFamily x:Key="Font.Global">Microsoft YaHei UI, Microsoft YaHei, Segoe UI</FontFamily>
+    <sys:Double x:Key="Font.Hero" xmlns:sys="clr-namespace:System;assembly=mscorlib">24</sys:Double>
+    <sys:Double x:Key="Font.Head" xmlns:sys="clr-namespace:System;assembly=mscorlib">18</sys:Double>
+    <sys:Double x:Key="Font.Body" xmlns:sys="clr-namespace:System;assembly=mscorlib">14</sys:Double>
+    <sys:Double x:Key="Font.Small" xmlns:sys="clr-namespace:System;assembly=mscorlib">12</sys:Double>
+
+    <!-- ============================== 形状与间距 ============================== -->
+
+    <CornerRadius x:Key="Radius.Card">8</CornerRadius>
+    <CornerRadius x:Key="Radius.Control">4</CornerRadius>
+    <CornerRadius x:Key="Radius.Dialog">8</CornerRadius>
+    <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
+
+    <Thickness x:Key="Sp.Xs">4</Thickness>
+    <Thickness x:Key="Sp.Sm">8</Thickness>
+    <Thickness x:Key="Sp.Md">16</Thickness>
+    <Thickness x:Key="Sp.Lg">24</Thickness>
+
+    <Thickness x:Key="Pad.Control">14,7</Thickness>
+    <Thickness x:Key="Pad.Card">16</Thickness>
+    <Thickness x:Key="Pad.Dialog">24</Thickness>
+
+    <!-- ============================== 动画/交互 ============================== -->
+
+    <Duration x:Key="Dur.Trans">0:0:0.22</Duration>
+    <Duration x:Key="Dur.Dialog">0:0:0.18</Duration>
+    <Duration x:Key="Dur.Quick">0:0:0.12</Duration>
+
+</ResourceDictionary>

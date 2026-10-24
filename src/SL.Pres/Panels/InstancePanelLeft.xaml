@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="SL.Pres.Panels.InstancePanelLeft"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:SL.Pres.Controls">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="12,10,12,14">
+
+            <TextBlock Text="实例功能" Style="{StaticResource Style.Sub}" Margin="6,4,0,8" />
+            <StackPanel>
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="概览"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.overview}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.overview" />
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="模组管理"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.mods}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.mods" />
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="资源包"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.packs}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.packs" />
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="光影"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.shaders}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.shaders" />
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="存档"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.saves}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.saves" />
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="设置"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.cfg}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.cfg" />
+                <ctrls:MyRadioTab GroupName="NavInst" Style="{StaticResource Style.NavItem}" MinHeight="36" Margin="0,2"
+                                  Content="日志"
+                                  IsChecked="{Binding CurrentKey, Mode=OneWay, Converter={StaticResource StrEq}, ConverterParameter=inst.logs}"
+                                  Command="{Binding NavigateCommand}" CommandParameter="inst.logs" />
+            </StackPanel>
+
+            <Border Margin="0,16,0,0" Padding="12,10" Background="{DynamicResource Brush.Card}"
+                    CornerRadius="{DynamicResource Radius.Card}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="1.20.2 · Fabric Lite" FontSize="{DynamicResource Font.Body}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.Fg}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="实例隔离与多实例列表在阶段四接入" Style="{StaticResource Style.Sub}" Margin="0,3,0,0" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

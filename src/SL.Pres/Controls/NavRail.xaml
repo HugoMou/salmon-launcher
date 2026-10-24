@@ -1,0 +1,68 @@
+<UserControl x:Class="SL.Pres.Controls.NavRail"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:SL.Pres.Controls">
+
+    <Border Background="{DynamicResource Brush.NavBg}"
+            BorderBrush="{DynamicResource Brush.Border}"
+            BorderThickness="0,0,1,0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Groups}" Margin="4,10,4,10">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,4">
+                                <TextBlock Text="{Binding Title}" Style="{StaticResource Style.Sub}"
+                                           Margin="12,8,0,4"
+                                           Visibility="{Binding DataContext.ShowLabels, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
+
+                                <ItemsControl ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ctrls:MyRadioTab Style="{StaticResource Style.NavItem}"
+                                                              Glyph="{Binding Glyph}"
+                                                              ToolTip="{Binding Label}"
+                                                              Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                              CommandParameter="{Binding Key}">
+                                                <ctrls:MyRadioTab.Content>
+                                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               Visibility="{Binding DataContext.ShowLabels, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}" />
+                                                </ctrls:MyRadioTab.Content>
+                                                <ctrls:MyRadioTab.IsChecked>
+                                                    <MultiBinding Converter="{StaticResource KeyIsCurrentFmt}" Mode="OneWay">
+                                                        <Binding Path="Key" />
+                                                        <Binding Path="DataContext.CurrentKey" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                                    </MultiBinding>
+                                                </ctrls:MyRadioTab.IsChecked>
+                                            </ctrls:MyRadioTab>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- 折叠 / 展开 -->
+            <Border Grid.Row="1" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0" Padding="6,6">
+                <ctrls:MyButton Style="{StaticResource BtnStyleGhost}" Height="34"
+                                Command="{Binding ToggleSideCommand}"
+                                ToolTip="折叠 / 展开导航">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SideToggleGlyph}" FontSize="13" VerticalAlignment="Center" />
+                        <TextBlock Text="折叠导航" FontSize="{DynamicResource Font.Small}" Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding ShowLabels, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                </ctrls:MyButton>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

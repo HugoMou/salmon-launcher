@@ -1,0 +1,57 @@
+<UserControl x:Class="SL.Pres.Pages.SkinStationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:SL.Pres.Controls">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+
+            <Border Style="{StaticResource Style.Card}" Margin="0,0,0,14" Padding="18,14">
+                <StackPanel>
+                    <TextBlock Text="皮肤站" Style="{StaticResource Style.Head}" />
+                    <TextBlock Text="{Binding AccountText}" Style="{StaticResource Style.Sub}" Margin="0,4,0,0" />
+                    <TextBlock Text="{Binding MsaHint}" Style="{StaticResource Style.Sub}" Margin="0,6,0,0"
+                               TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding HintText}" Style="{StaticResource Style.Sub}" Margin="0,6,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Style.Card}" Margin="0,0,0,14" Padding="18,16">
+                <StackPanel Orientation="Horizontal">
+                    <!-- 头像(8×8 → 就近插值放大) -->
+                    <Border Background="#18FFFFFF" CornerRadius="6" Padding="8">
+                        <Image Source="{Binding SkinHead}" Stretch="Uniform"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor"
+                               Width="96" Height="96"
+                               Visibility="{Binding HasSkin, Converter={StaticResource BoolToVis}}" />
+                    </Border>
+
+                    <Border Background="#18FFFFFF" CornerRadius="6" Padding="8" Margin="18,0,0,0"
+                            Visibility="{Binding HasSkin, Converter={StaticResource BoolToVis}}">
+                        <Image Source="{Binding SkinFull}" Stretch="None"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor" MaxHeight="240" />
+                    </Border>
+
+                    <TextBlock VerticalAlignment="Center" Margin="18,0,0,0"
+                               Text="(导入皮肤后此处展示头部特写与整图)"
+                               Visibility="{Binding HasSkin, Converter={StaticResource BoolHidden}}" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Style.Card}" Padding="18,14">
+                <StackPanel Orientation="Horizontal">
+                    <ctrls:MyButton Content="{Binding MsaButtonText}" MinWidth="128" MinHeight="40"
+                                    Command="{Binding MsaLoginCommand}" />
+                    <ctrls:MyButton Content="切换账户" MinWidth="128" MinHeight="40" Margin="10,0,0,0"
+                                    Command="{Binding ChangeAccountCommand}" />
+                    <ctrls:MyButton Content="导入皮肤(.png)" MinWidth="150" MinHeight="40" Margin="10,0,0,0"
+                                    Command="{Binding ImportCommand}" />
+                    <ctrls:MyButton Content="打开皮肤目录" MinWidth="128" MinHeight="40" Margin="10,0,0,0"
+                                    Command="{Binding OpenDirCommand}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
