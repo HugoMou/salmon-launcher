@@ -17,7 +17,7 @@
               Visibility="Collapsed"
               IsHitTestVisible="False">
             <Grid.Background>
-                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.85" />
+                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.5" />
             </Grid.Background>
             <Border x:Name="WallpaperScrim" />
         </Grid>
@@ -26,9 +26,19 @@
         <Grid x:Name="AppTitleBar" Height="48" Background="Transparent">
             <StackPanel Orientation="Horizontal"
                         Margin="14,0,0,0"
-                        Spacing="10"
+                        Spacing="9"
                         VerticalAlignment="Center">
-                <Ellipse Width="18" Height="18" Fill="{ThemeResource Brush.Accent}" />
+                <!-- 应用 Logo:鲑鱼侧影 -->
+                <Viewbox Width="24" Height="24">
+                    <Canvas Width="32" Height="32">
+                        <Path Fill="{ThemeResource Brush.Accent}"
+                              Data="M3,17 C8,11 18,8 25,11 C27,12 28.6,13.6 29.2,15 C28.6,16.4 27,18 25,19 C18,22 8,19 3,17 Z" />
+                        <Path Fill="{ThemeResource Brush.Accent}"
+                              Data="M3.4,17 L0.4,12.2 L0.4,21.8 Z" />
+                        <Ellipse Canvas.Left="23" Canvas.Top="13" Width="2.4" Height="2.4"
+                                 Fill="{ThemeResource Brush.AccentFg}" />
+                    </Canvas>
+                </Viewbox>
                 <TextBlock Text="Salmon Launcher"
                            VerticalAlignment="Center"
                            Foreground="{ThemeResource Brush.Fg}"
@@ -38,7 +48,7 @@
                            Text=""
                            VerticalAlignment="Center"
                            Foreground="{ThemeResource Brush.FgDim}"
-                           FontSize="13" />
+                           FontSize="12.5" />
             </StackPanel>
         </Grid>
 
@@ -48,6 +58,7 @@
                         CompactModeThresholdWidth="860"
                         ExpandedModeThresholdWidth="1000"
                         IsPaneToggleButtonVisible="True"
+                        IsPaneOpen="True"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         OpenPaneLength="212"
@@ -63,12 +74,8 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!-- 页面标题 + 非模态提示层 -->
-                    <StackPanel Margin="36,22,36,0" Spacing="10">
-                        <TextBlock x:Name="HeaderText"
-                                   FontSize="24"
-                                   FontWeight="SemiBold"
-                                   Foreground="{ThemeResource Brush.Fg}" />
+                    <!-- 提示层(页面标题由标题栏与页面自身承担,这里只放 toast) -->
+                    <StackPanel Margin="36,14,36,0" Spacing="10">
                         <ItemsControl x:Name="NotifyHost">
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="ContentPresenter">

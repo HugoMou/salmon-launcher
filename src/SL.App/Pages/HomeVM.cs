@@ -58,6 +58,8 @@ public sealed class HomeVM : VmBase
         set => Set(ref _selectedInstance, value);
     }
 
+    private string? _lastSelectedId;
+
     private bool _busy;
     public bool Busy
     {
@@ -98,7 +100,11 @@ public sealed class HomeVM : VmBase
         Instances.Clear();
         foreach (var row in fresh)
             Instances.Add(row);
-        SelectedInstance = fresh.FirstOrDefault(r => r.Id == _selectedInstance?.Id) ?? fresh.FirstOrDefault();
+
+        // 集合重建后强制通知一次,避免 ComboBox 先绑定 SelectedItem 时丢选中
+        SelectedInstance = null;
+        SelectedInstance = fresh.FirstOrDefault(r => r.Id == _lastSelectedId) ?? fresh.FirstOrDefault();
+        _lastSelectedId = SelectedInstance?.Id;
 
         var repo = AccountStore.Load();
         var active = repo.Accounts.FirstOrDefault(a => a.Id == repo.ActiveId);

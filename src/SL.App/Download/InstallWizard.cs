@@ -1,4 +1,5 @@
 using SL.Core.Boot;
+using SL.Core.Launch;
 using SL.Core.Net;
 using SL.Core.Transfers;
 using SL.App.Infrastructure;
@@ -111,6 +112,19 @@ public static class InstallWizard
     {
         var dest = Path.Combine(Runtime.InstancesDir, instanceId, subDir, fileName);
         Submit(fileName, url, sha1, size, dest, TransferPriority.Normal);
+    }
+
+    /// <summary>提交加载器安装所需的库文件(由 LoaderInstall 生成的清单)。</summary>
+    public static int SubmitLoaderFiles(IReadOnlyList<LoaderFile> files)
+    {
+        var count = 0;
+        foreach (var file in files)
+        {
+            Submit(file.DisplayName, file.Url, file.Sha1, file.Size,
+                file.DestPath, file.IsLibrary ? TransferPriority.Library : TransferPriority.Normal);
+            count++;
+        }
+        return count;
     }
 
     private static void Submit(string name, string url, string? sha1, long size, string dest, int priority)

@@ -104,13 +104,12 @@ public sealed partial class MainWindow : Window
             AppServices.Nav.Navigate(key);
     }
 
-    /// <summary>导航变化 → 同步标题、面包屑与 NavigationView 选中态。</summary>
+    /// <summary>导航变化 → 同步面包屑与 NavigationView 选中态。</summary>
     private void SyncShell()
     {
         var key = AppServices.Nav.CurrentKey;
         var spec = PageCatalog.Get(key);
 
-        HeaderText.Text = Loc.T(spec.Title);
         PageTitleText.Text = $"· {Loc.T(spec.Title)}";
 
         var item = FindItem(NavView.MenuItems, key);

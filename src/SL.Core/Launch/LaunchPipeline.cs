@@ -206,6 +206,8 @@ public static class LaunchPipeline
         // ============================== 参数组装 ==============================
         Raise("组装启动参数…");
         var classpath = BuildClasspath(detail, clientJar);
+        Logging.AppLog.Info("Launch",
+            $"mainClass={detail.MainClass} · 库 {detail.Libraries.Count} 项 · classpath {classpath.Split(';').Length} 段");
         var args = BuildArgs(root, detail, classpath, instanceId, instanceDir, nativesDir, accountName, memoryMb, identity);
         args.Insert(0, $"-Xmx{memoryMb}M");
         foreach (var extra in jvmExtraArgs.Split(' ', StringSplitOptions.RemoveEmptyEntries))
@@ -316,7 +318,16 @@ public static class LaunchPipeline
             || url.Contains("bmclapi2.bangbang93.com", StringComparison.Ordinal)
             || url.Contains("api.adoptium.net", StringComparison.Ordinal)
             || url.Contains("github.com", StringComparison.Ordinal)
-            || url.Contains("piston-meta", StringComparison.Ordinal));
+            || url.Contains("piston-meta", StringComparison.Ordinal)
+            // 加载器相关仓库(Fabric / Quilt / Forge / NeoForge / Maven Central)
+            || url.Contains("meta.fabricmc.net", StringComparison.Ordinal)
+            || url.Contains("maven.fabricmc.net", StringComparison.Ordinal)
+            || url.Contains("meta.quiltmc.org", StringComparison.Ordinal)
+            || url.Contains("maven.quiltmc.org", StringComparison.Ordinal)
+            || url.Contains("maven.minecraftforge.net", StringComparison.Ordinal)
+            || url.Contains("maven.neoforged.net", StringComparison.Ordinal)
+            || url.Contains("repo1.maven.org", StringComparison.Ordinal)
+            || url.Contains("libraries.minecraft.net", StringComparison.Ordinal));
 
     /// <summary>客户端 jar 是否完整可用:大小、SHA-1 与 zip 结构(必须含主类)。</summary>
     private static bool IsValidClientJar(string path, string? sha1, long size)

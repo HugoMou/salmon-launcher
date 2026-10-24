@@ -322,13 +322,13 @@ public static class ThemeManager
         Fill(dark, darkSrc);
         Fill(light, lightSrc);
 
-        // 壁纸存在时页面底色半透明,让壁纸透出来
+        // 壁纸存在时页面底色保留一点透明度,让背景若隐若现又不干扰阅读
         var pageDark = Parse(darkSrc.TryGetValue("Brush.PageBg", out var pd) ? pd : "#13191D");
         var pageLight = Parse(lightSrc.TryGetValue("Brush.PageBg", out var pl) ? pl : "#EDF1F2");
-        Put(dark, "Brush.PageBgTrans", WithAlpha(pageDark, 0xDA));
-        Put(light, "Brush.PageBgTrans", WithAlpha(pageLight, 0xDE));
-        Put(dark, "Brush.WallpaperScrim", Argb(0x55, 0, 0, 0));
-        Put(light, "Brush.WallpaperScrim", Argb(0x44, 0xFF, 0xFF, 0xFF));
+        Put(dark, "Brush.PageBgTrans", WithAlpha(pageDark, 0xF0));
+        Put(light, "Brush.PageBgTrans", WithAlpha(pageLight, 0xF4));
+        Put(dark, "Brush.WallpaperScrim", Argb(0x3D, 0, 0, 0));
+        Put(light, "Brush.WallpaperScrim", Argb(0x2E, 0xFF, 0xFF, 0xFF));
 
         // 强调色系列(写入两套字典,值随主题变体)
         Put(dark, "Brush.Accent", accentDark);
