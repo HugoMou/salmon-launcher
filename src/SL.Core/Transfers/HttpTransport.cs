@@ -44,6 +44,21 @@ public sealed class HttpTransport : ITransport
         if (!string.IsNullOrEmpty(dir))
             Directory.CreateDirectory(dir);
 
+        // 本地已有可用文件(重复安装 / 上次已完成)且大小吻合(或带 SHA-1 可校验):
+        // 不再发请求,直接交给引擎做终验;否则会带超大 Range 触发服务器 416。
+        var expectedTotal = context.Task.Spec.BytesTotal;
+        if (File.Exists(dest) && new FileInfo(dest).Length > 0)
+        {
+            var localLength = new FileInfo(dest).Length;
+            var sizeMatches = expectedTotal <= 0 || localLength == expectedTotal;
+            var verifiable = expectedTotal > 0 || !string.IsNullOrEmpty(context.Task.Spec.ExpectedSha1);
+            if (sizeMatches && verifiable)
+            {
+                context.Progress(localLength);
+                return TransportResult.Ok(localLength);
+            }
+        }
+
         var startBytes = PrepareLocalPrefix(context, dest);
         if (startBytes < 0)
             return TransportResult.Fail("本地断点文件异常,已重新排队");
@@ -55,6 +70,13 @@ public sealed class HttpTransport : ITransport
         using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellation)
             .ConfigureAwait(false);
 
+        // Range 越界:本地前缀比服务器文件还大,删掉重下
+        if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
+        {
+            StartOver(dest);
+            return TransportResult.Fail($"HTTP 416 断点失效,已清空本地缓存重试");
+        }
+
         // 服务器无视 Range 返回完整 200 → 前缀失效,整文件重写
         if (response.StatusCode == HttpStatusCode.OK)
             startBytes = 0;
@@ -63,11 +85,11 @@ public sealed class HttpTransport : ITransport
             return TransportResult.Fail($"HTTP {(int)response.StatusCode} {response.ReasonPhrase}");
 
         var contentLength = response.Content.Headers.ContentLength ?? -1;
-        var totalExpected = response.StatusCode == HttpStatusCode.PartialContent && contentLength > 0
+        var total = response.StatusCode == HttpStatusCode.PartialContent && contentLength > 0
             ? startBytes + contentLength
             : contentLength;
-        if (context.Task.Spec.BytesTotal > 0 && totalExpected < 0)
-            totalExpected = context.Task.Spec.BytesTotal;
+        if (context.Task.Spec.BytesTotal > 0 && total < 0)
+            total = context.Task.Spec.BytesTotal;
 
         try
         {
@@ -104,11 +126,24 @@ public sealed class HttpTransport : ITransport
         }
 
         var finalLength = new FileInfo(dest).Length;
-        if (totalExpected > 0 && finalLength != totalExpected)
-            return TransportResult.Fail($"下载不完整:期望 {totalLengthFmt(totalExpected)},实际 {totalLengthFmt(finalLength)}(网络中断)");
+        if (total > 0 && finalLength != total)
+            return TransportResult.Fail($"下载不完整:期望 {totalLengthFmt(total)},实际 {totalLengthFmt(finalLength)}(网络中断)");
 
         context.Progress(finalLength);
         return TransportResult.Ok(finalLength);
+    }
+
+    private static void StartOver(string dest)
+    {
+        try
+        {
+            if (File.Exists(dest))
+                File.Delete(dest);
+        }
+        catch (IOException)
+        {
+            // 删不掉就交给下一轮覆盖写
+        }
     }
 
     /// <summary>读取本地前缀:返回续传起点;返回 -1 表示本地状态无法自洽(已清理,从头来)。</summary>

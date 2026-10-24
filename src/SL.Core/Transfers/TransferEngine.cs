@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace SL.Core.Transfers;
@@ -342,6 +342,7 @@ public sealed class TransferEngine : ITransferService
                 }
                 catch (Exception ex)
                 {
+                    Logging.AppLog.Warn("Transfer", $"{task.Spec.DisplayName} @ {source.Url} 抛出 {ex.GetType().Name}: {ex.Message}");
                     result = TransportResult.Fail(ex.Message);
                 }
 
@@ -367,6 +368,7 @@ public sealed class TransferEngine : ITransferService
                     NoteSource(source.Url, ok: false);
                     task.Error = result.FailureReason ?? "未知来源错误";
                 }
+                Logging.AppLog.Warn("Transfer", $"{task.Spec.DisplayName} 失败({source.Url}): {task.Error}");
 
                 // 同源指数退避重试
                 if (attempt < _options.MaxAttemptsPerSource)
