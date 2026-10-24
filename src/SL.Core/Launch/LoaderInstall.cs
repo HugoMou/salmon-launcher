@@ -24,8 +24,16 @@ public sealed record LoaderFile(string DisplayName, string Url, string DestPath,
 /// </summary>
 public static class LoaderInstall
 {
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(30) };
-    private static readonly HttpClient Downloader = new() { Timeout = TimeSpan.FromMinutes(10) };
+    private static readonly HttpClient Http = CreateHttp(TimeSpan.FromSeconds(30));
+    private static readonly HttpClient Downloader = CreateHttp(TimeSpan.FromMinutes(10));
+
+    /// <summary>BMCLAPI 等代理对缺少 User-Agent 的请求直接回 403,必须带上。</summary>
+    private static HttpClient CreateHttp(TimeSpan timeout)
+    {
+        var client = new HttpClient { Timeout = timeout };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("SalmonLauncher/" + Boot.Runtime.AppVersion);
+        return client;
+    }
 
     private const string FabricLoaderList = "https://meta.fabricmc.net/v2/versions/loader";
     private const string FabricProfile = "https://meta.fabricmc.net/v2/versions/loader/{0}/{1}/profile/json";
@@ -46,6 +54,8 @@ public static class LoaderInstall
             return url.Replace("https://maven.minecraftforge.net/", BmclMaven + "/", StringComparison.Ordinal);
         if (url.Contains("maven.neoforged.net/releases/", StringComparison.Ordinal))
             return url.Replace("https://maven.neoforged.net/releases/", BmclMaven + "/", StringComparison.Ordinal);
+        if (url.Contains("libraries.minecraft.net/", StringComparison.Ordinal))
+            return url.Replace("https://libraries.minecraft.net/", BmclMaven + "/", StringComparison.Ordinal);
         return null;
     }
 
@@ -357,12 +367,12 @@ public static class LoaderInstall
                 "{\"profiles\":{},\"settings\":{},\"version\":3}", ct).ConfigureAwait(false);
 
         var before = SnapshotVersionDirs(installRoot);
-        // 官方 maven 不通时(国内常见)让安装器改走 BMCLAPI 代理,否则库下载会全部失败
-        var mirror = await MavenUnreachableAsync(isNeo, ct).ConfigureAwait(false) ? BmclMaven : null;
-        step?.Invoke(mirror is null
-            ? $"正在运行 {loader} 安装器(会下载数百 MB 依赖,请耐心等待)…"
-            : $"正在运行 {loader} 安装器(官方源不可达,已切换 BMCLAPI 镜像)…");
-        await RunInstallerAsync(javaExe, installerPath, installRoot, mirror, ct).ConfigureAwait(false);
+        // 安装器的库全部来自 maven.neoforged.net / libraries.minecraft.net,国内直连常被拒;
+        // 先用镜像把这些库补进共享 libraries,安装器校验通过后就不会再联网下载。
+        await PrefetchInstallerLibrariesAsync(installerPath, step, ct).ConfigureAwait(false);
+
+        step?.Invoke($"正在运行 {loader} 安装器(会下载数百 MB 依赖,请耐心等待)…");
+        await RunInstallerAsync(javaExe, installerPath, installRoot, ct).ConfigureAwait(false);
 
         var expected = isNeo
             ? "neoforge-" + version
@@ -536,12 +546,75 @@ public static class LoaderInstall
         }
     }
 
-    /// <summary>取文本:主源失败时回退 BMCLAPI 镜像。</summary>
+    /// <summary>取文本:镜像优先,失败再试官方源(每个源各重试一次)。</summary>
     private static async Task<string> FetchTextAsync(string url, CancellationToken ct)
     {
+        var sources = new List<string>();
+        if (MirrorUrl(url) is { } mirrorUrl)
+            sources.Add(mirrorUrl);
+        sources.Add(url);
+
+        Exception? last = null;
+        foreach (var source in sources)
+        {
+            for (var attempt = 1; attempt <= 2; attempt++)
+            {
+                try
+                {
+                    return await Http.GetStringAsync(source, ct).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    last = ex;
+                    Logging.AppLog.Warn("LoaderInstall", $"{source} 第 {attempt} 次失败:{ex.Message}");
+                }
+            }
+        }
+        throw new InvalidOperationException(
+            "无法获取加载器版本列表:官方源与镜像均不可用,请检查网络后重试", last);
+    }
+
+    /// <summary>
+    /// 读取安装器内的 install_profile.json,把其中列出的库预先补进共享 libraries。
+    /// 安装器随后会校验 sha1 并直接复用,从而绕开被墙的官方 maven。
+    /// </summary>
+    private static async Task PrefetchInstallerLibrariesAsync(string installerPath,
+        Action<string>? step, CancellationToken ct)
+    {
+        List<(string Url, string Dest, string Sha1)> todo;
         try
         {
-            return await Http.GetStringAsync(url, ct).ConfigureAwait(false);
+            using var zip = System.IO.Compression.ZipFile.OpenRead(installerPath);
+            var entry = zip.GetEntry("install_profile.json");
+            if (entry is null)
+                return;
+
+            todo = [];
+            using var doc = await JsonDocument.ParseAsync(entry.Open(), cancellationToken: ct).ConfigureAwait(false);
+            if (!doc.RootElement.TryGetProperty("libraries", out var libs)
+                || libs.ValueKind != JsonValueKind.Array)
+                return;
+
+            foreach (var lib in libs.EnumerateArray())
+            {
+                if (!lib.TryGetProperty("downloads", out var downloads)
+                    || !downloads.TryGetProperty("artifact", out var artifact))
+                    continue;
+                var path = artifact.TryGetProperty("path", out var p) ? p.GetString() ?? "" : "";
+                var url = artifact.TryGetProperty("url", out var u) ? u.GetString() ?? "" : "";
+                var sha1 = artifact.TryGetProperty("sha1", out var s) ? s.GetString() ?? "" : "";
+                if (path.Length == 0 || url.Length == 0)
+                    continue;
+
+                var dest = Path.Combine(Boot.Runtime.LibrariesDir, path.Replace('/', Path.DirectorySeparatorChar));
+                if (File.Exists(dest) && (sha1.Length == 0 || Sha1Of(dest) == sha1))
+                    continue;
+                todo.Add((url, dest, sha1));
+            }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -549,37 +622,83 @@ public static class LoaderInstall
         }
         catch (Exception ex)
         {
-            if (MirrorUrl(url) is not { } mirrorUrl)
-                throw;
-            Logging.AppLog.Warn("LoaderInstall", $"主源 {url} 不可用({ex.Message}),改用镜像");
-            return await Http.GetStringAsync(mirrorUrl, ct).ConfigureAwait(false);
+            // install_profile.json 结构异常时不阻断安装器自身流程
+            Logging.AppLog.Warn("LoaderInstall", "读取 install_profile.json 失败:" + ex.Message);
+            return;
+        }
+
+        if (todo.Count == 0)
+            return;
+
+        var done = 0;
+        foreach (var (url, dest, sha1) in todo)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (!await TryFetchLibraryAsync(url, dest, sha1, ct).ConfigureAwait(false))
+                throw new InvalidOperationException(
+                    $"加载器依赖补全失败:{Path.GetFileName(dest)}(官方源与镜像均不可用)");
+
+            done++;
+            if (done % 5 == 0 || done == todo.Count)
+                step?.Invoke($"补全安装器依赖 {done}/{todo.Count}…");
         }
     }
 
-    /// <summary>探测官方 maven 是否可达(8 秒内无响应即判定不可达)。</summary>
-    private static async Task<bool> MavenUnreachableAsync(bool isNeo, CancellationToken ct)
+    /// <summary>优先走 BMCLAPI 镜像下载单个库,失败再试原始地址;落盘后校验 sha1。</summary>
+    private static async Task<bool> TryFetchLibraryAsync(string url, string dest, string sha1, CancellationToken ct)
     {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        cts.CancelAfter(TimeSpan.FromSeconds(8));
-        try
+        var sources = new List<string>();
+        if (MirrorUrl(url) is { } mirrorUrl)
+            sources.Add(mirrorUrl);
+        sources.Add(url);
+
+        // 镜像代理偶尔会返回 5xx(上游抖动),每个源重试三次并稍作停顿
+        foreach (var source in sources)
         {
-            var host = isNeo ? "https://maven.neoforged.net/releases/" : "https://maven.minecraftforge.net/";
-            using var response = await Http.GetAsync(host, HttpCompletionOption.ResponseHeadersRead, cts.Token)
-                .ConfigureAwait(false);
-            return false; // 有响应即视为可达(404 也算通)
+            for (var attempt = 1; attempt <= 3; attempt++)
+            {
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+                    var temp = dest + ".download";
+                    await using (var file = await DownloadOnceAsync(source, temp, ct).ConfigureAwait(false))
+                    {
+                        if (file.Length == 0)
+                            continue;
+                    }
+
+                    if (sha1.Length > 0 && Sha1Of(temp) != sha1)
+                    {
+                        File.Delete(temp);
+                        continue;
+                    }
+                    File.Move(temp, dest, overwrite: true);
+                    return true;
+                }
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Logging.AppLog.Warn("LoaderInstall", $"库 {source} 第 {attempt} 次预取失败:{ex.Message}");
+                    if (attempt < 3)
+                        await Task.Delay(TimeSpan.FromSeconds(2), ct).ConfigureAwait(false);
+                }
+            }
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch
-        {
-            return true;
-        }
+        return false;
+    }
+
+    private static string Sha1Of(string path)
+    {
+        using var stream = File.OpenRead(path);
+        using var sha = System.Security.Cryptography.SHA1.Create();
+        return Convert.ToHexString(sha.ComputeHash(stream)).ToLowerInvariant();
     }
 
     private static async Task RunInstallerAsync(string javaExe, string installer, string installRoot,
-        string? mirror, CancellationToken ct)
+        CancellationToken ct)
     {
         var psi = new ProcessStartInfo
         {
@@ -596,11 +715,6 @@ public static class LoaderInstall
         psi.ArgumentList.Add(installer);
         psi.ArgumentList.Add("--installClient");
         psi.ArgumentList.Add(installRoot);
-        if (!string.IsNullOrEmpty(mirror))
-        {
-            psi.ArgumentList.Add("--mirror");
-            psi.ArgumentList.Add(mirror);
-        }
 
         using var process = new Process { StartInfo = psi };
         var tail = new Queue<string>();
