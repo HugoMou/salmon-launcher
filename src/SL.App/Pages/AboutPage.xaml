@@ -21,7 +21,10 @@
                 <StackPanel Spacing="16">
                     <StackPanel Orientation="Horizontal" Spacing="16">
                         <Border Width="60" Height="60" CornerRadius="15" Background="{ThemeResource Brush.AccentSoft}">
-                            <FontIcon Glyph="&#xE768;" FontSize="27" Foreground="{ThemeResource Brush.Accent}" />
+                            <Image Source="ms-appx:///Assets/Logo.png"
+                                   Width="48"
+                                   Height="48"
+                                   Stretch="Uniform" />
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="3">
                             <TextBlock Text="Salmon Launcher"

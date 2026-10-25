@@ -32,6 +32,7 @@ public sealed partial class MainWindow : Window
             presenter.PreferredMinimumHeight = 640;
         }
         AppWindow.Resize(new SizeInt32(1320, 860));
+        SetWindowIcon();
 
         BuildMenu();
         NotifyHost.ItemsSource = AppServices.Notify.Items;
@@ -48,6 +49,23 @@ public sealed partial class MainWindow : Window
         AppServices.Nav.Attach(NavFrame);
         SyncShell();
         ApplyTheme();
+    }
+
+    // ---------------------------------------------------------- 窗口图标
+
+    /// <summary>任务栏 / Alt+Tab 图标:项目内置的 Assets\Logo.ico(含 16–256 多尺寸)。</summary>
+    private void SetWindowIcon()
+    {
+        try
+        {
+            var icon = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Logo.ico");
+            if (System.IO.File.Exists(icon))
+                AppWindow.SetIcon(icon);
+        }
+        catch (Exception ex)
+        {
+            Core.Logging.AppLog.Warn("Shell", "设置窗口图标失败:" + ex.Message);
+        }
     }
 
     // ---------------------------------------------------------- 首次启动协议

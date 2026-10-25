@@ -5,28 +5,28 @@ using System.Net.Sockets;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using SL.Core.Logging;
 using SL.Core.Net;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace SL.App.Pages;
 
-/// <summary>局域网房间行。</summary>
-public sealed class LanRoomRow
+/// <summary>局域网发现的开放世界行。</summary>
+public sealed class McLanRow
 {
-    public LanRoomRow(LanRoom room, Action<LanRoom> join)
+    public McLanRow(McLanWorld world, Action<McLanWorld> copy)
     {
-        Room = room.Room;
-        Detail = $"{room.HostName} · {room.Address}:{room.Port}";
-        JoinCommand = new RelayCommand(() => join(room));
+        Motd = world.Motd;
+        Address = $"{world.Address}:{world.Port}";
+        CopyCommand = new RelayCommand(() => copy(world));
     }
 
-    public string Room { get; }
-    public string Detail { get; }
-    public RelayCommand JoinCommand { get; }
+    public string Motd { get; }
+    public string Address { get; }
+    public RelayCommand CopyCommand { get; }
 }
 
 /// <summary>收藏的中继服务器行。</summary>
@@ -47,44 +47,45 @@ public sealed class SavedRelayRow
 }
 
 /// <summary>
-/// 联机页:三种接入方式 —— 本机当自建中继、局域网自动发现、手动添加中继服务器。
-/// 底层都是同一套 TCP 行协议(VoxLinkRelay / VoxLinkRelayClient),消息真实收发。
+/// 联机页:三种接入方式都基于真实的 TCP 端口转发。
+/// - 自建中继:把本机服务器端口(25565)转发到对外端口,好友直连;
+/// - 局域网:监听 Minecraft 原生组播公告,列出同网段已开放的世界;
+/// - 添加中继服务器:连别人开的中继,在本机再开一个本地端口供游戏连接。
 /// </summary>
 public sealed partial class MultiplayerPage : Page
 {
     private readonly DispatcherQueue _ui = DispatcherQueue.GetForCurrentThread();
     private readonly ObservableCollection<string> _messages = [];
-    private readonly ObservableCollection<LanRoomRow> _rooms = [];
+    private readonly ObservableCollection<McLanRow> _worlds = [];
     private readonly ObservableCollection<SavedRelayRow> _saved = [];
 
-    private VoxLinkRelay? _relay;
-    private VoxLinkLanBeacon? _beacon;
-    private VoxLinkLanScanner? _scanner;
-    private VoxLinkRelayClient? _client;
-
-    private string MyName => AppServices.Settings.Current.AccountName;
+    private TcpForwarder? _hostForwarder;
+    private TcpForwarder? _manualForwarder;
+    private McLanScanner? _scanner;
 
     public MultiplayerPage()
     {
         InitializeComponent();
         LogList.ItemsSource = _messages;
-        LanList.ItemsSource = _rooms;
+        LanList.ItemsSource = _worlds;
         SavedList.ItemsSource = _saved;
         ModeHost.IsChecked = true;
+        HintText.Text = "中继只转发 TCP 流量;跨网联机需要把对外端口在路由器上做端口映射,或让双方都接入同一个中继。";
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        StatusText.Text = "选择一种联机方式:自建中继、局域网发现或手动添加中继服务器";
+        StatusText.Text = "选择一种联机方式:自建中继、局域网发现或添加中继服务器";
         RefreshSaved();
-        AddLog("联机模块就绪 · 当前玩家名 " + MyName);
+        AddLog("联机模块就绪 · 玩家名 " + AppServices.Settings.Current.AccountName);
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
-        StopHost(silent: true);
+        StopHost();
+        StopManualForward();
         StopScanner();
     }
 
@@ -110,59 +111,67 @@ public sealed partial class MultiplayerPage : Page
 
     private void OnStartHost(object sender, RoutedEventArgs e)
     {
-        if (_relay is { Active: true })
+        if (_hostForwarder is not null)
         {
-            StopHost(silent: false);
+            StopHost();
             return;
         }
 
-        var port = double.IsNaN(HostPortBox.Value) ? 0 : (int)HostPortBox.Value;
-        var room = RoomNameBox.Text.Trim();
-        if (room.Length == 0)
-            room = "我的房间";
+        var localPort = ReadPort(LocalPortBox, 25565);
+        var listenPort = ReadPort(HostPortBox, 0);
+        var forwarder = new TcpForwarder();
+        forwarder.Log += text => _ui.TryEnqueue(() => AddLog("[中继] " + text));
+        forwarder.StatsChanged += () => _ui.TryEnqueue(UpdateHostInfo);
 
-        var relay = new VoxLinkRelay();
-        relay.Message += text => _ui.TryEnqueue(() => AddLog(text));
-        relay.System += text => _ui.TryEnqueue(() => AddLog("[中继] " + text));
-        relay.MemberJoined += name => _ui.TryEnqueue(() =>
+        if (!forwarder.Start(listenPort, "127.0.0.1", localPort, out var error))
         {
-            UpdateHostInfo();
-            AddLog("[成员] " + name + " 已加入");
-        });
-        relay.MemberLeft += name => _ui.TryEnqueue(() =>
-        {
-            UpdateHostInfo();
-            AddLog("[成员] " + name + " 已离开");
-        });
-
-        if (!relay.Start(port, room))
-        {
-            relay.Dispose();
-            AppServices.Notify.Publish(NotifyKind.Error, "中继启动失败,端口可能被占用");
+            forwarder.Dispose();
+            StatusText.Text = "中继启动失败:" + error;
+            AppLog.Warn("Multiplayer", $"自建中继启动失败(本地 {localPort} → 对外 {listenPort}):{error}");
+            AppServices.Notify.Publish(NotifyKind.Error, "中继启动失败:" + error);
             return;
         }
 
-        _relay = relay;
-        _beacon = new VoxLinkLanBeacon();
-        _beacon.Start(relay.Port, room, MyName);
-
+        _hostForwarder = forwarder;
         HostStartButton.Content = "停止中继";
         HostInfoPanel.Visibility = Visibility.Visible;
         UpdateHostInfo();
-        StatusText.Text = $"中继运行中 · 端口 {relay.Port} · 房间 {room}";
-        AppLog.Info("Multiplayer", $"自建中继已启动:端口 {relay.Port}");
-        AppServices.Notify.Publish(NotifyKind.Success, "中继已启动,邀请码见下方");
+        StatusText.Text = $"中继运行中 · {LocalAddress()}:{forwarder.ListenPort} → 本机 {localPort}";
+        AppLog.Info("Multiplayer", $"自建中继已启动:{forwarder.ListenPort} → 127.0.0.1:{localPort}");
+        AppServices.Notify.Publish(NotifyKind.Success, "中继已启动,把地址发给好友即可");
     }
 
     private void UpdateHostInfo()
     {
-        if (_relay is not { Active: true })
+        if (_hostForwarder is not { Active: true } forwarder)
             return;
-        var address = LocalAddress();
-        HostEndpointText.Text = $"{address}:{_relay.Port}   (邀请码 {_relay.InviteCode})";
-        HostMemberText.Text = $"当前成员 {_relay.MemberCount} 人 · 房间 {_relay.RoomName}";
+        HostEndpointText.Text = $"{LocalAddress()}:{forwarder.ListenPort}";
+        HostMemberText.Text =
+            $"在线 {forwarder.ConnectionCount} 人 · 上行 {FormatBytes(forwarder.UpBytes)} · "
+            + $"下行 {FormatBytes(forwarder.DownBytes)} · 转发到 {forwarder.Target}";
     }
 
+    private void OnCopyEndpoint(object sender, RoutedEventArgs e)
+    {
+        if (HostEndpointText.Text.Length == 0)
+            return;
+        Copy(HostEndpointText.Text);
+        AppServices.Notify.Publish(NotifyKind.Success, "地址已复制:" + HostEndpointText.Text);
+    }
+
+    private void StopHost()
+    {
+        if (_hostForwarder is null)
+            return;
+        _hostForwarder.Dispose();
+        _hostForwarder = null;
+        HostStartButton.Content = "启动中继";
+        HostInfoPanel.Visibility = Visibility.Collapsed;
+        HostEndpointText.Text = "";
+        StatusText.Text = "中继已停止";
+    }
+
+    /// <summary>本机在局域网内的 IPv4(优先非回环、非虚拟网卡)。</summary>
     private static string LocalAddress()
     {
         try
@@ -174,7 +183,8 @@ public sealed partial class MultiplayerPage : Page
                     continue;
                 foreach (var addr in nic.GetIPProperties().UnicastAddresses)
                 {
-                    if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
+                    if (addr.Address.AddressFamily == AddressFamily.InterNetwork
+                        && !IPAddress.IsLoopback(addr.Address))
                         return addr.Address.ToString();
                 }
             }
@@ -183,29 +193,22 @@ public sealed partial class MultiplayerPage : Page
         return "127.0.0.1";
     }
 
-    private void StopHost(bool silent)
-    {
-        _beacon?.Dispose();
-        _beacon = null;
-        _relay?.Dispose();
-        _relay = null;
-        HostStartButton.Content = "启动中继";
-        HostInfoPanel.Visibility = Visibility.Collapsed;
-        if (!silent)
-            StatusText.Text = "中继已停止";
-    }
-
     // ------------------------------------------------------------ 模式二:局域网
 
     private void StartScanner()
     {
         if (_scanner is not null)
             return;
-        var scanner = new VoxLinkLanScanner();
-        scanner.Found += room => _ui.TryEnqueue(() => UpsertRoom(room));
+        var scanner = new McLanScanner();
+        scanner.Found += world => _ui.TryEnqueue(() => UpsertWorld(world));
+        scanner.Failed += reason => _ui.TryEnqueue(() =>
+        {
+            AddLog("[局域网] " + reason);
+            StatusText.Text = reason;
+        });
         scanner.Start();
         _scanner = scanner;
-        AddLog("[局域网] 正在监听同网段广播…");
+        AddLog("[局域网] 正在监听 224.0.2.60:4445 的开放世界公告…");
     }
 
     private void StopScanner()
@@ -214,51 +217,95 @@ public sealed partial class MultiplayerPage : Page
         _scanner = null;
     }
 
-    private void UpsertRoom(LanRoom room)
+    private void UpsertWorld(McLanWorld world)
     {
-        if (_rooms.Any(r => r.Detail.EndsWith($"{room.Address}:{room.Port}", StringComparison.Ordinal)))
+        if (_worlds.Any(r => r.Address == $"{world.Address}:{world.Port}"))
             return;
-        _rooms.Add(new LanRoomRow(room, JoinLanRoom));
-        StatusText.Text = $"局域网发现 {_rooms.Count} 个房间";
+        _worlds.Add(new McLanRow(world, CopyWorld));
+        StatusText.Text = $"局域网发现 {_worlds.Count} 个开放世界";
+        AddLog($"[局域网] 发现 {world.Motd} · {world.Address}:{world.Port}");
+    }
+
+    private void CopyWorld(McLanWorld world)
+    {
+        Copy($"{world.Address}:{world.Port}");
+        AppServices.Notify.Publish(NotifyKind.Success, $"地址已复制:{world.Address}:{world.Port}");
+        AddLog($"[复制] {world.Address}:{world.Port} · 在游戏「多人游戏 → 直接连接」里粘贴即可");
     }
 
     private void OnRescanLan(object sender, RoutedEventArgs e)
     {
-        _rooms.Clear();
+        _worlds.Clear();
         StopScanner();
         StartScanner();
         StatusText.Text = "正在重新扫描局域网…";
     }
 
-    private void JoinLanRoom(LanRoom room)
-    {
-        _ = ConnectAsync(room.Address, room.Port, room.Room);
-    }
+    // ------------------------------------------------------------ 模式三:添加中继服务器
 
-    // ------------------------------------------------------------ 模式三:手动中继
-
-    private async void OnConnectManual(object sender, RoutedEventArgs e)
+    private void OnConnectManual(object sender, RoutedEventArgs e)
     {
         var host = ManualHostBox.Text.Trim();
         if (host.Length == 0)
         {
-            await AppServices.Dialogs.AlertAsync("地址不能为空",
-                "请填写中继服务器的 IP 或域名。", SL.App.Dialogs.MsgMark.Warning).ConfigureAwait(true);
+            _ = AppServices.Dialogs.AlertAsync("地址不能为空",
+                "请填写中继服务器的 IP 或域名。", Dialogs.MsgMark.Warning);
             return;
         }
 
-        var port = double.IsNaN(ManualPortBox.Value) ? 25565 : (int)ManualPortBox.Value;
+        var port = ReadPort(ManualPortBox, 25565);
         var name = ManualNameBox.Text.Trim();
         RelayBook.Add(new RelayEndpoint(name.Length > 0 ? name : host, host, port));
         RefreshSaved();
-        await ConnectAsync(host, port, name).ConfigureAwait(true);
+        StartManualForward(host, port, ReadPort(ManualLocalPortBox, 25565));
+    }
+
+    private void StartManualForward(string host, int port, int localPort)
+    {
+        StopManualForward();
+
+        var forwarder = new TcpForwarder();
+        forwarder.Log += text => _ui.TryEnqueue(() => AddLog("[远端] " + text));
+        forwarder.StatsChanged += () => _ui.TryEnqueue(UpdateManualStatus);
+        if (!forwarder.Start(localPort, host, port, out var error))
+        {
+            forwarder.Dispose();
+            StatusText.Text = "接入失败:" + error;
+            AppLog.Warn("Multiplayer", $"接入中继失败({host}:{port} → 本地 {localPort}):{error}");
+            AppServices.Notify.Publish(NotifyKind.Error, "接入失败:" + error);
+            return;
+        }
+
+        _manualForwarder = forwarder;
+        UpdateManualStatus();
+        AppLog.Info("Multiplayer", $"接入中继 {host}:{port} → 本地 {forwarder.ListenPort}");
+        AppServices.Notify.Publish(NotifyKind.Success, $"已接入,游戏里连接 127.0.0.1:{forwarder.ListenPort}");
+    }
+
+    private void UpdateManualStatus()
+    {
+        if (_manualForwarder is not { Active: true } forwarder)
+            return;
+        StatusText.Text =
+            $"已接入 {forwarder.Target} · 游戏里连接 127.0.0.1:{forwarder.ListenPort}"
+            + $" · 在线 {forwarder.ConnectionCount}";
+    }
+
+    private void StopManualForward()
+    {
+        _manualForwarder?.Dispose();
+        _manualForwarder = null;
     }
 
     private void RefreshSaved()
     {
         _saved.Clear();
         foreach (var endpoint in RelayBook.List())
-            _saved.Add(new SavedRelayRow(endpoint, e => _ = ConnectAsync(e.Host, e.Port, e.Name), RemoveSaved));
+        {
+            _saved.Add(new SavedRelayRow(endpoint,
+                e => StartManualForward(e.Host, e.Port, ReadPort(ManualLocalPortBox, 25565)),
+                RemoveSaved));
+        }
     }
 
     private void RemoveSaved(RelayEndpoint endpoint)
@@ -268,82 +315,44 @@ public sealed partial class MultiplayerPage : Page
         AddLog("[收藏] 已移除 " + endpoint.Display);
     }
 
-    // ------------------------------------------------------------ 客户端连接
-
-    private async Task ConnectAsync(string host, int port, string roomOrName)
-    {
-        StopClient();
-        var client = new VoxLinkRelayClient();
-        client.Message += text => _ui.TryEnqueue(() => AddLog(text));
-        client.System += text => _ui.TryEnqueue(() => AddLog("[房间] " + text));
-        client.Disconnected += () => _ui.TryEnqueue(() => AddLog("[房间] 与服务端断开连接"));
-
-        StatusText.Text = $"正在连接 {host}:{port} …";
-        try
-        {
-            await client.ConnectAsync(host, port, MyName, CancellationToken.None).ConfigureAwait(true);
-            _client = client;
-            StatusText.Text = $"已连接到 {host}:{port}" + (roomOrName.Length > 0 ? $" · {roomOrName}" : "");
-            AddLog($"[连接] 已加入 {host}:{port}");
-            AppLog.Info("Multiplayer", $"已连接中继 {host}:{port}");
-            AppServices.Notify.Publish(NotifyKind.Success, "已加入联机房间");
-        }
-        catch (Exception ex)
-        {
-            client.Dispose();
-            AppLog.Error("Multiplayer", ex);
-            StatusText.Text = "连接失败:" + ex.Message;
-            AppServices.Notify.Publish(NotifyKind.Error, "连接失败:" + ex.Message);
-        }
-    }
-
-    private void StopClient()
-    {
-        _client?.Dispose();
-        _client = null;
-    }
+    // ------------------------------------------------------------ 断开
 
     private void OnDisconnect(object sender, RoutedEventArgs e)
     {
-        StopClient();
-        StopHost(silent: false);
-        AddLog("[系统] 已断开所有联机连接");
+        StopHost();
+        StopManualForward();
+        _worlds.Clear();
+        AddLog("[系统] 已断开全部联机通道");
+        StatusText.Text = "已断开全部联机通道";
     }
 
-    // ------------------------------------------------------------ 消息
+    // ------------------------------------------------------------ 基础设施
 
-    private void OnMessageKeyDown(object sender, KeyRoutedEventArgs e)
+    private static int ReadPort(NumberBox box, int fallback)
     {
-        if (e.Key != Windows.System.VirtualKey.Enter)
-            return;
-        SendCurrent(MessageBox.Text);
+        // 用户可能刚输入完数值、还没离开输入框(Value 尚未提交),优先读输入框文本
+        if (double.TryParse(box.Text, out var typed))
+            return (int)Math.Clamp(typed, box.Minimum, box.Maximum);
+        if (!double.IsNaN(box.Value))
+            return (int)Math.Clamp(box.Value, box.Minimum, box.Maximum);
+        return fallback;
     }
 
-    private void OnSend(object sender, RoutedEventArgs e) => SendCurrent(MessageBox.Text);
-
-    private void SendCurrent(string text)
+    private static void Copy(string text)
     {
-        var body = text.Trim();
-        if (body.Length == 0)
-            return;
-
-        if (_relay is { Active: true })
-        {
-            _relay.Say(MyName, body);
-            MessageBox.Text = "";
-            return;
-        }
-
-        if (_client is { Connected: true })
-        {
-            _ = _client.SendAsync(body);
-            AddLog($"{MyName}: {body}");
-            MessageBox.Text = "";
-            return;
-        }
-
-        AppServices.Notify.Publish(NotifyKind.Warning, "尚未连接房间,请先启动中继或加入房间");
+        var package = new DataPackage { RequestedOperation = DataPackageOperation.Copy };
+        package.SetText(text);
+        Clipboard.SetContent(package);
+        Clipboard.Flush();
     }
+
+    private static string FormatBytes(long bytes) => bytes switch
+    {
+        >= 1L << 30 => $"{bytes / (double)(1L << 30):F2} GB",
+        >= 1L << 20 => $"{bytes / (double)(1L << 20):F1} MB",
+        >= 1L << 10 => $"{bytes / 1024.0:F0} KB",
+        _ => bytes + " B",
+    };
 
     private void AddLog(string text)
     {

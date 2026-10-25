@@ -34,4 +34,9 @@
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Assets\Logo.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Logo.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
