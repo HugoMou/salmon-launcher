@@ -199,28 +199,169 @@ public sealed partial class SettingsPage : Page
         AppServices.Settings.Update(c => c.ModrinthMirror = MirrorToggle.IsOn);
     }
 
-    /// <summary>清除全部数据:二次确认后清空数据根目录,退出应用;下次启动即为初始状态。</summary>
+    // ---------------------------------------------------------- 清除全部数据
+
+    /// <summary>顺带清除的可选类目:勾选即删,不勾则按 TopEntries 保留对应顶层项。</summary>
+    private sealed record ScopeOption(string Label, string Detail, string[] TopEntries);
+
+    private static readonly ScopeOption[] Scopes =
+    [
+        new("实例与存档", "mods、存档、资源包、光影", ["instances"]),
+        new("游戏本体与依赖", "versions、libraries、assets;之后仍可重新下载", ["versions", "libraries", "assets"]),
+        new("Java 运行时", "已下载的 Temurin 等 JDK", ["java"]),
+        new("下载与图片缓存", "cache 下的元数据与缩略图", ["cache"]),
+    ];
+
+    /// <summary>清除全部数据:先选择顺带清除范围,再经 10 秒冷静期确认,最后清除并退出。</summary>
     private async void OnClearAllData(object sender, RoutedEventArgs e)
     {
-        var confirmed = await AppServices.Dialogs.ConfirmAsync(
-            "清除全部数据",
-            "将删除数据目录 %APPDATA%\\SalmonLauncher 下的全部内容:实例与存档、游戏本体与依赖库、Java、账户、设置、日志、主题。\n\n此操作不可撤销,完成后启动器会自动退出,重新打开即为首次使用状态。若游戏正在运行,请先退出游戏。",
-            MsgMark.Warning,
-            "全部清除",
-            "取消");
-        if (!confirmed)
+        // 第一步:选择除了启动器数据还顺带清除什么(不选即只清启动器数据)
+        var keep = await ShowScopeAsync().ConfigureAwait(true);
+        if (keep is null)
             return;
 
-        var failed = SL.Core.Boot.DataReset.Purge();
+        // 第二步:10 秒冷静期,倒计时结束前无法确认
+        if (!await ShowCooldownAsync(keep).ConfigureAwait(true))
+            return;
+
+        var failed = SL.Core.Boot.DataReset.Purge(keep);
         if (failed.Count > 0)
         {
             await AppServices.Dialogs.AlertAsync(
                 "部分文件被占用",
                 $"还有 {failed.Count} 项未能删除(通常是游戏或 Java 仍在运行)。\n这些残留会在下次启动时自动继续清除。",
-                MsgMark.Warning);
+                MsgMark.Warning).ConfigureAwait(true);
         }
 
         Application.Current.Exit();
+    }
+
+    /// <summary>第一步:勾选要顺带清除的数据;返回要保留的顶层项,null 表示取消。</summary>
+    private async Task<List<string>?> ShowScopeAsync()
+    {
+        var panel = new StackPanel { Spacing = 12 };
+        panel.Children.Add(new TextBlock
+        {
+            Text = "启动器自身的数据一定会清除:设置、账户与令牌、日志、主题、中继收藏。下面这些是可自由勾选的顺带清除项,不勾选的会保留下来:",
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12.5,
+            Opacity = 0.85,
+        });
+
+        var checks = new CheckBox[Scopes.Length];
+        for (var i = 0; i < Scopes.Length; i++)
+        {
+            checks[i] = new CheckBox
+            {
+                IsChecked = true,
+                Content = new StackPanel
+                {
+                    Spacing = 1,
+                    Children =
+                    {
+                        new TextBlock { Text = Scopes[i].Label, FontSize = 13.5 },
+                        new TextBlock { Text = Scopes[i].Detail, FontSize = 11, Opacity = 0.7 },
+                    },
+                },
+            };
+            panel.Children.Add(checks[i]);
+        }
+
+        var dialog = new ContentDialog
+        {
+            Title = "清除启动器数据",
+            Content = panel,
+            PrimaryButtonText = "下一步",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Primary,
+        };
+        var result = await AppServices.Dialogs.ShowCustomAsync(dialog).ConfigureAwait(true);
+        if (result != ContentDialogResult.Primary)
+            return null;
+
+        var keep = new List<string>();
+        for (var i = 0; i < Scopes.Length; i++)
+        {
+            if (checks[i].IsChecked != true)
+                keep.AddRange(Scopes[i].TopEntries);
+        }
+        return keep;
+    }
+
+    /// <summary>第二步:10 秒冷静期;期间交代后果并锁住确认按钮,倒计时结束后才允许确认。</summary>
+    private async Task<bool> ShowCooldownAsync(IReadOnlyList<string> keep)
+    {
+        bool Kept(ScopeOption s) => s.TopEntries.All(e => keep.Contains(e, StringComparer.OrdinalIgnoreCase));
+        var kept = Scopes.Where(Kept).Select(s => s.Label).ToList();
+        var removed = Scopes.Where(s => !Kept(s)).Select(s => s.Label).ToList();
+
+        var panel = new StackPanel { Spacing = 10 };
+        panel.Children.Add(new TextBlock
+        {
+            Text = "将删除:启动器自身的设置、账户与令牌、日志、主题、中继收藏"
+                   + (removed.Count > 0 ? "、" + string.Join("、", removed) : "") + "。",
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12.5,
+        });
+        if (kept.Count > 0)
+        {
+            panel.Children.Add(new TextBlock
+            {
+                Text = "将保留:" + string.Join("、", kept) + "。",
+                TextWrapping = TextWrapping.Wrap,
+                FontSize = 12.5,
+                Opacity = 0.8,
+            });
+        }
+
+        var instruction = new TextBlock
+        {
+            Text = "现在进入 10 秒冷静期:倒计时结束前下方按钮无法点击。10 秒之后,如果你仍然点击它,就会开始清除数据;期间随时可以点「取消」退出。",
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12.5,
+            Opacity = 0.9,
+        };
+        panel.Children.Add(instruction);
+
+        var countdown = new TextBlock
+        {
+            Text = "冷静期剩余 10 秒…",
+            FontSize = 13,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+        };
+        panel.Children.Add(countdown);
+
+        var dialog = new ContentDialog
+        {
+            Title = "10 秒冷静期",
+            Content = panel,
+            PrimaryButtonText = "请等待 10 秒",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Close,
+        };
+        dialog.IsPrimaryButtonEnabled = false;
+
+        var remain = 10;
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        timer.Tick += (_, _) =>
+        {
+            remain--;
+            if (remain > 0)
+            {
+                countdown.Text = $"冷静期剩余 {remain} 秒…";
+                return;
+            }
+            timer.Stop();
+            countdown.Text = "冷静期结束,现在可以确认。";
+            instruction.Text = "10 秒冷静期已结束:现在点击下方按钮,就会立即开始清除数据。";
+            dialog.PrimaryButtonText = "仍要清除,开始";
+            dialog.IsPrimaryButtonEnabled = true;
+        };
+        dialog.Opened += (_, _) => timer.Start();
+        dialog.Closed += (_, _) => timer.Stop();
+
+        var result = await AppServices.Dialogs.ShowCustomAsync(dialog).ConfigureAwait(true);
+        return result == ContentDialogResult.Primary;
     }
 
     /// <summary>切换界面语言:保存设置并就地刷新整棵树(菜单/页面/提示)。</summary>

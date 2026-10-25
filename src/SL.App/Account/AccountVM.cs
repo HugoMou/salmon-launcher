@@ -66,16 +66,14 @@ public sealed class AccountVM : VmBase
     {
         _settings = AppServices.Settings;
         _settings.Changed += _ => RefreshActiveFromStore();
-        LoginDeviceCodeCommand = new RelayCommand(async () => await LoginAsync(browser: false), () => !Busy);
-        LoginBrowserCommand = new RelayCommand(async () => await LoginAsync(browser: true), () => !Busy);
+        LoginPremiumCommand = new RelayCommand(async () => await LoginChoiceAsync(), () => !Busy);
         AddOfflineCommand = new RelayCommand(async () => await AddOfflineAsync(), () => !Busy);
         Refresh();
     }
 
     public ObservableCollection<AccountRowVM> Accounts { get; } = [];
 
-    public RelayCommand LoginDeviceCodeCommand { get; }
-    public RelayCommand LoginBrowserCommand { get; }
+    public RelayCommand LoginPremiumCommand { get; }
     public RelayCommand AddOfflineCommand { get; }
 
     private bool _busy;
@@ -86,8 +84,7 @@ public sealed class AccountVM : VmBase
         {
             if (Set(ref _busy, value))
             {
-                LoginDeviceCodeCommand.NotifyCanExecuteChanged();
-                LoginBrowserCommand.NotifyCanExecuteChanged();
+                LoginPremiumCommand.NotifyCanExecuteChanged();
                 AddOfflineCommand.NotifyCanExecuteChanged();
             }
         }
@@ -136,20 +133,90 @@ public sealed class AccountVM : VmBase
         Refresh();
     }
 
-    private async Task LoginAsync(bool browser)
+    /// <summary>正版登录:先选择登录方式(内置浏览器 / 设备码 / 复制授权链接)。</summary>
+    private async Task LoginChoiceAsync()
     {
         if (Busy)
             return;
+
+        var choice = await AppServices.Dialogs.ChooseAsync(
+            "正版授权登录",
+            "选择一种登录方式;令牌只保存在本机。",
+            [
+                "浏览器授权(在启动器内置窗口直接登录)",
+                "设备码登录(到 microsoft.com/link 输入一次性代码)",
+                "复制授权链接(在外部浏览器打开,完成后把回跳链接粘贴回来)",
+            ]).ConfigureAwait(true);
+        if (choice is null)
+            return;
+
         Busy = true;
         try
         {
-            ContentDialog dialog = browser ? new BrowserLoginDialog() : new DeviceCodeLoginDialog();
-            await AppServices.Dialogs.ShowCustomAsync(dialog).ConfigureAwait(true);
+            switch (choice.Value)
+            {
+                case 0:
+                    await AppServices.Dialogs.ShowCustomAsync(new BrowserLoginDialog()).ConfigureAwait(true);
+                    break;
+                case 1:
+                    await AppServices.Dialogs.ShowCustomAsync(new DeviceCodeLoginDialog()).ConfigureAwait(true);
+                    break;
+                default:
+                    await LoginByUrlAsync().ConfigureAwait(true);
+                    break;
+            }
         }
         finally
         {
             Busy = false;
             Refresh();
+        }
+    }
+
+    /// <summary>复制授权链接:链接进剪贴板,用户在外部浏览器完成登录后粘贴回跳链接换取会话。</summary>
+    private async Task LoginByUrlAsync()
+    {
+        var req = MsAuth.BeginInteractive();
+        try
+        {
+            var package = new Windows.ApplicationModel.DataTransfer.DataPackage
+            {
+                RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy,
+            };
+            package.SetText(req.Url);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+            Windows.ApplicationModel.DataTransfer.Clipboard.Flush();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn("Account", "复制授权链接失败:" + ex.Message);
+        }
+
+        var callback = await AppServices.Dialogs.PromptAsync(
+            "复制授权链接已就绪",
+            "授权链接已复制到剪贴板:请在浏览器中打开并完成登录;登录结束后,把地址栏里 login.live.com/oauth20_desktop.srf 开头的完整回跳链接粘贴到下面并确定。").ConfigureAwait(true);
+        if (callback is null)
+            return;
+
+        try
+        {
+            AppServices.Notify.Publish(NotifyKind.Info, "正在完成微软登录…");
+            var code = MsAuth.ExtractAuthorizationCode(callback);
+            var session = await MsAuth.CompleteInteractiveAsync(code, req.Verifier).ConfigureAwait(true);
+            var entry = AccountStore.UpsertMsa(session);
+            _settings.Update(c =>
+            {
+                c.AccountType = "msa";
+                c.AccountName = session.Name;
+                c.ActiveAccountId = entry.Id;
+            });
+            AppLog.Info("Account", $"正版登录成功(复制链接):{session.Name}");
+            AppServices.Notify.Publish(NotifyKind.Success, $"正版登录成功:{session.Name}");
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Account", ex);
+            await AppServices.Dialogs.AlertAsync("登录未完成", ex.Message, MsgMark.Warning).ConfigureAwait(true);
         }
     }
 
