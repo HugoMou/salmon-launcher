@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="SL.App.Pages.AboutPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,7 +7,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled"
                   HorizontalScrollMode="Disabled">
-        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="820" HorizontalAlignment="Left">
+        <StackPanel Margin="36,28,36,32" Spacing="16" MaxWidth="860" HorizontalAlignment="Left">
             <TextBlock Text="关于"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
@@ -105,6 +105,52 @@
                 </StackPanel>
             </Border>
 
+            <!-- 系统要求 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="系统要求" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 系统:Windows 10 版本 2004(内部版本 19041)或更高,Windows 11 亦可" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 架构:x64;暂不提供 ARM64 与 32 位版本" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 运行时:界面框架随软件自带,无需另行安装 .NET 或 Windows App SDK" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 内存:启动器约占用 300 MB;游戏建议分配 4 GB 以上" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 磁盘:启动器本体约 200 MB,每个游戏实例另需 300 MB 起" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 网络:首次安装需要联网下载游戏文件与 Java 运行时" />
+                </StackPanel>
+            </Border>
+
+            <!-- 数据与隐私 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="数据与隐私" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 所有设置、账户令牌、日志、实例、存档与壁纸都保存在上面的数据目录里,不会上传到任何服务器。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 不含统计、埋点与广告组件,不收集设备信息、游戏行为或个人信息。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 卸载软件不会自动删除数据目录;需要清理时可在「外观与设置 → 清除全部数据」中选择范围。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 迁移到新电脑时,复制整个数据目录即可带走全部设置与实例。" />
+                </StackPanel>
+            </Border>
+
+            <!-- 安装与卸载 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="安装与卸载" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 安装:解压到任意目录后双击 SL.exe 即可运行,无需安装程序。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 升级:用新版本覆盖旧的程序文件,数据目录与实例不受影响。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 卸载:先退出启动器,再删除程序目录;如需彻底清理,再删除上面的数据目录。" />
+                </StackPanel>
+            </Border>
+
             <!-- 能力一览 -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
@@ -130,6 +176,20 @@
                         <TextBlock Grid.Row="2" Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 联机:自建中继、局域网发现与手动中继三种接入" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 排障:崩溃诊断建议、日志检索与主题工坊换肤" />
                     </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 反馈与问题报告 -->
+            <Border Background="{ThemeResource Brush.Card}"
+                    BorderBrush="{ThemeResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="遇到问题时" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 游戏崩溃:先到「工具 → 崩溃诊断」查看结论,再附上实例 logs/latest.log 的尾部。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 启动器异常:打开日志目录,附上最近的日志与出错前的操作步骤。" />
+                    <TextBlock Style="{ThemeResource Style.TermsBody}" Text="· 反馈问题时请注明版本号与系统版本;请勿在公开渠道粘贴账户令牌。" />
                 </StackPanel>
             </Border>
 

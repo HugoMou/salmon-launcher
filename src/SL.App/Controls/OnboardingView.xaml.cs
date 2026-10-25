@@ -1,11 +1,9 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Shapes;
 using SL.App.Account;
 using SL.App.Infrastructure;
 using SL.App.Localization;
-using SL.App.Pages;
 using SL.App.Themes;
 using SL.Core.Logging;
 
@@ -21,6 +19,7 @@ public sealed partial class OnboardingView : UserControl
     private const int StepCount = 4;
 
     private readonly AccountVM _account = new();
+    private readonly List<WallpaperCard> _wallpapers = [];
     private readonly Ellipse[] _pending;
     private readonly Ellipse[] _current;
     private readonly Ellipse[] _done;
@@ -29,6 +28,7 @@ public sealed partial class OnboardingView : UserControl
     private readonly TextBlock[] _labels;
 
     private bool _loading;
+    private bool _wallpapersLoaded;
     private int _step;
 
     /// <summary>已完成的页数:打勾圆点与进度条的依据(只增不减,回退不取消打勾)。</summary>
@@ -55,7 +55,7 @@ public sealed partial class OnboardingView : UserControl
         BuildLanguageList();
         if (AppServices.Settings.Current.TermsAccepted)
             TermsCheck.IsChecked = true;
-        LoadThemeConfig();
+        LoadThemeStep();
         _loading = false;
 
         ShowStep(0);
@@ -117,55 +117,48 @@ public sealed partial class OnboardingView : UserControl
 
     private void OnTermsToggled(object sender, RoutedEventArgs e) => RefreshGate();
 
-    // ---------------------------------------------------------- 第 4 页:主题
+    // ---------------------------------------------------------- 第 4 页:主题(主题工坊)
 
-    private void LoadThemeConfig()
+    /// <summary>与主题工坊同一套设置:内置场景 + 选择图片,配色自动从画面里取。</summary>
+    private void LoadThemeStep()
     {
-        ModeSystem.IsChecked = AppServices.Settings.Current.Theme == SL.Core.Settings.ThemePref.FollowSystem;
-        ModeLight.IsChecked = AppServices.Settings.Current.Theme == SL.Core.Settings.ThemePref.Light;
-        ModeDark.IsChecked = AppServices.Settings.Current.Theme == SL.Core.Settings.ThemePref.Dark;
-        RefreshThemeCards();
+        foreach (var scene in WallpaperFactory.Scenes)
+            _wallpapers.Add(new WallpaperCard { Scene = scene });
+
+        ThemeSceneGrid.ItemsSource = _wallpapers;
+        RefreshThemeStatus();
     }
 
-    private void RefreshThemeCards()
+    private void RefreshThemeStatus() => ThemeStatusText.Text = ThemeApplier.CurrentSummary();
+
+    /// <summary>第一次进入主题页时才生成缩略图,避免拖慢首屏。</summary>
+    private async Task EnsureWallpapersAsync()
     {
-        var c = AppServices.Settings.Current;
-        PaletteGrid.ItemsSource = ThemeManager.Palettes
-            .Select(p => new PaletteCardVM(p, c.Palette))
-            .ToList();
-        AccentList.ItemsSource = ThemeManager.Accents
-            .Select(a => new AccentCardVM(a, c.Accent))
-            .ToList();
+        if (_wallpapersLoaded)
+            return;
+        _wallpapersLoaded = true;
+        await Task.WhenAll(_wallpapers.Select(ThemeApplier.PrepareAsync)).ConfigureAwait(true);
+        RefreshThemeStatus();
     }
 
-    private void OnModeChecked(object sender, RoutedEventArgs e)
+    private async void OnThemeSceneClick(object sender, ItemClickEventArgs e)
     {
-        if (_loading)
+        if (e.ClickedItem is not WallpaperCard card)
             return;
-        var pref = ReferenceEquals(sender, ModeLight) ? SL.Core.Settings.ThemePref.Light
-            : ReferenceEquals(sender, ModeDark) ? SL.Core.Settings.ThemePref.Dark
-            : SL.Core.Settings.ThemePref.FollowSystem;
-        AppServices.Settings.Update(c => c.Theme = pref);
+        if (await ThemeApplier.ApplySceneAsync(card).ConfigureAwait(true))
+            RefreshThemeStatus();
     }
 
-    private void OnPaletteClick(object sender, ItemClickEventArgs e)
+    private async void OnThemePickImage(object sender, RoutedEventArgs e)
     {
-        if (e.ClickedItem is not PaletteCardVM card)
-            return;
-        if (AppServices.Settings.Current.Palette == card.Palette.Id)
-            return;
-        AppServices.Settings.Update(c => c.Palette = card.Palette.Id);
-        RefreshThemeCards();
+        if (await ThemeApplier.PickAndApplyAsync().ConfigureAwait(true))
+            RefreshThemeStatus();
     }
 
-    private void OnAccentTapped(object sender, TappedRoutedEventArgs e)
+    private void OnThemeClear(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement { DataContext: AccentCardVM card })
-            return;
-        if (AppServices.Settings.Current.Accent == card.Accent.Id)
-            return;
-        AppServices.Settings.Update(c => c.Accent = card.Accent.Id);
-        RefreshThemeCards();
+        ThemeApplier.ClearWallpaper();
+        RefreshThemeStatus();
     }
 
     // ---------------------------------------------------------- 步骤流转
@@ -208,6 +201,9 @@ public sealed partial class OnboardingView : UserControl
         StartBtn.Visibility = step == 4 ? Visibility.Visible : Visibility.Collapsed;
         SkipBtn.Visibility = step == 3 ? Visibility.Visible : Visibility.Collapsed;
 
+        if (step == 3)
+            _ = EnsureWallpapersAsync();
+
         RefreshProgress();
         RefreshGate();
     }
@@ -244,7 +240,17 @@ public sealed partial class OnboardingView : UserControl
         AccountHint.Visibility = _step == 2 && !ok ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private void OnLocChanged() => DispatcherQueue.TryEnqueue(RefreshProgress);
+    private void OnLocChanged() => DispatcherQueue.TryEnqueue(() =>
+    {
+        RefreshProgress();
+        if (_wallpapers.Count > 0)
+        {
+            // 场景名是翻译后的文本,语言切换后需重新绑定一次
+            ThemeSceneGrid.ItemsSource = null;
+            ThemeSceneGrid.ItemsSource = _wallpapers;
+        }
+        RefreshThemeStatus();
+    });
 
     private void OnSettingsChanged(SL.Core.Settings.AppConfig cfg)
         => DispatcherQueue.TryEnqueue(RefreshGate);

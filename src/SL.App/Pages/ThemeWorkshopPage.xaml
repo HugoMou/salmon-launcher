@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="SL.App.Pages.ThemeWorkshopPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:SL.App.Pages">
+    xmlns:themes="using:SL.App.Themes">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled"
@@ -71,7 +71,7 @@
                       ScrollViewer.IsVerticalRailEnabled="False"
                       Padding="0,0,0,24">
                 <GridView.ItemTemplate>
-                    <DataTemplate x:DataType="local:WallpaperCard">
+                    <DataTemplate x:DataType="themes:WallpaperCard">
                         <Border Background="{ThemeResource Brush.Card}"
                                 BorderBrush="{ThemeResource Brush.Border}"
                                 BorderThickness="1"
