@@ -42,6 +42,9 @@ public partial class App : Application
 
     private void Startup()
     {
+        // 上次「清除全部数据」若有被占用删不掉的残留,先补删,再进入正常初始化
+        Core.Boot.DataReset.RunPending();
+
         Core.Boot.Runtime.EnsureBaseDirectories();
         Core.Logging.AppLog.Initialize();
         Core.Logging.AppLog.Info("Boot", "1 目录与日志就绪");

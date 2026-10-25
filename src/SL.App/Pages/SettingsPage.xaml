@@ -376,6 +376,39 @@
                     </Button>
                 </Grid>
             </Border>
+
+            <!-- 危险操作:清除全部数据 -->
+            <Border Background="{ThemeResource Brush.DangerSoft}"
+                    BorderBrush="{ThemeResource Brush.Danger}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="22"
+                    HorizontalAlignment="Stretch">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xE74D;" FontSize="20" Foreground="{ThemeResource Brush.Danger}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="清除全部数据" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
+                        <TextBlock FontSize="11.5"
+                                   TextWrapping="Wrap"
+                                   Foreground="{ThemeResource Brush.FgDim}"
+                                   Text="删除全部实例与存档、游戏本体与依赖、Java、账户、设置、日志和主题,恢复到首次使用的初始状态。操作不可撤销,完成后启动器会自动退出;若游戏正在运行,请先退出游戏。" />
+                    </StackPanel>
+                    <Button Grid.Column="2"
+                            Click="OnClearAllData"
+                            VerticalAlignment="Center"
+                            Background="{ThemeResource Brush.Danger}"
+                            BorderBrush="{ThemeResource Brush.Danger}"
+                            Foreground="White"
+                            Padding="16,7">
+                        <TextBlock Text="清除全部数据" />
+                    </Button>
+                </Grid>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

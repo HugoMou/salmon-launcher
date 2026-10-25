@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using SL.App.Account;
+using SL.App.Dialogs;
 using SL.App.Infrastructure;
 using SL.App.Localization;
 using SL.App.Themes;
@@ -196,6 +197,30 @@ public sealed partial class SettingsPage : Page
         if (_loading)
             return;
         AppServices.Settings.Update(c => c.ModrinthMirror = MirrorToggle.IsOn);
+    }
+
+    /// <summary>清除全部数据:二次确认后清空数据根目录,退出应用;下次启动即为初始状态。</summary>
+    private async void OnClearAllData(object sender, RoutedEventArgs e)
+    {
+        var confirmed = await AppServices.Dialogs.ConfirmAsync(
+            "清除全部数据",
+            "将删除数据目录 %APPDATA%\\SalmonLauncher 下的全部内容:实例与存档、游戏本体与依赖库、Java、账户、设置、日志、主题。\n\n此操作不可撤销,完成后启动器会自动退出,重新打开即为首次使用状态。若游戏正在运行,请先退出游戏。",
+            MsgMark.Warning,
+            "全部清除",
+            "取消");
+        if (!confirmed)
+            return;
+
+        var failed = SL.Core.Boot.DataReset.Purge();
+        if (failed.Count > 0)
+        {
+            await AppServices.Dialogs.AlertAsync(
+                "部分文件被占用",
+                $"还有 {failed.Count} 项未能删除(通常是游戏或 Java 仍在运行)。\n这些残留会在下次启动时自动继续清除。",
+                MsgMark.Warning);
+        }
+
+        Application.Current.Exit();
     }
 
     /// <summary>切换界面语言:保存设置并就地刷新整棵树(菜单/页面/提示)。</summary>

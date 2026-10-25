@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SL.Data", "src\SL.Data\SL.Data.csproj", "{6A3B7C2E-8F31-4D5A-9C4B-2E71A9F0B3D1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SL.App", "src\SL.App\SL.App.csproj", "{A36BB6F9-3F40-4D97-BEAC-9245A840B7F6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SL.Core", "src\SL.Core\SL.Core.csproj", "{C4D8E9F2-1B35-47A8-8E62-9F03C7A5D4E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SL.Data", "src\SL.Data\SL.Data.csproj", "{6A3B7C2E-8F31-4D5A-9C4B-2E71A9F0B3D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SL.App", "src\SL.App\SL.App.csproj", "{A36BB6F9-3F40-4D97-BEAC-9245A840B7F6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
