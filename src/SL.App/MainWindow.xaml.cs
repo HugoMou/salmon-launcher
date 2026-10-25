@@ -40,8 +40,12 @@ public sealed partial class MainWindow : Window
         RootGrid.Loaded += async (_, _) =>
         {
             AppServices.Dialogs.Attach(RootGrid.XamlRoot);
-            await EnsureTermsAsync();
+            if (AppServices.Settings.Current.OnboardingCompleted)
+                await EnsureTermsAsync();
+            else
+                Onboarding.Visibility = Visibility.Visible;
         };
+        Onboarding.Completed += async () => await EnsureTermsAsync();
         AppServices.Nav.CurrentChanged += () => DispatcherQueue.TryEnqueue(SyncShell);
         ThemeManager.ThemeChanged += () => DispatcherQueue.TryEnqueue(ApplyTheme);
         Loc.Changed += () => DispatcherQueue.TryEnqueue(OnLanguageChanged);

@@ -46,6 +46,9 @@ public class AppSettings
 
     /// <summary>界面语言:"auto"(跟随系统)或 zh-Hans / zh-Hant / en / ja</summary>
     public string Language { get; set; } = "auto";
+
+    /// <summary>欢迎页(首次启动初始化)是否已完成;清除数据后回到 false 重新引导</summary>
+    public bool OnboardingCompleted { get; set; }
 }
 
 /// <summary>设置文件的读写入口(原子落盘)。</summary>

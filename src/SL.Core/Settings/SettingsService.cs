@@ -62,6 +62,7 @@ public sealed class SettingsService : ISettingsService
         ModrinthMirror = s.ModrinthMirror,
         TermsAccepted = s.TermsAccepted,
         Language = string.IsNullOrWhiteSpace(s.Language) ? "auto" : s.Language,
+        OnboardingCompleted = s.OnboardingCompleted,
     };
 
     private static Data.Settings.AppSettings Map(AppConfig c) => new()
@@ -85,6 +86,7 @@ public sealed class SettingsService : ISettingsService
         ModrinthMirror = c.ModrinthMirror,
         TermsAccepted = c.TermsAccepted,
         Language = c.Language,
+        OnboardingCompleted = c.OnboardingCompleted,
     };
 
     private static AppConfig Clone(AppConfig c) => new()
@@ -120,5 +122,6 @@ public sealed class SettingsService : ISettingsService
            && a.DownloadSource == b.DownloadSource
            && a.ModrinthMirror == b.ModrinthMirror
            && a.TermsAccepted == b.TermsAccepted
-           && a.Language == b.Language;
+           && a.Language == b.Language
+           && a.OnboardingCompleted == b.OnboardingCompleted;
 }

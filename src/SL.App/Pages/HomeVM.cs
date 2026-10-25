@@ -39,6 +39,8 @@ public sealed class HomeVM : VmBase
         OpenDiagCommand = new RelayCommand(() => AppServices.Nav.Navigate("tools.diag"));
         OpenLogsCommand = new RelayCommand(() => AppServices.Nav.Navigate("tools.log"));
         OpenAccountCommand = new RelayCommand(() => AppServices.Nav.Navigate("st.launch"));
+        //欢迎页里创建/登录账户后主页卡片要立即跟上(此时还没离开过主页,不会走再入刷新)
+        AppServices.Settings.Changed += _ => RefreshAccount();
         Refresh();
     }
 
@@ -106,6 +108,15 @@ public sealed class HomeVM : VmBase
         SelectedInstance = fresh.FirstOrDefault(r => r.Id == _lastSelectedId) ?? fresh.FirstOrDefault();
         _lastSelectedId = SelectedInstance?.Id;
 
+        InstanceSummary = fresh.Count == 0
+            ? "尚无实例 · 可前往「下载 → 游戏版本」安装"
+            : $"共 {fresh.Count} 个实例 · 就绪";
+
+        RefreshAccount();
+    }
+
+    private void RefreshAccount()
+    {
         var repo = AccountStore.Load();
         var active = repo.Accounts.FirstOrDefault(a => a.Id == repo.ActiveId);
         if (active is null)
@@ -120,9 +131,6 @@ public sealed class HomeVM : VmBase
             AccountName = active.Name;
             AccountDetail = (active.Kind == "msa" ? "正版账户" : "离线账户") + " · 点击前往账户管理";
         }
-        InstanceSummary = fresh.Count == 0
-            ? "尚无实例 · 可前往「下载 → 游戏版本」安装"
-            : $"共 {fresh.Count} 个实例 · 就绪";
     }
 
     private async Task LaunchAsync()

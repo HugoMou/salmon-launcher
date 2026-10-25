@@ -3,6 +3,7 @@
     x:Class="SL.App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SL.App.Controls"
     xmlns:notify="using:SL.App.Notify">
 
     <Grid x:Name="RootGrid">
@@ -98,5 +99,8 @@
                 </Grid>
             </NavigationView.Content>
         </NavigationView>
+
+        <!-- 欢迎页:首次进入或清除数据后的四步初始化,完成前盖住内容区 -->
+        <controls:OnboardingView x:Name="Onboarding" Grid.RowSpan="2" Visibility="Collapsed" />
     </Grid>
 </Window>
