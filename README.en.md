@@ -5,7 +5,7 @@
 A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and **.NET 10**. Installation, launching, instances and mods, multiplayer, skin preview, crash analysis and theming all live inside one two-pane interface.
 
 - Version: 1.0.0
-- Platform: Windows 10 (1903+) / Windows 11, x64
+- Platform: Windows 10 (2004+) / Windows 11, x64
 - Licence: GNU General Public License v3.0 or later (GPL-3.0-or-later)
 
 ---

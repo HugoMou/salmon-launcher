@@ -5,7 +5,7 @@
 **WinUI 3 / Windows App SDK** と **.NET 10** で作られた Minecraft Java Edition ランチャーです。インストール、起動、バージョン管理と Mod、マルチプレイ、スキン表示、クラッシュ診断、テーマ切り替えを 1 つの 2 ペイン画面にまとめています。
 
 - バージョン: 1.0.0
-- 対応 OS: Windows 10 (1903 以降) / Windows 11、x64 のみ
+- 対応 OS: Windows 10 (2004 以降) / Windows 11、x64 のみ
 - ライセンス: GNU General Public License v3.0 以降(GPL-3.0-or-later)
 
 ---

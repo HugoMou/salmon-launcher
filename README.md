@@ -5,7 +5,7 @@
 一个使用 **WinUI 3 / Windows App SDK** 与 **.NET 10** 构建的 Minecraft Java 版启动器。安装、启动、实例与模组、联机、皮肤预览、崩溃诊断与主题切换全部集成在一个双栏界面里。
 
 - 版本：1.0.0
-- 平台：Windows 10 (1903+) / Windows 11，x64
+- 平台：Windows 10 (2004+) / Windows 11，x64
 - 许可：GNU General Public License v3.0 或更新版本（GPL-3.0-or-later）
 
 ---
