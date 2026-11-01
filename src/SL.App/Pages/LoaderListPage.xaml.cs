@@ -21,6 +21,7 @@ using SL.App.Dialogs;
 using SL.App.Download;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using SL.App.Localization;
 using SL.Core.Boot;
 using SL.Core.Launch;
 
@@ -67,20 +68,20 @@ public sealed partial class LoaderListPage : Page
 
     private void UpdateSummary()
         => SummaryText.Text = InstallWizard.HasVersion
-            ? $"Minecraft {InstallWizard.VersionId} · 选择要一起安装的加载器"
-            : "尚未选择游戏版本 · 请先回到「下载 → 游戏版本」选择一个版本";
+            ? string.Format(Loc.T("Minecraft {0} · 选择要一起安装的加载器"), InstallWizard.VersionId)
+            : Loc.T("尚未选择游戏版本 · 请先回到「下载 → 游戏版本」选择一个版本");
 
     private IReadOnlyList<LoaderRow> BuildRows() =>
     [
-        new("原版(纯净)", "推荐", "只安装官方核心、库与资源;可随时再加模组。", "\uE7FC", true,
+        new(Loc.T("原版(纯净)"), Loc.T("推荐"), Loc.T("只安装官方核心、库与资源;可随时再加模组。"), "\uE7FC", true,
             () => ChooseVanilla()),
-        new("Fabric", "模组", "轻量模组加载器:自动获取官方 profile 并生成可启动实例。", "\uE7B8", true,
+        new(Loc.T("Fabric"), Loc.T("模组"), Loc.T("轻量模组加载器:自动获取官方 profile 并生成可启动实例。"), "\uE7B8", true,
             () => InstallLoaderAsync("Fabric")),
-        new("Quilt", "模组", "Fabric 衍生加载器:同样走官方 profile 一键生成实例。", "\uE7B8", true,
+        new(Loc.T("Quilt"), Loc.T("模组"), Loc.T("Fabric 衍生加载器:同样走官方 profile 一键生成实例。"), "\uE7B8", true,
             () => InstallLoaderAsync("Quilt")),
-        new("Forge", "模组", "老牌模组加载器:自动下载并运行官方安装器,完成后直接可启动。", "\uE7B8", true,
+        new(Loc.T("Forge"), Loc.T("模组"), Loc.T("老牌模组加载器:自动下载并运行官方安装器,完成后直接可启动。"), "\uE7B8", true,
             () => InstallLoaderAsync("Forge")),
-        new("NeoForge", "模组", "1.20.2 起的 Forge 分支:自动运行官方安装器并生成实例。", "\uE7B8", true,
+        new(Loc.T("NeoForge"), Loc.T("模组"), Loc.T("1.20.2 起的 Forge 分支:自动运行官方安装器并生成实例。"), "\uE7B8", true,
             () => InstallLoaderAsync("NeoForge")),
     ];
 
@@ -88,7 +89,7 @@ public sealed partial class LoaderListPage : Page
     {
         if (!InstallWizard.HasVersion)
         {
-            AppServices.Notify.Publish(NotifyKind.Warning, "请先在「游戏版本」里选择一个版本");
+            AppServices.Notify.Publish(NotifyKind.Warning, Loc.T("请先在「游戏版本」里选择一个版本"));
             return;
         }
         InstallWizard.ChooseLoader("原版");
@@ -103,7 +104,7 @@ public sealed partial class LoaderListPage : Page
 
         if (!InstallWizard.HasVersion)
         {
-            AppServices.Notify.Publish(NotifyKind.Warning, "请先在「游戏版本」里选择一个版本");
+            AppServices.Notify.Publish(NotifyKind.Warning, Loc.T("请先在「游戏版本」里选择一个版本"));
             return;
         }
 
@@ -113,15 +114,15 @@ public sealed partial class LoaderListPage : Page
         if (!File.Exists(vanillaJson) || !File.Exists(vanillaJar))
         {
             await AppServices.Dialogs.AlertAsync(
-                $"请先安装原版 {game}",
-                $"加载器需要以原版 {game} 为基础。请先在「安装概览」完成原版安装,再回到本页添加 {loader}。",
+                string.Format(Loc.T("请先安装原版 {0}"), game),
+                string.Format(Loc.T("加载器需要以原版 {0} 为基础。请先在「安装概览」完成原版安装,再回到本页添加 {1}。"), game, loader),
                 MsgMark.Info).ConfigureAwait(true);
             return;
         }
 
         _busy = true;
         var started = DateTimeOffset.Now;
-        SummaryText.Text = $"正在准备 {loader}…";
+        SummaryText.Text = string.Format(Loc.T("正在准备 {0}…"), loader);
         try
         {
             var plan = await LoaderInstall.BuildPlanAsync(loader, game, null, vanillaJson, vanillaJar,
@@ -132,16 +133,16 @@ public sealed partial class LoaderListPage : Page
 
             var seconds = (int)(DateTimeOffset.Now - started).TotalSeconds;
             AppServices.Notify.Publish(NotifyKind.Success,
-                $"{loader} 实例 {plan.InstanceId} 已创建,开始下载 {count} 个库文件");
+                string.Format(Loc.T("{0} 实例 {1} 已创建,开始下载 {2} 个库文件"), loader, plan.InstanceId, count));
             SummaryText.Text =
-                $"{loader} 实例已创建({seconds}s)· 下载完成后可在「实例 → 概览」启动";
+                string.Format(Loc.T("{0} 实例已创建({1}s)· 下载完成后可在「实例 → 概览」启动"), loader, seconds);
             AppServices.Nav.Navigate("launch.tasks");
         }
         catch (Exception ex)
         {
             SL.Core.Logging.AppLog.Error("LoaderInstall", ex);
-            SummaryText.Text = $"{loader} 安装失败:{ex.Message}";
-            AppServices.Notify.Publish(NotifyKind.Error, $"{loader} 安装失败:" + ex.Message);
+            SummaryText.Text = string.Format(Loc.T("{0} 安装失败:{1}"), loader, ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, string.Format(Loc.T("{0} 安装失败:"), loader) + ex.Message);
             UpdateSummary();
         }
         finally

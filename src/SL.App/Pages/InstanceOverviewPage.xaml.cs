@@ -22,6 +22,7 @@ using SL.Core.Account;
 using SL.Core.Instances;
 using SL.Core.Launch;
 using SL.Core.Logging;
+using SL.App.Localization;
 using SL.App.Dialogs;
 using SL.App.Instances;
 using SL.App.Infrastructure;
@@ -77,8 +78,8 @@ public sealed partial class InstanceOverviewPage : Page
 
         if (_current is null)
         {
-            StatusText.Text = "尚未安装实例 · 前往「下载 → 游戏版本」安装一个";
-            InstanceId.Text = "无实例";
+            StatusText.Text = Loc.T("尚未安装实例 · 前往「下载 → 游戏版本」安装一个");
+            InstanceId.Text = Loc.T("无实例");
             InstalledText.Text = "";
             ModCount.Text = "—";
             SaveCount.Text = "—";
@@ -87,12 +88,12 @@ public sealed partial class InstanceOverviewPage : Page
         }
 
         InstanceId.Text = _current.InstanceId;
-        InstalledText.Text = $"安装于 {_current.InstalledAt:yyyy-MM-dd HH:mm} · 目录 {InstanceRegistry.InstanceDirOf(_current.InstanceId)}";
+        InstalledText.Text = string.Format(Loc.T("安装于 {0} · 目录 {1}"), _current.InstalledAt.ToString("yyyy-MM-dd HH:mm"), InstanceRegistry.InstanceDirOf(_current.InstanceId));
         var mods = InstanceRegistry.ListMods(_current.InstanceId);
         ModCount.Text = $"{mods.Count(m => m.Enabled)} / {mods.Count}";
         SaveCount.Text = InstanceRegistry.ListSaves(_current.InstanceId).Count.ToString();
         SizeText.Text = $"{_current.SizeMb} MB";
-        StatusText.Text = $"共 {all.Count} 个实例 · 当前查看 {_current.InstanceId}";
+        StatusText.Text = string.Format(Loc.T("共 {0} 个实例 · 当前查看 {1}"), all.Count, _current.InstanceId);
     }
 
     private void OnInstanceChanged(object sender, SelectionChangedEventArgs e)
@@ -107,7 +108,7 @@ public sealed partial class InstanceOverviewPage : Page
     {
         if (_current is null)
         {
-            await AppServices.Dialogs.AlertAsync("尚未安装实例", "请先到「下载 → 游戏版本」安装一个实例。",
+            await AppServices.Dialogs.AlertAsync(Loc.T("尚未安装实例"), Loc.T("请先到「下载 → 游戏版本」安装一个实例。"),
                 MsgMark.Info).ConfigureAwait(true);
             return;
         }
@@ -131,26 +132,26 @@ public sealed partial class InstanceOverviewPage : Page
             catch (Exception ex)
             {
                 AppLog.Error("InstanceOverview", ex);
-                AppServices.Notify.Publish(NotifyKind.Warning, "正版会话续签失败,将回退为离线启动");
+                AppServices.Notify.Publish(NotifyKind.Warning, Loc.T("正版会话续签失败,将回退为离线启动"));
             }
         }
 
-        StatusText.Text = "正在启动…";
+        StatusText.Text = Loc.T("正在启动…");
         try
         {
             var result = await LaunchPipeline.StartAsync(_current.InstanceId, accountName, cfg.MemoryMb,
                 CancellationToken.None, identity, cfg.JvmExtraArgs, cfg.GameWidth, cfg.GameHeight)
                 .ConfigureAwait(true);
             if (result.Success)
-                AppServices.Notify.Publish(NotifyKind.Success, $"已启动 {_current.InstanceId}(PID {result.ProcessId})");
+                AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("已启动 {0}(PID {1})"), _current.InstanceId, result.ProcessId));
             else
-                AppServices.Notify.Publish(NotifyKind.Error, "启动失败:" + (result.Error ?? "未知原因"));
-            StatusText.Text = result.Success ? "游戏运行中" : "启动失败:" + (result.Error ?? "未知原因");
+                AppServices.Notify.Publish(NotifyKind.Error, Loc.T("启动失败:") + (result.Error ?? Loc.T("未知原因")));
+            StatusText.Text = result.Success ? Loc.T("游戏运行中") : Loc.T("启动失败:") + (result.Error ?? Loc.T("未知原因"));
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceOverview", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "启动失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("启动失败:") + ex.Message);
         }
     }
 
@@ -170,17 +171,17 @@ public sealed partial class InstanceOverviewPage : Page
             var path = InstanceRegistry.BackupSaves(_current.InstanceId);
             if (path is null)
             {
-                await AppServices.Dialogs.AlertAsync("没有可备份的存档",
-                    "该实例的 saves 目录为空;进入游戏创建世界后再来备份。", MsgMark.Info).ConfigureAwait(true);
+                await AppServices.Dialogs.AlertAsync(Loc.T("没有可备份的存档"),
+                    Loc.T("该实例的 saves 目录为空;进入游戏创建世界后再来备份。"), MsgMark.Info).ConfigureAwait(true);
                 return;
             }
-            AppServices.Notify.Publish(NotifyKind.Success, "存档已备份:" + System.IO.Path.GetFileName(path));
-            StatusText.Text = "已备份到 " + path;
+            AppServices.Notify.Publish(NotifyKind.Success, Loc.T("存档已备份:") + System.IO.Path.GetFileName(path));
+            StatusText.Text = Loc.T("已备份到 ") + path;
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceOverview", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "备份失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("备份失败:") + ex.Message);
         }
     }
 

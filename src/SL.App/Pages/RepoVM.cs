@@ -23,6 +23,7 @@ using SL.App.Download;
 using SL.App.Dialogs;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using SL.App.Localization;
 
 namespace SL.App.Pages;
 
@@ -38,10 +39,12 @@ public sealed class RepoRow
     public Modrinth.ProjectHit Hit { get; }
     public RelayCommand InstallCommand { get; }
 
+    public string InstallText => Loc.T("下载并安装");
+
     public string Title => Hit.Title;
     public string Description => Hit.Description;
-    public string Author => "作者 " + Hit.Author;
-    public string Downloads => "下载 " + Hit.DownloadsText;
+    public string Author => Loc.T("作者") + " " + Hit.Author;
+    public string Downloads => Loc.T("下载") + " " + Hit.DownloadsText;
     public string Categories => string.Join(" · ", Hit.Categories);
 }
 
@@ -68,7 +71,7 @@ public sealed class RepoVM : VmBase, IRefreshable
         set => Set(ref _keyword, value);
     }
 
-    private string _title = "模组仓库";
+    private string _title = Loc.T("模组仓库");
     public string Title { get => _title; private set => Set(ref _title, value); }
 
     private string _status = "";
@@ -95,9 +98,9 @@ public sealed class RepoVM : VmBase, IRefreshable
 
     public string SearchHint => _category switch
     {
-        ModrinthCategory.Mods => "搜索模组(如 sodium、create)",
-        ModrinthCategory.Shaders => "搜索光影(如 complementary、bsl)",
-        _ => "搜索资源包(如 faithful、stay true)",
+        ModrinthCategory.Mods => Loc.T("搜索模组(如 sodium、create)"),
+        ModrinthCategory.Shaders => Loc.T("搜索光影(如 complementary、bsl)"),
+        _ => Loc.T("搜索资源包(如 faithful、stay true)"),
     };
 
     public string SubDir => _category switch
@@ -118,9 +121,9 @@ public sealed class RepoVM : VmBase, IRefreshable
         };
         Title = _category switch
         {
-            ModrinthCategory.Mods => "模组仓库",
-            ModrinthCategory.Shaders => "光影仓库",
-            _ => "资源包仓库",
+            ModrinthCategory.Mods => Loc.T("模组仓库"),
+            ModrinthCategory.Shaders => Loc.T("光影仓库"),
+            _ => Loc.T("资源包仓库"),
         };
         On(nameof(SearchHint));
         On(nameof(TargetText));
@@ -132,8 +135,8 @@ public sealed class RepoVM : VmBase, IRefreshable
         _targetInstance = latest?.InstanceId ?? "";
         (_gameVersion, _loader) = SplitInstance(_targetInstance);
         TargetText = latest is null
-            ? "尚未安装实例 · 下载后将保存到实例目录,请先安装一个版本"
-            : $"安装目标:实例 {latest.InstanceId}({_gameVersion} · {_loader})→ {SubDir}";
+            ? Loc.T("尚未安装实例 · 下载后将保存到实例目录,请先安装一个版本")
+            : string.Format(Loc.T("安装目标:实例 {0}({1} · {2})→ {3}"), latest.InstanceId, _gameVersion, _loader, SubDir);
         On(nameof(TargetText));
 
         if (!_loadedOnce)
@@ -163,7 +166,7 @@ public sealed class RepoVM : VmBase, IRefreshable
         if (Busy)
             return;
         Busy = true;
-        Status = "正在检索 Modrinth…";
+        Status = Loc.T("正在检索 Modrinth…");
         try
         {
             var gameVersion = _gameVersion.Length > 0 ? _gameVersion : "1.21.4";
@@ -186,14 +189,14 @@ public sealed class RepoVM : VmBase, IRefreshable
                 Rows.Add(new RepoRow(hit, this));
 
             Status = hits.Count == 0
-                ? "没有匹配结果 · 换个关键词或确认实例版本"
-                : $"共 {hits.Count} 个结果 · {gameVersion} · {_loader}";
+                ? Loc.T("没有匹配结果 · 换个关键词或确认实例版本")
+                : string.Format(Loc.T("共 {0} 个结果 · {1} · {2}"), hits.Count, gameVersion, _loader);
         }
         catch (Exception ex)
         {
             AppLog.Error("RepoPage", ex);
-            Status = "检索失败:" + ex.Message;
-            AppServices.Notify.Publish(NotifyKind.Error, "检索失败:" + ex.Message);
+            Status = Loc.T("检索失败:") + ex.Message;
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("检索失败:") + ex.Message);
         }
         finally
         {
@@ -205,15 +208,15 @@ public sealed class RepoVM : VmBase, IRefreshable
     {
         if (_targetInstance.Length == 0)
         {
-            await AppServices.Dialogs.AlertAsync("尚未安装实例",
-                "请先在「下载 → 游戏版本」安装一个实例;模组、光影与资源包都需要放进某个实例目录。",
+            await AppServices.Dialogs.AlertAsync(Loc.T("尚未安装实例"),
+                Loc.T("请先在「下载 → 游戏版本」安装一个实例;模组、光影与资源包都需要放进某个实例目录。"),
                 MsgMark.Info).ConfigureAwait(true);
             return;
         }
 
         try
         {
-            Status = $"正在解析 {row.Title} 的最新文件…";
+            Status = string.Format(Loc.T("正在解析 {0} 的最新文件…"), row.Title);
             var file = _category == ModrinthCategory.Mods
                 ? await Modrinth.LatestVersionFileAsync(row.Hit.Slug, _gameVersion, _loader, CancellationToken.None)
                     .ConfigureAwait(true)
@@ -221,22 +224,22 @@ public sealed class RepoVM : VmBase, IRefreshable
 
             if (file is null)
             {
-                Status = $"{row.Title} 没有适用于 {_gameVersion} / {_loader} 的文件";
-                AppServices.Notify.Publish(NotifyKind.Warning, $"{row.Title} 没有适用于当前版本的文件");
+                Status = string.Format(Loc.T("{0} 没有适用于 {1} / {2} 的文件"), row.Title, _gameVersion, _loader);
+                AppServices.Notify.Publish(NotifyKind.Warning, string.Format(Loc.T("{0} 没有适用于当前版本的文件"), row.Title));
                 return;
             }
 
             InstallWizard.SubmitInstanceFile(_targetInstance, SubDir, file.FileName,
                 file.Url, file.Sha1, file.Size);
             AppLog.Info("RepoPage", $"已提交 {row.Title} → {SubDir}/{file.FileName}");
-            Status = $"已提交 {file.FileName}({file.SizeText})到 {SubDir}";
-            AppServices.Notify.Publish(NotifyKind.Success, $"已提交下载:{file.FileName}");
+            Status = string.Format(Loc.T("已提交 {0}({1})到 {2}"), file.FileName, file.SizeText, SubDir);
+            AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("已提交下载:{0}"), file.FileName));
         }
         catch (Exception ex)
         {
             AppLog.Error("RepoPage", ex);
-            Status = "安装失败:" + ex.Message;
-            AppServices.Notify.Publish(NotifyKind.Error, "安装失败:" + ex.Message);
+            Status = Loc.T("安装失败:") + ex.Message;
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("安装失败:") + ex.Message);
         }
     }
 }

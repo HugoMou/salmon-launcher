@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using Microsoft.UI.Dispatching;
 using SL.Core.Transfers;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 
 namespace SL.App.Tasks;
 
@@ -69,17 +70,17 @@ public sealed class TaskRowVM : VmBase
     public string Title => _snap.DisplayName;
 
     /// <summary>标题旁的运行标识:完成时显示"完成",其余为空</summary>
-    public string RunBadge => _snap.State == TransferState.Completed ? "完成" : "";
+    public string RunBadge => _snap.State == TransferState.Completed ? Loc.T("完成") : "";
 
     public string StateText => _snap.State switch
     {
-        TransferState.Queued => "排队中",
-        TransferState.Downloading => "下载中",
-        TransferState.Verifying => "校验中",
-        TransferState.Paused => "已暂停",
-        TransferState.Completed => "已完成",
-        TransferState.Failed => "失败",
-        TransferState.Cancelled => "已取消",
+        TransferState.Queued => Loc.T("排队中"),
+        TransferState.Downloading => Loc.T("下载中"),
+        TransferState.Verifying => Loc.T("校验中"),
+        TransferState.Paused => Loc.T("已暂停"),
+        TransferState.Completed => Loc.T("已完成"),
+        TransferState.Failed => Loc.T("失败"),
+        TransferState.Cancelled => Loc.T("已取消"),
         _ => "",
     };
 
@@ -119,7 +120,7 @@ public sealed class TaskRowVM : VmBase
             if (remainBytes <= 0)
                 return "";
             var seconds = (int)(remainBytes / _snap.SpeedBytesPerSecond);
-            return seconds >= 90 ? $"剩 {seconds / 60} 分钟" : $"剩 {seconds} 秒";
+            return seconds >= 90 ? string.Format(Loc.T("剩 {0} 分钟"), seconds / 60) : string.Format(Loc.T("剩 {0} 秒"), seconds);
         }
     }
 
@@ -154,8 +155,8 @@ public sealed class TaskCenterVM : VmBase, IRefreshable
         {
             var active = Rows.Count(r => r.IsIndeterminate
                 || !string.IsNullOrEmpty(r.SpeedText)
-                || r.StateText is "排队中" or "校验中");
-            return active > 0 ? $"{active} 个任务进行中 · 共 {Rows.Count} 项" : $"共 {Rows.Count} 项";
+                || r.StateText == Loc.T("排队中") || r.StateText == Loc.T("校验中"));
+            return active > 0 ? string.Format(Loc.T("{0} 个任务进行中 · 共 {1} 项"), active, Rows.Count) : string.Format(Loc.T("共 {0} 项"), Rows.Count);
         }
     }
 

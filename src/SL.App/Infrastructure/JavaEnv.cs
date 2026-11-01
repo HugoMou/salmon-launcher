@@ -14,6 +14,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 using SL.Core.Java;
+using SL.App.Localization;
 
 namespace SL.App.Infrastructure;
 
@@ -23,7 +24,7 @@ namespace SL.App.Infrastructure;
 /// </summary>
 public static class JavaEnv
 {
-    private static string _statusText = "Java:扫描中…";
+    private static string _statusText = Loc.T("Java:扫描中…");
     private static string _detailText = "";
 
     /// <summary>一句话状态(启动面板显示)。</summary>
@@ -67,7 +68,7 @@ public static class JavaEnv
             var list = await JavaScan.ScanAsync(CancellationToken.None).ConfigureAwait(true);
             if (list.Count == 0)
             {
-                StatusText = "未检测到本地 Java(启动游戏时按需自动获取)";
+                StatusText = Loc.T("未检测到本地 Java(启动游戏时按需自动获取)");
                 DetailText = "";
                 Best = null;
                 Changed?.Invoke();
@@ -76,11 +77,11 @@ public static class JavaEnv
 
             Best = list[0];
             StatusText = $"Java {Best.VersionText} · {Best.Vendor}";
-            DetailText = list.Count == 1 ? Best.HomePath : $"共 {list.Count} 个运行时 · 首选 {Best.HomePath}";
+            DetailText = list.Count == 1 ? Best.HomePath : string.Format(Loc.T("共 {0} 个运行时 · 首选 {1}"), list.Count, Best.HomePath);
         }
         catch (Exception ex)
         {
-            StatusText = "Java 扫描失败:" + ex.Message;
+            StatusText = Loc.T("Java 扫描失败:") + ex.Message;
             Core.Logging.AppLog.Error("JavaEnv.Rescan", ex);
         }
         Changed?.Invoke();

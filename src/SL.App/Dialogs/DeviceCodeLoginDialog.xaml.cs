@@ -20,6 +20,7 @@ using SL.Core.Account;
 using SL.Core.Logging;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using SL.App.Localization;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace SL.App.Dialogs;
@@ -48,7 +49,7 @@ public sealed partial class DeviceCodeLoginDialog : ContentDialog
     {
         try
         {
-            SetStatus("正在向微软申请设备码…", working: true);
+            SetStatus(Loc.T("正在向微软申请设备码…"), working: true);
             var (userCode, deviceCode, link, interval) = await MsAuth.StartAsync(_cts.Token);
             if (_closed)
                 return;
@@ -57,7 +58,7 @@ public sealed partial class DeviceCodeLoginDialog : ContentDialog
             CodeText.Tag = userCode;
             CopyButton.IsEnabled = true;
             OpenButton.IsEnabled = true;
-            SetStatus("等待浏览器授权中;完成后本窗口会自动继续…", working: true);
+            SetStatus(Loc.T("等待浏览器授权中;完成后本窗口会自动继续…"), working: true);
 
             var session = await MsAuth.LoginAsync(deviceCode, interval, 900,
                 step => _ui.TryEnqueue(() => SetStatus(step, working: true)), _cts.Token);
@@ -70,7 +71,7 @@ public sealed partial class DeviceCodeLoginDialog : ContentDialog
                 c.ActiveAccountId = entry.Id;
             });
             AppLog.Info("Account", $"正版登录成功:{session.Name}");
-            AppServices.Notify.Publish(NotifyKind.Success, $"正版登录成功:{session.Name}");
+            AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("正版登录成功:{0}"), session.Name));
             Hide();
         }
         catch (OperationCanceledException)
@@ -102,7 +103,7 @@ public sealed partial class DeviceCodeLoginDialog : ContentDialog
         pkg.SetText(code);
         Clipboard.SetContent(pkg);
         Clipboard.Flush();
-        AppServices.Notify.Publish(NotifyKind.Success, "设备码已复制,请粘贴到浏览器登录页");
+        AppServices.Notify.Publish(NotifyKind.Success, Loc.T("设备码已复制,请粘贴到浏览器登录页"));
     }
 
     private async void OnOpen(object sender, RoutedEventArgs e)

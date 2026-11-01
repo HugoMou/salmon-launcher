@@ -19,6 +19,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using SL.Core.Logging;
+using SL.App.Localization;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.UI;
@@ -73,7 +74,7 @@ public sealed partial class SkinPreview : UserControl
         {
             AppLog.Error("SkinPreview", ex);
             Clear();
-            Hint.Text = "皮肤读取失败:" + ex.Message;
+            Hint.Text = Loc.T("皮肤读取失败:") + ex.Message;
             Hint.Visibility = Visibility.Visible;
         }
     }

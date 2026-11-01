@@ -125,7 +125,7 @@
                                                HorizontalAlignment="Right"
                                                Foreground="{ThemeResource Brush.FgFaint}" />
                                     <Button Command="{Binding InstallCommand}"
-                                            Content="下载并安装"
+                                            Content="{Binding InstallText}"
                                             Padding="14,5" />
                                 </StackPanel>
                             </Grid>

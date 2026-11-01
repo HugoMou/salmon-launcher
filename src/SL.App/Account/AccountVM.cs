@@ -22,6 +22,7 @@ using SL.Core.Settings;
 using SL.App.Dialogs;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using SL.App.Localization;
 
 namespace SL.App.Account;
 
@@ -41,13 +42,13 @@ public sealed class AccountRowVM : VmBase
     public AccountEntry Entry { get; }
     public string Id => Entry.Id;
     public string Name => Entry.Name;
-    public string KindText => Entry.Kind == "msa" ? "正版" : "离线";
+    public string KindText => Entry.Kind == "msa" ? Loc.T("正版") : Loc.T("离线");
     public string KindGlyph => Entry.Kind == "msa" ? "\uE8EA" : "\uE77B";
     public string Detail => Entry.Kind == "msa"
         ? Entry.Session is { } s
-            ? $"令牌有效至 {s.MinecraftExpiresAt:MM-dd HH:mm}"
-            : "本机缺少完整会话,请重新登录"
-        : "离线账户 · 无需正版登录";
+            ? string.Format(Loc.T("令牌有效至 {0}"), s.MinecraftExpiresAt.ToString("MM-dd HH:mm"))
+            : Loc.T("本机缺少完整会话,请重新登录")
+        : Loc.T("离线账户 · 无需正版登录");
 
     private bool _active;
     public bool Active
@@ -121,14 +122,14 @@ public sealed class AccountVM : VmBase
         AccountStore.SetActive(row.Id);
         SyncSettings(row.Entry);
         AppLog.Info("Account", $"切换账户:{row.Name}({row.KindText})");
-        AppServices.Notify.Publish(NotifyKind.Success, $"已切换到账户 {row.Name}");
+        AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("已切换到账户 {0}"), row.Name));
         Refresh();
     }
 
     internal async Task DeleteAsync(AccountRowVM row)
     {
-        if (!await AppServices.Dialogs.ConfirmAsync("删除账户",
-                $"将删除「{row.Name}」({row.KindText});正版账户的会话令牌也会一并清除,该操作不可撤销。",
+        if (!await AppServices.Dialogs.ConfirmAsync(Loc.T("删除账户"),
+                string.Format(Loc.T("将删除「{0}」({1});正版账户的会话令牌也会一并清除,该操作不可撤销。"), row.Name, row.KindText),
                 MsgMark.Warning).ConfigureAwait(true))
             return;
         AccountStore.Remove(row.Id);
@@ -144,7 +145,7 @@ public sealed class AccountVM : VmBase
             _settings.Update(c => c.AccountType = "offline");
         }
         AppLog.Info("Account", $"已删除账户:{row.Name}");
-        AppServices.Notify.Publish(NotifyKind.Info, $"已删除账户 {row.Name}");
+        AppServices.Notify.Publish(NotifyKind.Info, string.Format(Loc.T("已删除账户 {0}"), row.Name));
         Refresh();
     }
 
@@ -155,12 +156,12 @@ public sealed class AccountVM : VmBase
             return;
 
         var choice = await AppServices.Dialogs.ChooseAsync(
-            "正版授权登录",
-            "选择一种登录方式;令牌只保存在本机。",
+            Loc.T("正版授权登录"),
+            Loc.T("选择一种登录方式;令牌只保存在本机。"),
             [
-                "浏览器授权(在启动器内置窗口直接登录)",
-                "设备码登录(到 microsoft.com/link 输入一次性代码)",
-                "系统浏览器登录(自动打开浏览器,完成后把回跳链接粘贴回来)",
+                Loc.T("浏览器授权(在启动器内置窗口直接登录)"),
+                Loc.T("设备码登录(到 microsoft.com/link 输入一次性代码)"),
+                Loc.T("系统浏览器登录(自动打开浏览器,完成后把回跳链接粘贴回来)"),
             ]).ConfigureAwait(true);
         if (choice is null)
             return;
@@ -201,7 +202,7 @@ public sealed class AccountVM : VmBase
 
         try
         {
-            AppServices.Notify.Publish(NotifyKind.Info, "正在完成微软登录…");
+            AppServices.Notify.Publish(NotifyKind.Info, Loc.T("正在完成微软登录…"));
             var code = MsAuth.ExtractAuthorizationCode(callback);
             var session = await MsAuth.CompleteInteractiveAsync(code, req.Verifier).ConfigureAwait(true);
             var entry = AccountStore.UpsertMsa(session);
@@ -212,12 +213,12 @@ public sealed class AccountVM : VmBase
                 c.ActiveAccountId = entry.Id;
             });
             AppLog.Info("Account", $"正版登录成功(复制链接):{session.Name}");
-            AppServices.Notify.Publish(NotifyKind.Success, $"正版登录成功:{session.Name}");
+            AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("正版登录成功:{0}"), session.Name));
         }
         catch (Exception ex)
         {
             AppLog.Error("Account", ex);
-            await AppServices.Dialogs.AlertAsync("登录未完成", ex.Message, MsgMark.Warning).ConfigureAwait(true);
+            await AppServices.Dialogs.AlertAsync(Loc.T("登录未完成"), ex.Message, MsgMark.Warning).ConfigureAwait(true);
         }
     }
 
@@ -243,20 +244,20 @@ public sealed class AccountVM : VmBase
     {
         if (Busy)
             return;
-        var name = await AppServices.Dialogs.PromptAsync("添加离线账户",
-            "输入游戏内玩家名(1–16 个字符,仅限字母、数字、下划线)。").ConfigureAwait(true);
+        var name = await AppServices.Dialogs.PromptAsync(Loc.T("添加离线账户"),
+            Loc.T("输入游戏内玩家名(1–16 个字符,仅限字母、数字、下划线)。")).ConfigureAwait(true);
         if (name is null)
             return;
         if (!IsValidName(name))
         {
-            await AppServices.Dialogs.AlertAsync("名字不合法",
-                "玩家名需 1–16 个字符,仅限字母、数字、下划线。", MsgMark.Warning).ConfigureAwait(true);
+            await AppServices.Dialogs.AlertAsync(Loc.T("名字不合法"),
+                Loc.T("玩家名需 1–16 个字符,仅限字母、数字、下划线。"), MsgMark.Warning).ConfigureAwait(true);
             return;
         }
         var entry = AccountStore.AddOffline(name);
         SyncSettings(entry);
         AppLog.Info("Account", $"添加离线账户:{entry.Name}");
-        AppServices.Notify.Publish(NotifyKind.Success, $"已添加离线账户 {entry.Name}");
+        AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("已添加离线账户 {0}"), entry.Name));
         Refresh();
     }
 
@@ -292,15 +293,15 @@ public sealed class AccountVM : VmBase
         {
             ActiveGlyph = "\uE77B";
             Summary = _settings.Current.AccountName;
-            Detail = "尚未选择账户 · 启动时将使用离线名";
+            Detail = Loc.T("尚未选择账户 · 启动时将使用离线名");
             return;
         }
         ActiveGlyph = active.Kind == "msa" ? "\uE8EA" : "\uE77B";
         Summary = active.Name;
         Detail = active.Kind == "msa"
             ? active.Session is { } s
-                ? $"正版 · 令牌有效至 {s.MinecraftExpiresAt:MM-dd HH:mm}"
-                : "正版 · 本机缺少完整会话,请重新登录"
-            : "离线模式 · 无需正版账户";
+                ? string.Format(Loc.T("正版 · 令牌有效至 {0}"), s.MinecraftExpiresAt.ToString("MM-dd HH:mm"))
+                : Loc.T("正版 · 本机缺少完整会话,请重新登录")
+            : Loc.T("离线模式 · 无需正版账户");
     }
 }

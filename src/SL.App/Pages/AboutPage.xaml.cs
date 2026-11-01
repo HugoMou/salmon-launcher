@@ -17,6 +17,7 @@ using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using SL.App.Localization;
 using SL.App.Infrastructure;
 using SL.Core.Boot;
 
@@ -28,7 +29,7 @@ public sealed partial class AboutPage : Page
     public AboutPage()
     {
         InitializeComponent();
-        VersionText.Text = $"版本 {Runtime.AppVersion} · Windows 桌面版";
+        VersionText.Text = string.Format(Loc.T("版本 {0} · Windows 桌面版"), Runtime.AppVersion);
         VersionRowText.Text = Runtime.AppVersion;
         RuntimeText.Text = $"WinUI 3 / Windows App SDK · .NET {Environment.Version} · {Environment.OSVersion.VersionString}";
         RootText.Text = Runtime.Root;
@@ -43,8 +44,8 @@ public sealed partial class AboutPage : Page
 
     private void SyncTerms()
         => TermsStateText.Text = AppServices.Settings.Current.TermsAccepted
-            ? "已阅读并同意用户协议"
-            : "尚未同意 · 前往「用户协议」页面确认";
+            ? Loc.T("已阅读并同意用户协议")
+            : Loc.T("尚未同意 · 前往「用户协议」页面确认");
 
     private void OnOpenRoot(object sender, RoutedEventArgs e) => OpenPath(Runtime.Root);
 

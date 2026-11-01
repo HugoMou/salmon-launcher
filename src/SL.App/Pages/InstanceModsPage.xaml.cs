@@ -20,6 +20,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.Core.Instances;
 using SL.Core.Logging;
+using SL.App.Localization;
 using SL.App.Dialogs;
 using SL.App.Instances;
 using SL.App.Infrastructure;
@@ -36,7 +37,7 @@ public sealed class ModRow
         Name = info.BaseName;
         Enabled = info.Enabled;
         Detail = $"{info.SizeBytes / 1024.0:F0} KB · {info.ModifiedAt:yyyy-MM-dd HH:mm}"
-                 + (info.Enabled ? "" : " · 已停用");
+                 + (info.Enabled ? "" : Loc.T(" · 已停用"));
         Glyph = info.Enabled ? "\uE7B8" : "\uE7BA";
     }
 
@@ -80,7 +81,7 @@ public sealed partial class InstanceModsPage : Page
         _rows.Clear();
         if (InstanceContext.CurrentId.Length == 0)
         {
-            StatusText.Text = "尚未安装实例 · 请先安装一个版本";
+            StatusText.Text = Loc.T("尚未安装实例 · 请先安装一个版本");
             return;
         }
 
@@ -89,8 +90,8 @@ public sealed partial class InstanceModsPage : Page
 
         var enabled = _rows.Count(r => r.Enabled);
         StatusText.Text = _rows.Count == 0
-            ? $"实例 {InstanceContext.CurrentId} 的 mods 目录为空 · 可从「下载 → 模组仓库」安装"
-            : $"实例 {InstanceContext.CurrentId} · 共 {_rows.Count} 个模组,启用 {enabled} 个";
+            ? string.Format(Loc.T("实例 {0} 的 mods 目录为空 · 可从「下载 → 模组仓库」安装"), InstanceContext.CurrentId)
+            : string.Format(Loc.T("实例 {0} · 共 {1} 个模组,启用 {2} 个"), InstanceContext.CurrentId, _rows.Count, enabled);
     }
 
     private void OnInstanceChanged(object sender, SelectionChangedEventArgs e)
@@ -111,12 +112,12 @@ public sealed partial class InstanceModsPage : Page
         try
         {
             var enabled = InstanceRegistry.ToggleMod(InstanceContext.CurrentId, row.FileName);
-            AppServices.Notify.Publish(NotifyKind.Info, $"{(enabled ? "已启用" : "已停用")}:{row.Name}");
+            AppServices.Notify.Publish(NotifyKind.Info, (enabled ? Loc.T("已启用") : Loc.T("已停用")) + ":" + row.Name);
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceMods", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "切换失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("切换失败:") + ex.Message);
         }
         Reload();
     }
@@ -128,19 +129,19 @@ public sealed partial class InstanceModsPage : Page
         if (InstanceContext.CurrentId.Length == 0)
             return;
 
-        if (!await AppServices.Dialogs.ConfirmAsync("删除模组",
-                $"将删除「{row.Name}」,该操作不可撤销。", MsgMark.Warning).ConfigureAwait(true))
+        if (!await AppServices.Dialogs.ConfirmAsync(Loc.T("删除模组"),
+                string.Format(Loc.T("将删除「{0}」,该操作不可撤销。"), row.Name), MsgMark.Warning).ConfigureAwait(true))
             return;
 
         try
         {
             InstanceRegistry.DeleteMod(InstanceContext.CurrentId, row.FileName);
-            AppServices.Notify.Publish(NotifyKind.Info, "已删除:" + row.Name);
+            AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已删除:") + row.Name);
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceMods", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "删除失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("删除失败:") + ex.Message);
         }
         Reload();
     }
@@ -149,25 +150,25 @@ public sealed partial class InstanceModsPage : Page
     {
         if (InstanceContext.CurrentId.Length == 0)
         {
-            await AppServices.Dialogs.AlertAsync("尚未安装实例", "请先安装一个实例再导入模组。",
+            await AppServices.Dialogs.AlertAsync(Loc.T("尚未安装实例"), Loc.T("请先安装一个实例再导入模组。"),
                 MsgMark.Info).ConfigureAwait(true);
             return;
         }
 
-        var path = await AppServices.Dialogs.PromptAsync("导入模组",
-            "粘贴模组 .jar 的完整路径(同名文件会自动追加序号,不会覆盖)。").ConfigureAwait(true);
+        var path = await AppServices.Dialogs.PromptAsync(Loc.T("导入模组"),
+            Loc.T("粘贴模组 .jar 的完整路径(同名文件会自动追加序号,不会覆盖)。")).ConfigureAwait(true);
         if (path is null)
             return;
 
         try
         {
             var name = InstanceRegistry.ImportMod(InstanceContext.CurrentId, path.Trim('"'));
-            AppServices.Notify.Publish(NotifyKind.Success, "已导入:" + name);
+            AppServices.Notify.Publish(NotifyKind.Success, Loc.T("已导入:") + name);
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceMods", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "导入失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("导入失败:") + ex.Message);
         }
         Reload();
     }

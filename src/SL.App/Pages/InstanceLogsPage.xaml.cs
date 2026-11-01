@@ -19,6 +19,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.Core.Logging;
 using SL.Core.Tools;
+using SL.App.Localization;
 using SL.App.Instances;
 using SL.App.Infrastructure;
 
@@ -67,30 +68,30 @@ public sealed partial class InstanceLogsPage : Page
     {
         if (InstanceContext.CurrentId.Length == 0)
         {
-            StatusText.Text = "尚未安装实例 · 请先安装一个版本";
-            LogText.Text = "没有可显示的日志。";
+            StatusText.Text = Loc.T("尚未安装实例 · 请先安装一个版本");
+            LogText.Text = Loc.T("没有可显示的日志。");
             return;
         }
 
         var file = LogReader.LatestInstanceLog(InstanceContext.CurrentId);
         if (file is null)
         {
-            StatusText.Text = $"实例 {InstanceContext.CurrentId} 还没有运行日志 · 启动一次游戏后即可查看";
-            LogText.Text = "latest.log 尚未生成。";
+            StatusText.Text = string.Format(Loc.T("实例 {0} 还没有运行日志 · 启动一次游戏后即可查看"), InstanceContext.CurrentId);
+            LogText.Text = Loc.T("latest.log 尚未生成。");
             return;
         }
 
         var tail = LogReader.ReadTail(file, 2000, KeywordBox.Text.Trim());
         if (tail is null)
         {
-            StatusText.Text = "日志读取失败(文件可能正被游戏占用)";
+            StatusText.Text = Loc.T("日志读取失败(文件可能正被游戏占用)");
             LogText.Text = "";
             return;
         }
 
         LogText.Text = tail.Lines.Count == 0
-            ? "没有匹配的日志行。"
+            ? Loc.T("没有匹配的日志行。")
             : string.Join(Environment.NewLine, tail.Lines);
-        StatusText.Text = $"实例 {InstanceContext.CurrentId} · {tail.Lines.Count} 行 · 警告 {tail.WarnCount} · 错误 {tail.ErrorCount}";
+        StatusText.Text = string.Format(Loc.T("实例 {0} · {1} 行 · 警告 {2} · 错误 {3}"), InstanceContext.CurrentId, tail.Lines.Count, tail.WarnCount, tail.ErrorCount);
     }
 }

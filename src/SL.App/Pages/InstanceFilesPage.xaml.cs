@@ -20,6 +20,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.Core.Instances;
 using SL.Core.Logging;
+using SL.App.Localization;
 using SL.App.Dialogs;
 using SL.App.Instances;
 using SL.App.Infrastructure;
@@ -72,9 +73,9 @@ public sealed partial class InstanceFilesPage : Page
         _routeKey = e.Parameter as string ?? "inst.packs";
         (_subDir, _isSaves, TitleText.Text) = _routeKey switch
         {
-            "inst.shaders" => ("shaderpacks", false, "光影"),
-            "inst.saves" => ("saves", true, "存档"),
-            _ => ("resourcepacks", false, "资源包"),
+            "inst.shaders" => ("shaderpacks", false, Loc.T("光影")),
+            "inst.saves" => ("saves", true, Loc.T("存档")),
+            _ => ("resourcepacks", false, Loc.T("资源包")),
         };
         BackupButton.Visibility = _isSaves ? Visibility.Visible : Visibility.Collapsed;
         Reload();
@@ -93,7 +94,7 @@ public sealed partial class InstanceFilesPage : Page
         _rows.Clear();
         if (InstanceContext.CurrentId.Length == 0)
         {
-            StatusText.Text = "尚未安装实例 · 请先安装一个版本";
+            StatusText.Text = Loc.T("尚未安装实例 · 请先安装一个版本");
             return;
         }
 
@@ -109,15 +110,15 @@ public sealed partial class InstanceFilesPage : Page
         foreach (var save in saves)
         {
             _rows.Add(new InstanceFileRow(save.Name,
-                $"最近游玩 {save.LastPlayed:yyyy-MM-dd HH:mm} · {save.SizeMb} MB",
+                string.Format(Loc.T("最近游玩 {0} · {1} MB"), save.LastPlayed.ToString("yyyy-MM-dd HH:mm"), save.SizeMb),
                 "\uE74E",
-                $"打开",
+                Loc.T("打开"),
                 System.IO.Path.Combine(InstanceRegistry.InstanceDirOf(InstanceContext.CurrentId), "saves", save.Name)));
         }
 
         StatusText.Text = saves.Count == 0
-            ? $"实例 {InstanceContext.CurrentId} 暂无存档 · 进入游戏创建世界后会出现在这里"
-            : $"实例 {InstanceContext.CurrentId} · 共 {saves.Count} 个存档";
+            ? string.Format(Loc.T("实例 {0} 暂无存档 · 进入游戏创建世界后会出现在这里"), InstanceContext.CurrentId)
+            : string.Format(Loc.T("实例 {0} · 共 {1} 个存档"), InstanceContext.CurrentId, saves.Count);
     }
 
     private void LoadFiles()
@@ -147,13 +148,13 @@ public sealed partial class InstanceFilesPage : Page
             _rows.Add(new InstanceFileRow(file.Name,
                 $"{sizeText} · {file.LastWriteTime:yyyy-MM-dd HH:mm}",
                 _isSaves ? "\uE74E" : "\uE8F1",
-                "删除",
+                Loc.T("删除"),
                 file.FullName));
         }
 
         StatusText.Text = files.Count == 0
-            ? $"实例 {InstanceContext.CurrentId} 的 {_subDir} 目录为空 · 可从下载页安装"
-            : $"实例 {InstanceContext.CurrentId} · {_subDir} 共 {files.Count} 个文件";
+            ? string.Format(Loc.T("实例 {0} 的 {1} 目录为空 · 可从下载页安装"), InstanceContext.CurrentId, _subDir)
+            : string.Format(Loc.T("实例 {0} · {1} 共 {2} 个文件"), InstanceContext.CurrentId, _subDir, files.Count);
     }
 
     private void OnInstanceChanged(object sender, SelectionChangedEventArgs e)
@@ -184,19 +185,19 @@ public sealed partial class InstanceFilesPage : Page
             return;
         }
 
-        if (!await AppServices.Dialogs.ConfirmAsync("删除文件",
-                $"将删除「{row.Name}」,该操作不可撤销。", MsgMark.Warning).ConfigureAwait(true))
+        if (!await AppServices.Dialogs.ConfirmAsync(Loc.T("删除文件"),
+                string.Format(Loc.T("将删除「{0}」,该操作不可撤销。"), row.Name), MsgMark.Warning).ConfigureAwait(true))
             return;
 
         try
         {
             System.IO.File.Delete(row.Path);
-            AppServices.Notify.Publish(NotifyKind.Info, "已删除:" + row.Name);
+            AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已删除:") + row.Name);
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceFiles", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "删除失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("删除失败:") + ex.Message);
         }
         Reload();
     }
@@ -210,17 +211,17 @@ public sealed partial class InstanceFilesPage : Page
             var path = InstanceRegistry.BackupSaves(InstanceContext.CurrentId);
             if (path is null)
             {
-                await AppServices.Dialogs.AlertAsync("没有可备份的存档", "saves 目录为空。", MsgMark.Info)
+                await AppServices.Dialogs.AlertAsync(Loc.T("没有可备份的存档"), Loc.T("saves 目录为空。"), MsgMark.Info)
                     .ConfigureAwait(true);
                 return;
             }
-            AppServices.Notify.Publish(NotifyKind.Success, "存档已备份:" + System.IO.Path.GetFileName(path));
-            StatusText.Text = "已备份到 " + path;
+            AppServices.Notify.Publish(NotifyKind.Success, Loc.T("存档已备份:") + System.IO.Path.GetFileName(path));
+            StatusText.Text = Loc.T("已备份到 ") + path;
         }
         catch (Exception ex)
         {
             AppLog.Error("InstanceFiles", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "备份失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("备份失败:") + ex.Message);
         }
     }
 

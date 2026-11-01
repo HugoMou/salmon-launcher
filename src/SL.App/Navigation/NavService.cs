@@ -16,6 +16,7 @@
 using Microsoft.UI.Xaml.Controls;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using SL.App.Localization;
 
 namespace SL.App.Navigation;
 
@@ -64,7 +65,7 @@ public sealed class NavService
             return;
         if (!PageCatalog.All.TryGetValue(key, out var spec))
         {
-            AppServices.Notify.Publish(NotifyKind.Error, $"未注册页面:{key}");
+            AppServices.Notify.Publish(NotifyKind.Error, string.Format(Loc.T("未注册页面:{0}"), key));
             return;
         }
         if (key == CurrentKey && _frame.Content is not null && _frame.CurrentSourcePageType == spec.PageType)

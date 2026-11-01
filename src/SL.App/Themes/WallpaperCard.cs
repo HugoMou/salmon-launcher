@@ -27,7 +27,7 @@ public sealed class WallpaperCard : INotifyPropertyChanged
 {
     private ImageSource? _thumb;
     private Brush _dot = new SolidColorBrush(Colors.Gray);
-    private string _hex = "取色中…";
+    private string _hex = Loc.T("取色中…");
     private bool _ready;
 
     public required WallpaperScene Scene { get; init; }

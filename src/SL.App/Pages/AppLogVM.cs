@@ -19,6 +19,7 @@ using SL.Core.Boot;
 using SL.Core.Logging;
 using SL.Core.Tools;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 
 namespace SL.App.Pages;
 
@@ -41,7 +42,7 @@ public sealed class AppLogVM : VmBase, IRefreshable
     private const int TailLines = 2000;
 
     private string _logText = "";
-    private string _summary = "正在读取…";
+    private string _summary = Loc.T("正在读取…");
     private bool _errorsOnly;
 
     public AppLogVM()
@@ -116,8 +117,8 @@ public sealed class AppLogVM : VmBase, IRefreshable
         SelectedFile = Files.FirstOrDefault(f => f.Path == keep) ?? Files.FirstOrDefault();
         if (SelectedFile is null)
         {
-            LogText = "尚无日志文件。启动器运行并产生事件后,日志会自动写入此处。";
-            Summary = $"日志目录:{Runtime.LogDir}";
+            LogText = Loc.T("尚无日志文件。启动器运行并产生事件后,日志会自动写入此处。");
+            Summary = string.Format(Loc.T("日志目录:{0}"), Runtime.LogDir);
         }
     }
 
@@ -133,7 +134,7 @@ public sealed class AppLogVM : VmBase, IRefreshable
         var tail = LogReader.ReadTail(_selectedFile.Path, TailLines, keyword);
         if (tail is null)
         {
-            LogText = "无法读取该日志(文件可能已被删除或正被占用)。";
+            LogText = Loc.T("无法读取该日志(文件可能已被删除或正被占用)。");
             Summary = _selectedFile.Display;
             return;
         }
@@ -143,7 +144,7 @@ public sealed class AppLogVM : VmBase, IRefreshable
             text = string.Join(Environment.NewLine,
                 tail.Lines.Where(l => l.Contains(_keyword.Trim(), StringComparison.OrdinalIgnoreCase)));
 
-        LogText = string.IsNullOrWhiteSpace(text) ? "没有匹配的日志行。" : text;
-        Summary = $"{_selectedFile.Display} · {tail.Lines.Count} 行 · 警告 {tail.WarnCount} · 错误 {tail.ErrorCount}";
+        LogText = string.IsNullOrWhiteSpace(text) ? Loc.T("没有匹配的日志行。") : text;
+        Summary = string.Format(Loc.T("{0} · {1} 行 · 警告 {2} · 错误 {3}"), _selectedFile.Display, tail.Lines.Count, tail.WarnCount, tail.ErrorCount);
     }
 }

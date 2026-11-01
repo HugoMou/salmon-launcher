@@ -16,6 +16,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
+using SL.App.Localization;
 
 namespace SL.App.Dialogs;
 
@@ -48,14 +49,14 @@ public sealed class DialogService
         string? okLabel = null, string? cancelLabel = null)
     {
         var dialog = Build(title, MessageContent(message, mark),
-            okLabel ?? "确定", cancelLabel ?? "取消");
+            okLabel ?? Loc.T("确定"), cancelLabel ?? Loc.T("取消"));
         var result = await ShowAsync(dialog).ConfigureAwait(true);
         return result == ContentDialogResult.Primary;
     }
 
     public async Task<bool> AlertAsync(string title, string message, MsgMark mark = MsgMark.Info)
     {
-        var dialog = Build(title, MessageContent(message, mark), "知道了", null);
+        var dialog = Build(title, MessageContent(message, mark), Loc.T("知道了"), null);
         await ShowAsync(dialog).ConfigureAwait(true);
         return true;
     }
@@ -78,7 +79,7 @@ public sealed class DialogService
             });
         panel.Children.Add(input);
 
-        var dialog = Build(title, panel, "确定", "取消");
+        var dialog = Build(title, panel, Loc.T("确定"), Loc.T("取消"));
         var result = await ShowAsync(dialog).ConfigureAwait(true);
         if (result != ContentDialogResult.Primary)
             return null;
@@ -104,7 +105,7 @@ public sealed class DialogService
             });
         panel.Children.Add(list);
 
-        var dialog = Build(title, panel, "确定", "取消");
+        var dialog = Build(title, panel, Loc.T("确定"), Loc.T("取消"));
         var result = await ShowAsync(dialog).ConfigureAwait(true);
         return result == ContentDialogResult.Primary ? list.SelectedIndex : null;
     }

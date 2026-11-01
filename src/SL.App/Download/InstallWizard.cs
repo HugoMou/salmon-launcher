@@ -17,6 +17,7 @@ using SL.Core.Boot;
 using SL.Core.Launch;
 using SL.Core.Net;
 using SL.Core.Transfers;
+using SL.App.Localization;
 using SL.App.Infrastructure;
 
 namespace SL.App.Download;
@@ -100,21 +101,21 @@ public static class InstallWizard
 
         if (VersionUrl.Length > 0)
         {
-            Submit($"元数据 {id}.json", VersionUrl, VersionSha1, -1,
+            Submit(string.Format(Loc.T("元数据 {0}.json"), id), VersionUrl, VersionSha1, -1,
                 Path.Combine(instanceMetaDir, id + ".json"), TransferPriority.CoreGameFile);
             count++;
         }
 
         if (detail.Client is { } client)
         {
-            Submit($"游戏核心 {id}.jar", client.Url, client.Sha1, client.Size,
+            Submit(string.Format(Loc.T("游戏核心 {0}.jar"), id), client.Url, client.Sha1, client.Size,
                 Path.Combine(versionDir, id + ".jar"), TransferPriority.CoreGameFile);
             count++;
         }
 
         foreach (var lib in detail.Libraries)
         {
-            Submit("库 " + Path.GetFileName(lib.RelativePath), lib.Url, lib.Sha1, lib.Size,
+            Submit(Loc.T("库 ") + Path.GetFileName(lib.RelativePath), lib.Url, lib.Sha1, lib.Size,
                 Path.Combine(Runtime.LibrariesDir, lib.RelativePath.Replace('/', Path.DirectorySeparatorChar)),
                 TransferPriority.Library);
             count++;
@@ -122,7 +123,7 @@ public static class InstallWizard
 
         if (detail.AssetIndex is { } assetIndex)
         {
-            Submit($"资源索引 {detail.AssetId}.json", assetIndex.Url, assetIndex.Sha1, assetIndex.Size,
+            Submit(string.Format(Loc.T("资源索引 {0}.json"), detail.AssetId), assetIndex.Url, assetIndex.Sha1, assetIndex.Size,
                 Path.Combine(indexesDir, detail.AssetId + ".json"), TransferPriority.AssetIndex);
             count++;
         }

@@ -124,7 +124,7 @@ public sealed partial class BrowserLoginDialog : ContentDialog
                 c.ActiveAccountId = entry.Id;
             });
             AppLog.Info("Account", $"正版登录成功(内置浏览器):{session.Name}");
-            AppServices.Notify.Publish(NotifyKind.Success, $"正版登录成功:{session.Name}");
+            AppServices.Notify.Publish(NotifyKind.Success, string.Format(Loc.T("正版登录成功:{0}"), session.Name));
             Hide();
         }
         catch (OperationCanceledException)

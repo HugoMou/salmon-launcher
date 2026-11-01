@@ -20,6 +20,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.Core.Account;
 using SL.Core.Logging;
+using SL.App.Localization;
 using SL.Core.Skins;
 using SL.App.Dialogs;
 using SL.App.Infrastructure;
@@ -91,14 +92,14 @@ public sealed partial class SkinStationPage : Page
         foreach (var account in repo.Accounts)
         {
             _users.Add(new SkinUserRow(account.Id, account.Name,
-                (account.Kind == "msa" ? "正版账户" : "离线账户") + (account.Id == repo.ActiveId ? " · 当前使用" : ""),
+                (account.Kind == "msa" ? Loc.T("正版账户") : Loc.T("离线账户")) + (account.Id == repo.ActiveId ? Loc.T(" · 当前使用") : ""),
                 account.Kind == "msa" ? "\uE8EA" : "\uE77B"));
         }
 
         if (_users.Count == 0)
         {
             var name = AppServices.Settings.Current.AccountName;
-            _users.Add(new SkinUserRow("offline:" + name, name, "离线账户 · 默认", "\uE77B"));
+            _users.Add(new SkinUserRow("offline:" + name, name, Loc.T("离线账户 · 默认"), "\uE77B"));
         }
 
         _currentUser = _users.FirstOrDefault(u => u.Id == keep) ?? _users[0];
@@ -110,12 +111,12 @@ public sealed partial class SkinStationPage : Page
     {
         _skins.Clear();
         Preview.Clear();
-        SkinNameText.Text = "未选择皮肤";
+        SkinNameText.Text = Loc.T("未选择皮肤");
         SkinMetaText.Text = "";
 
         if (_currentUser is null)
         {
-            StatusText.Text = "没有可用的用户";
+            StatusText.Text = Loc.T("没有可用的用户");
             return;
         }
 
@@ -127,14 +128,14 @@ public sealed partial class SkinStationPage : Page
         catch (Exception ex)
         {
             AppLog.Error("SkinStation", ex);
-            StatusText.Text = "读取皮肤失败:" + ex.Message;
+            StatusText.Text = Loc.T("读取皮肤失败:") + ex.Message;
             return;
         }
 
-        TitleText.Text = $"皮肤站 · {_currentUser.Name}";
+        TitleText.Text = string.Format(Loc.T("皮肤站 · {0}"), _currentUser.Name);
         StatusText.Text = _skins.Count == 0
-            ? $"{_currentUser.Name} 还没有保存的皮肤 · 可从本地添加或按网址下载"
-            : $"{_currentUser.Name} 共保存 {_skins.Count} 个皮肤 · 选中即可 3D 预览";
+            ? string.Format(Loc.T("{0} 还没有保存的皮肤 · 可从本地添加或按网址下载"), _currentUser.Name)
+            : string.Format(Loc.T("{0} 共保存 {1} 个皮肤 · 选中即可 3D 预览"), _currentUser.Name, _skins.Count);
 
         if (_skins.Count > 0)
             SkinList.SelectedItem = _skins[0];
@@ -154,7 +155,7 @@ public sealed partial class SkinStationPage : Page
         if (SkinList.SelectedItem is not SkinRow row)
             return;
         SkinNameText.Text = row.Name;
-        SkinMetaText.Text = $"{row.Item.SizeText} · {row.Item.ModelText} · 保存于 {row.Item.SavedText}";
+        SkinMetaText.Text = string.Format(Loc.T("{0} · {1} · 保存于 {2}"), row.Item.SizeText, row.Item.ModelText, row.Item.SavedText);
         await Preview.LoadAsync(row.Item.Path);
     }
 
@@ -169,21 +170,21 @@ public sealed partial class SkinStationPage : Page
         if (_currentUser is null)
             return;
 
-        var path = await AppServices.Dialogs.PromptAsync("添加本地皮肤",
-            "粘贴 PNG 皮肤文件的完整路径(64×64 现代皮肤或 64×32 旧版皮肤)。").ConfigureAwait(true);
+        var path = await AppServices.Dialogs.PromptAsync(Loc.T("添加本地皮肤"),
+            Loc.T("粘贴 PNG 皮肤文件的完整路径(64×64 现代皮肤或 64×32 旧版皮肤)。")).ConfigureAwait(true);
         if (path is null)
             return;
 
         try
         {
             var name = SkinLibrary.Import(_currentUser.Id, path.Trim('"', ' '));
-            AppServices.Notify.Publish(NotifyKind.Success, "已添加皮肤:" + name);
+            AppServices.Notify.Publish(NotifyKind.Success, Loc.T("已添加皮肤:") + name);
             LoadSkins();
         }
         catch (Exception ex)
         {
             AppLog.Error("SkinStation", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "添加失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("添加失败:") + ex.Message);
         }
     }
 
@@ -192,25 +193,25 @@ public sealed partial class SkinStationPage : Page
         if (_currentUser is null)
             return;
 
-        var url = await AppServices.Dialogs.PromptAsync("从网址添加皮肤",
-            "粘贴皮肤 PNG 的直链(http/https),例如皮肤站提供的纹理地址。").ConfigureAwait(true);
+        var url = await AppServices.Dialogs.PromptAsync(Loc.T("从网址添加皮肤"),
+            Loc.T("粘贴皮肤 PNG 的直链(http/https),例如皮肤站提供的纹理地址。")).ConfigureAwait(true);
         if (url is null)
             return;
 
         try
         {
-            StatusText.Text = "正在下载皮肤…";
+            StatusText.Text = Loc.T("正在下载皮肤…");
             var name = await SkinLibrary.DownloadAsync(_currentUser.Id, url.Trim(), null,
                 CancellationToken.None).ConfigureAwait(true);
             AppLog.Info("SkinStation", $"已下载皮肤 {name}");
-            AppServices.Notify.Publish(NotifyKind.Success, "已下载皮肤:" + name);
+            AppServices.Notify.Publish(NotifyKind.Success, Loc.T("已下载皮肤:") + name);
             LoadSkins();
         }
         catch (Exception ex)
         {
             AppLog.Error("SkinStation", ex);
-            StatusText.Text = "下载失败:" + ex.Message;
-            AppServices.Notify.Publish(NotifyKind.Error, "下载失败:" + ex.Message);
+            StatusText.Text = Loc.T("下载失败:") + ex.Message;
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("下载失败:") + ex.Message);
         }
     }
 
@@ -219,20 +220,20 @@ public sealed partial class SkinStationPage : Page
         if (_currentUser is null || SkinList.SelectedItem is not SkinRow row)
             return;
 
-        if (!await AppServices.Dialogs.ConfirmAsync("删除皮肤",
-                $"将删除「{row.Name}」,该操作不可撤销。", MsgMark.Warning).ConfigureAwait(true))
+        if (!await AppServices.Dialogs.ConfirmAsync(Loc.T("删除皮肤"),
+                string.Format(Loc.T("将删除「{0}」,该操作不可撤销。"), row.Name), MsgMark.Warning).ConfigureAwait(true))
             return;
 
         try
         {
             SkinLibrary.Delete(_currentUser.Id, row.Item.FileName);
-            AppServices.Notify.Publish(NotifyKind.Info, "已删除:" + row.Name);
+            AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已删除:") + row.Name);
             LoadSkins();
         }
         catch (Exception ex)
         {
             AppLog.Error("SkinStation", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "删除失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("删除失败:") + ex.Message);
         }
     }
 

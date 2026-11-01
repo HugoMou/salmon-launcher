@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SL.Core.Boot;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 
 namespace SL.App.Pages;
 
@@ -118,7 +119,7 @@ public sealed partial class GlobalSettingsPage : Page
 
     private async void OnRescanJava(object sender, RoutedEventArgs e)
     {
-        JavaText.Text = "正在扫描 Java…";
+        JavaText.Text = Loc.T("正在扫描 Java…");
         await JavaEnv.RescanAsync();
         UpdateJavaText();
     }

@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml;
 using SL.Core.Logging;
 using SL.Core.Tools;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 
 namespace SL.App.Pages;
 
@@ -40,7 +41,7 @@ public sealed class CrashRow
 public sealed class CrashDiagVM : VmBase, IRefreshable
 {
     private CrashRow? _selectedFile;
-    private string _summary = "正在扫描…";
+    private string _summary = Loc.T("正在扫描…");
     private string _excerpt = "";
 
     public CrashDiagVM()
@@ -68,8 +69,8 @@ public sealed class CrashDiagVM : VmBase, IRefreshable
     public string Excerpt { get => _excerpt; private set => Set(ref _excerpt, value); }
 
     public string FindingsEmptyHint => Files.Count == 0
-        ? "未发现可诊断文件。游戏崩溃后会在实例目录生成 crash-reports,这里会自动列出。"
-        : "未命中已收录的崩溃特征。可对照下方报告摘录排查,或到「实例 → 实例日志」查看完整日志。";
+        ? Loc.T("未发现可诊断文件。游戏崩溃后会在实例目录生成 crash-reports,这里会自动列出。")
+        : Loc.T("未命中已收录的崩溃特征。可对照下方报告摘录排查,或到「实例 → 实例日志」查看完整日志。");
 
     public Visibility FindingsEmptyVisibility
         => Findings.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -87,8 +88,8 @@ public sealed class CrashDiagVM : VmBase, IRefreshable
                 Files.Add(row);
 
             Summary = rows.Count == 0
-                ? "未发现崩溃报告 · 游戏正常运行时不产生报告"
-                : $"共 {rows.Count} 个可诊断文件 · 新→旧排列";
+                ? Loc.T("未发现崩溃报告 · 游戏正常运行时不产生报告")
+                : string.Format(Loc.T("共 {0} 个可诊断文件 · 新→旧排列"), rows.Count);
 
             SelectedFile = Files.FirstOrDefault(f => f.Path == keep) ?? Files.FirstOrDefault();
             if (SelectedFile is null)
@@ -102,7 +103,7 @@ public sealed class CrashDiagVM : VmBase, IRefreshable
         catch (Exception ex)
         {
             AppLog.Error("CrashDiagPage", ex);
-            Summary = "扫描失败:" + ex.Message;
+            Summary = Loc.T("扫描失败:") + ex.Message;
         }
     }
 
@@ -127,7 +128,7 @@ public sealed class CrashDiagVM : VmBase, IRefreshable
         catch (Exception ex)
         {
             AppLog.Error("CrashDiagPage", ex);
-            Excerpt = "分析失败:" + ex.Message;
+            Excerpt = Loc.T("分析失败:") + ex.Message;
         }
 
         On(nameof(FindingsEmptyVisibility));

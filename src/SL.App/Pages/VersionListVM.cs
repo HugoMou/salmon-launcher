@@ -21,6 +21,7 @@ using SL.Core.Net;
 using SL.App.Download;
 using SL.App.Infrastructure;
 using SL.App.Notify;
+using SL.App.Localization;
 
 namespace SL.App.Pages;
 
@@ -31,7 +32,7 @@ public sealed class VersionRow
     {
         Entry = entry;
         Id = entry.Id;
-        Badge = entry.Badge;
+        Badge = Loc.T(entry.Badge);
         Released = entry.ReleaseTime == default ? "" : entry.ReleaseTime.LocalDateTime.ToString("yyyy-MM-dd");
     }
 
@@ -108,8 +109,8 @@ public sealed class VersionListVM : VmBase, IRefreshable
     public string StatusText => _status.Length > 0
         ? _status
         : _loading
-            ? "正在读取版本清单…"
-            : $"共 {Rows.Count} 个版本" + (InstallWizard.HasVersion ? $" · 已选 {InstallWizard.VersionId}" : "");
+            ? Loc.T("正在读取版本清单…")
+            : string.Format(Loc.T("共 {0} 个版本"), Rows.Count) + (InstallWizard.HasVersion ? string.Format(Loc.T(" · 已选 {0}"), InstallWizard.VersionId) : "");
 
     private void SetStatus(string text)
     {
@@ -137,8 +138,8 @@ public sealed class VersionListVM : VmBase, IRefreshable
         catch (Exception ex)
         {
             AppLog.Error("Download", ex);
-            SetStatus("版本清单读取失败:" + ex.Message);
-            AppServices.Notify.Publish(NotifyKind.Error, "版本清单读取失败:" + ex.Message);
+            SetStatus(Loc.T("版本清单读取失败:") + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("版本清单读取失败:") + ex.Message);
         }
         finally
         {
@@ -182,7 +183,7 @@ public sealed class VersionListVM : VmBase, IRefreshable
         if (_selected is null)
             return;
         InstallWizard.ChooseVersion(_selected.Entry);
-        AppServices.Notify.Publish(NotifyKind.Info, $"已选择 Minecraft {_selected.Id},请选择加载器");
+        AppServices.Notify.Publish(NotifyKind.Info, string.Format(Loc.T("已选择 Minecraft {0},请选择加载器"), _selected.Id));
         AppServices.Nav.Navigate("dl.loaders");
     }
 }

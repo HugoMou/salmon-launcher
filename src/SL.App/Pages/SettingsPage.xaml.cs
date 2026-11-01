@@ -41,7 +41,7 @@ public sealed class PaletteCardVM
 
     public ThemePalette Palette { get; }
 
-    public string Name => Palette.Name;
+    public string Name => Loc.T(Palette.Name);
 
     public Brush Swatch1 { get; }
 
@@ -66,7 +66,7 @@ public sealed class AccentCardVM
 
     public AccentChoice Accent { get; }
 
-    public string Name => Accent.Name;
+    public string Name => Loc.T(Accent.Name);
 
     public Brush Fill { get; }
 
@@ -129,8 +129,8 @@ public sealed partial class SettingsPage : Page
         LanguageBox.SelectedIndex = langIndex;
 
         TermsStateText.Text = c.TermsAccepted
-            ? "已阅读并同意"
-            : "尚未同意 · 点击右侧按钮查看并确认";
+            ? Loc.T("已阅读并同意")
+            : Loc.T("尚未同意 · 点击右侧按钮查看并确认");
 
         UpdateThemeSummary(c);
         _loading = false;
@@ -139,15 +139,15 @@ public sealed partial class SettingsPage : Page
     /// <summary>显示当前生效的主题组合,便于确认切换结果。</summary>
     private void UpdateThemeSummary(SL.Core.Settings.AppConfig c)
     {
-        var palette = ThemeManager.Palettes.FirstOrDefault(p => p.Id == c.Palette)?.Name ?? "默认";
-        var accent = ThemeManager.Accents.FirstOrDefault(a => a.Id == c.Accent)?.Name ?? "默认";
+        var palette = ThemeManager.Palettes.FirstOrDefault(p => p.Id == c.Palette) is { } p ? Loc.T(p.Name) : Loc.T("默认");
+        var accent = ThemeManager.Accents.FirstOrDefault(a => a.Id == c.Accent) is { } a ? Loc.T(a.Name) : Loc.T("默认");
         var mode = c.Theme switch
         {
-            SL.Core.Settings.ThemePref.Light => "浅色",
-            SL.Core.Settings.ThemePref.Dark => "深色",
-            _ => "跟随系统",
+            SL.Core.Settings.ThemePref.Light => Loc.T("浅色"),
+            SL.Core.Settings.ThemePref.Dark => Loc.T("深色"),
+            _ => Loc.T("跟随系统"),
         };
-        ThemeCurrentText.Text = $"当前:{palette} · {accent} · {mode}";
+        ThemeCurrentText.Text = string.Format(Loc.T("当前:{0} · {1} · {2}"), palette, accent, mode);
     }
 
     private void OnModeChecked(object sender, RoutedEventArgs e)
@@ -243,8 +243,8 @@ public sealed partial class SettingsPage : Page
         if (failed.Count > 0)
         {
             await AppServices.Dialogs.AlertAsync(
-                "部分文件被占用",
-                $"还有 {failed.Count} 项未能删除(通常是游戏或 Java 仍在运行)。\n这些残留会在下次启动时自动继续清除。",
+                Loc.T("部分文件被占用"),
+                string.Format(Loc.T("还有 {0} 项未能删除(通常是游戏或 Java 仍在运行)。\n这些残留会在下次启动时自动继续清除。"), failed.Count),
                 MsgMark.Warning).ConfigureAwait(true);
         }
 
@@ -257,7 +257,7 @@ public sealed partial class SettingsPage : Page
         var panel = new StackPanel { Spacing = 12 };
         panel.Children.Add(new TextBlock
         {
-            Text = "启动器自身的数据一定会清除:设置、账户与令牌、日志、主题、中继收藏。下面这些是可自由勾选的顺带清除项,不勾选的会保留下来:",
+            Text = Loc.T("启动器自身的数据一定会清除:设置、账户与令牌、日志、主题、中继收藏。下面这些是可自由勾选的顺带清除项,不勾选的会保留下来:"),
             TextWrapping = TextWrapping.Wrap,
             FontSize = 12.5,
             Opacity = 0.85,
@@ -274,8 +274,8 @@ public sealed partial class SettingsPage : Page
                     Spacing = 1,
                     Children =
                     {
-                        new TextBlock { Text = Scopes[i].Label, FontSize = 13.5 },
-                        new TextBlock { Text = Scopes[i].Detail, FontSize = 11, Opacity = 0.7 },
+                        new TextBlock { Text = Loc.T(Scopes[i].Label), FontSize = 13.5 },
+                        new TextBlock { Text = Loc.T(Scopes[i].Detail), FontSize = 11, Opacity = 0.7 },
                     },
                 },
             };
@@ -284,10 +284,10 @@ public sealed partial class SettingsPage : Page
 
         var dialog = new ContentDialog
         {
-            Title = "清除启动器数据",
+            Title = Loc.T("清除启动器数据"),
             Content = panel,
-            PrimaryButtonText = "下一步",
-            CloseButtonText = "取消",
+            PrimaryButtonText = Loc.T("下一步"),
+            CloseButtonText = Loc.T("取消"),
             DefaultButton = ContentDialogButton.Primary,
         };
         var result = await AppServices.Dialogs.ShowCustomAsync(dialog).ConfigureAwait(true);
@@ -307,14 +307,14 @@ public sealed partial class SettingsPage : Page
     private async Task<bool> ShowCooldownAsync(IReadOnlyList<string> keep)
     {
         bool Kept(ScopeOption s) => s.TopEntries.All(e => keep.Contains(e, StringComparer.OrdinalIgnoreCase));
-        var kept = Scopes.Where(Kept).Select(s => s.Label).ToList();
-        var removed = Scopes.Where(s => !Kept(s)).Select(s => s.Label).ToList();
+        var kept = Scopes.Where(Kept).Select(s => Loc.T(s.Label)).ToList();
+        var removed = Scopes.Where(s => !Kept(s)).Select(s => Loc.T(s.Label)).ToList();
 
         var panel = new StackPanel { Spacing = 10 };
         panel.Children.Add(new TextBlock
         {
-            Text = "将删除:启动器自身的设置、账户与令牌、日志、主题、中继收藏"
-                   + (removed.Count > 0 ? "、" + string.Join("、", removed) : "") + "。",
+            Text = Loc.T("将删除:启动器自身的设置、账户与令牌、日志、主题、中继收藏")
+                   + (removed.Count > 0 ? Loc.T("、") + string.Join(Loc.T("、"), removed) : "") + Loc.T("。"),
             TextWrapping = TextWrapping.Wrap,
             FontSize = 12.5,
         });
@@ -322,7 +322,7 @@ public sealed partial class SettingsPage : Page
         {
             panel.Children.Add(new TextBlock
             {
-                Text = "将保留:" + string.Join("、", kept) + "。",
+                Text = Loc.T("将保留:") + string.Join(Loc.T("、"), kept) + Loc.T("。"),
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 12.5,
                 Opacity = 0.8,
@@ -331,7 +331,7 @@ public sealed partial class SettingsPage : Page
 
         var instruction = new TextBlock
         {
-            Text = "现在进入 10 秒冷静期:倒计时结束前下方按钮无法点击。10 秒之后,如果你仍然点击它,就会开始清除数据;期间随时可以点「取消」退出。",
+            Text = Loc.T("现在进入 10 秒冷静期:倒计时结束前下方按钮无法点击。10 秒之后,如果你仍然点击它,就会开始清除数据;期间随时可以点「取消」退出。"),
             TextWrapping = TextWrapping.Wrap,
             FontSize = 12.5,
             Opacity = 0.9,
@@ -340,7 +340,7 @@ public sealed partial class SettingsPage : Page
 
         var countdown = new TextBlock
         {
-            Text = "冷静期剩余 10 秒…",
+            Text = Loc.T("冷静期剩余 10 秒…"),
             FontSize = 13,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
         };
@@ -348,10 +348,10 @@ public sealed partial class SettingsPage : Page
 
         var dialog = new ContentDialog
         {
-            Title = "10 秒冷静期",
+            Title = Loc.T("10 秒冷静期"),
             Content = panel,
-            PrimaryButtonText = "请等待 10 秒",
-            CloseButtonText = "取消",
+            PrimaryButtonText = Loc.T("请等待 10 秒"),
+            CloseButtonText = Loc.T("取消"),
             DefaultButton = ContentDialogButton.Close,
         };
         dialog.IsPrimaryButtonEnabled = false;
@@ -363,13 +363,13 @@ public sealed partial class SettingsPage : Page
             remain--;
             if (remain > 0)
             {
-                countdown.Text = $"冷静期剩余 {remain} 秒…";
+                countdown.Text = string.Format(Loc.T("冷静期剩余 {0} 秒…"), remain);
                 return;
             }
             timer.Stop();
-            countdown.Text = "冷静期结束,现在可以确认。";
-            instruction.Text = "10 秒冷静期已结束:现在点击下方按钮,就会立即开始清除数据。";
-            dialog.PrimaryButtonText = "仍要清除,开始";
+            countdown.Text = Loc.T("冷静期结束,现在可以确认。");
+            instruction.Text = Loc.T("10 秒冷静期已结束:现在点击下方按钮,就会立即开始清除数据。");
+            dialog.PrimaryButtonText = Loc.T("仍要清除,开始");
             dialog.IsPrimaryButtonEnabled = true;
         };
         dialog.Opened += (_, _) => timer.Start();

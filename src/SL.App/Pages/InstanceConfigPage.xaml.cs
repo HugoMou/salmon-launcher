@@ -20,6 +20,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.Core.Instances;
 using SL.Core.Logging;
+using SL.App.Localization;
 using SL.App.Dialogs;
 using SL.App.Instances;
 using SL.App.Infrastructure;
@@ -65,12 +66,12 @@ public sealed partial class InstanceConfigPage : Page
 
         if (InstanceContext.CurrentId.Length == 0)
         {
-            StatusText.Text = "尚未安装实例 · 请先安装一个版本";
+            StatusText.Text = Loc.T("尚未安装实例 · 请先安装一个版本");
             PathText.Text = "—";
             return;
         }
 
-        StatusText.Text = $"当前实例 {InstanceContext.CurrentId}";
+        StatusText.Text = string.Format(Loc.T("当前实例 {0}"), InstanceContext.CurrentId);
         PathText.Text = InstanceRegistry.InstanceDirOf(InstanceContext.CurrentId);
     }
 
@@ -133,9 +134,9 @@ public sealed partial class InstanceConfigPage : Page
             return;
         var id = InstanceContext.CurrentId;
 
-        if (!await AppServices.Dialogs.ConfirmAsync("删除实例",
-                $"将删除实例「{id}」的整个目录(含模组、存档与日志),该操作不可撤销。\n"
-                + "共享的库与资源不会被删除。", MsgMark.Warning, okLabel: "删除").ConfigureAwait(true))
+        if (!await AppServices.Dialogs.ConfirmAsync(Loc.T("删除实例"),
+                string.Format(Loc.T("将删除实例「{0}」的整个目录(含模组、存档与日志),该操作不可撤销。\n"), id)
+                + Loc.T("共享的库与资源不会被删除。"), MsgMark.Warning, okLabel: Loc.T("删除")).ConfigureAwait(true))
             return;
 
         try
@@ -144,7 +145,7 @@ public sealed partial class InstanceConfigPage : Page
             if (System.IO.Directory.Exists(dir))
                 System.IO.Directory.Delete(dir, recursive: true);
             AppLog.Info("InstanceConfig", $"已删除实例 {id}");
-            AppServices.Notify.Publish(NotifyKind.Info, $"已删除实例 {id}");
+            AppServices.Notify.Publish(NotifyKind.Info, string.Format(Loc.T("已删除实例 {0}"), id));
             InstanceContext.Select("");
             InstanceContext.Refresh();
             LoadValues();
@@ -152,7 +153,7 @@ public sealed partial class InstanceConfigPage : Page
         catch (Exception ex)
         {
             AppLog.Error("InstanceConfig", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "删除失败:" + ex.Message);
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("删除失败:") + ex.Message);
         }
     }
 }
