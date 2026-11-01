@@ -25,9 +25,22 @@
 
 ## 系統需求
 
-- Windows 10 版本 1903（組建 18362）或更新，或 Windows 11；僅支援 x64。
+- Windows 10 版本 2004（組建 19041）或更新，或 Windows 11；僅支援 x64。
 - 首次啟動需連網取得版本清單；遊戲本體、執行庫與資源檔案皆從 Mojang 官方來源或其公開鏡像下載。
 - Java 執行環境預設按需自動取得（Eclipse Temurin），也可使用本機已安裝的 Java。
+
+## 下載與安裝
+
+**最新版本：v1.0.0**
+
+| 形式 | 檔案 | 說明 |
+| --- | --- | --- |
+| 安裝包（推薦） | `SL-Setup-1.0.0-win64.exe` | 標準 Windows 安裝精靈，自動建立開始功能表捷徑與卸載項目；可選擇僅為目前使用者安裝（無需系統管理員權限） |
+| 免安裝版 | `SL-1.0.0-portable-win64.zip` | 解壓即用，不寫入登錄檔；適合放在隨身碟 |
+
+兩者都包含完整的 .NET 10 與 Windows App SDK 執行階段，**無需另外安裝任何執行階段**。下載位址：[GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
+
+安裝包為未簽章版本，首次執行時 Windows SmartScreen 可能提示「更多資訊 → 仍要執行」。卸載程式會保留 `%APPDATA%\SalmonLauncher` 下的實例與存檔。
 
 ## 建置
 
@@ -44,6 +57,14 @@ src\SL.App\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\SL.exe
 ```
 
 發佈建置可加上 `-c Release`。專案啟用了 `TreatWarningsAsErrors`，任何警告都會中斷建置。
+
+### 產生安裝包與免安裝版
+
+```powershell
+.\installer\build-installer.ps1 -Version 1.0.0
+```
+
+腳本會先執行 `dotnet publish`（Release、自包含），再用 Inno Setup 編譯 `installer\SL.iss`，最後在 `dist\` 產生 `SL-Setup-<版本>-win64.exe` 與 `SL-<版本>-portable-win64.zip`。需先安裝 [Inno Setup 6](https://jrsoftware.org/isinfo.php)。
 
 ## 專案結構
 

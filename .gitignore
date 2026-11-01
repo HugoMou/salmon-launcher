@@ -25,6 +25,9 @@ Generated Files/
 # ---------- 本地运行数据 ----------
 minecraft-java.json
 
+# ---------- 发行产物 ----------
+dist/
+
 # ---------- 其他 ----------
 Thumbs.db
 Desktop.ini

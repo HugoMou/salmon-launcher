@@ -25,9 +25,22 @@ A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and *
 
 ## Requirements
 
-- Windows 10 version 1903 (build 18362) or newer, or Windows 11; x64 only.
+- Windows 10 version 2004 (build 19041) or newer, or Windows 11; x64 only.
 - The first launch needs an internet connection to fetch the version manifest. Game files, libraries and assets come from Mojang's official sources or public mirrors.
 - Java is downloaded on demand (Eclipse Temurin) by default; an existing local Java installation can be used instead.
+
+## Download and install
+
+**Latest release: v1.0.0**
+
+| Package | File | Notes |
+| --- | --- | --- |
+| Installer (recommended) | `SL-Setup-1.0.0-win64.exe` | Standard Windows setup wizard; adds a Start menu shortcut and an uninstall entry; can install for the current user without administrator rights |
+| Portable | `SL-1.0.0-portable-win64.zip` | Unzip and run; writes nothing to the registry; handy on a USB drive |
+
+Both packages bundle the complete .NET 10 and Windows App SDK runtimes, so **no separate runtime installation is needed**. Download: [GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases).
+
+The installer is unsigned, so Windows SmartScreen may show "More info → Run anyway" on first launch. Uninstalling keeps instances and saves under `%APPDATA%\SalmonLauncher`.
 
 ## Build
 
@@ -44,6 +57,14 @@ src\SL.App\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\SL.exe
 ```
 
 Use `-c Release` for a release build. `TreatWarningsAsErrors` is enabled, so any warning fails the build.
+
+### Build the installer and portable package
+
+```powershell
+.\installer\build-installer.ps1 -Version 1.0.0
+```
+
+The script runs `dotnet publish` (Release, self-contained), compiles `installer\SL.iss` with Inno Setup, and writes `SL-Setup-<version>-win64.exe` plus `SL-<version>-portable-win64.zip` into `dist\`. [Inno Setup 6](https://jrsoftware.org/isinfo.php) is required.
 
 ## Project layout
 
