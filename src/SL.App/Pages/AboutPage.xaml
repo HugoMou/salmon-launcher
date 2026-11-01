@@ -172,7 +172,7 @@
                         <TextBlock Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 版本安装:官方清单、多源回退、断点续传与完整性校验" />
                         <TextBlock Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 实例隔离:每个版本独立的模组、存档、日志与配置" />
                         <TextBlock Grid.Row="1" Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 内容仓库:模组 / 光影 / 资源包检索并安装到对应实例" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 账户:微软正版两种登录方式 + 无限量离线账户切换" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 账户:微软正版三种登录方式 + 无限量离线账户切换" />
                         <TextBlock Grid.Row="2" Grid.Column="0" Style="{ThemeResource Style.TermsBody}" Text="· 联机:自建中继、局域网发现与手动中继三种接入" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Style="{ThemeResource Style.TermsBody}" Text="· 排障:崩溃诊断建议、日志检索与主题工坊换肤" />
                     </Grid>

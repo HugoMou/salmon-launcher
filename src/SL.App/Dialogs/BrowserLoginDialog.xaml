@@ -7,7 +7,14 @@
     CloseButtonText="取消"
     DefaultButton="Close">
 
-    <Grid MinWidth="720" MinHeight="540" RowSpacing="10">
+    <ContentDialog.Resources>
+        <x:Double x:Key="ContentDialogMinWidth">320</x:Double>
+        <x:Double x:Key="ContentDialogMaxWidth">1180</x:Double>
+        <x:Double x:Key="ContentDialogMinHeight">200</x:Double>
+        <x:Double x:Key="ContentDialogMaxHeight">900</x:Double>
+    </ContentDialog.Resources>
+
+    <Grid x:Name="Body" RowSpacing="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -17,7 +24,8 @@
             <ProgressRing x:Name="BusyRing"
                           Width="18"
                           Height="18"
-                          IsActive="True" />
+                          IsActive="True"
+                          VerticalAlignment="Center" />
             <FontIcon x:Name="ErrorIcon"
                       Glyph="&#xE783;"
                       FontSize="16"
@@ -27,11 +35,11 @@
             <TextBlock x:Name="StepText"
                        Text="正在打开微软登录页…"
                        TextWrapping="Wrap"
-                       MaxWidth="620"
                        VerticalAlignment="Center" />
         </StackPanel>
 
         <Border Grid.Row="1"
+                Background="{ThemeResource Brush.Card}"
                 BorderBrush="{ThemeResource Brush.Border}"
                 BorderThickness="1"
                 CornerRadius="8">

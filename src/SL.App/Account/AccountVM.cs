@@ -145,7 +145,7 @@ public sealed class AccountVM : VmBase
             [
                 "浏览器授权(在启动器内置窗口直接登录)",
                 "设备码登录(到 microsoft.com/link 输入一次性代码)",
-                "复制授权链接(在外部浏览器打开,完成后把回跳链接粘贴回来)",
+                "系统浏览器登录(自动打开浏览器,完成后把回跳链接粘贴回来)",
             ]).ConfigureAwait(true);
         if (choice is null)
             return;
@@ -173,29 +173,15 @@ public sealed class AccountVM : VmBase
         }
     }
 
-    /// <summary>复制授权链接:链接进剪贴板,用户在外部浏览器完成登录后粘贴回跳链接换取会话。</summary>
+    /// <summary>复制授权链接:链接进剪贴板并直接唤起系统浏览器,登录完成后把回跳链接粘回来换取会话。</summary>
     private async Task LoginByUrlAsync()
     {
         var req = MsAuth.BeginInteractive();
-        try
-        {
-            var package = new Windows.ApplicationModel.DataTransfer.DataPackage
-            {
-                RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy,
-            };
-            package.SetText(req.Url);
-            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
-            Windows.ApplicationModel.DataTransfer.Clipboard.Flush();
-        }
-        catch (Exception ex)
-        {
-            AppLog.Warn("Account", "复制授权链接失败:" + ex.Message);
-        }
+        CopyToClipboard(req.Url);
 
-        var callback = await AppServices.Dialogs.PromptAsync(
-            "复制授权链接已就绪",
-            "授权链接已复制到剪贴板:请在浏览器中打开并完成登录;登录结束后,把地址栏里 login.live.com/oauth20_desktop.srf 开头的完整回跳链接粘贴到下面并确定。").ConfigureAwait(true);
-        if (callback is null)
+        var dialog = new ExternalLoginDialog(req.Url);
+        var result = await AppServices.Dialogs.ShowCustomAsync(dialog).ConfigureAwait(true);
+        if (result != ContentDialogResult.Primary || dialog.CallbackUrl is not { } callback)
             return;
 
         try
@@ -217,6 +203,24 @@ public sealed class AccountVM : VmBase
         {
             AppLog.Error("Account", ex);
             await AppServices.Dialogs.AlertAsync("登录未完成", ex.Message, MsgMark.Warning).ConfigureAwait(true);
+        }
+    }
+
+    private static void CopyToClipboard(string text)
+    {
+        try
+        {
+            var package = new Windows.ApplicationModel.DataTransfer.DataPackage
+            {
+                RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy,
+            };
+            package.SetText(text);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+            Windows.ApplicationModel.DataTransfer.Clipboard.Flush();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn("Account", "复制授权链接失败:" + ex.Message);
         }
     }
 

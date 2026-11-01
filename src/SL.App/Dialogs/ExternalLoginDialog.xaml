@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="SL.App.Dialogs.ExternalLoginDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="用浏览器登录正版"
+    PrimaryButtonText="完成登录"
+    CloseButtonText="取消"
+    DefaultButton="Primary">
+
+    <StackPanel MinWidth="480" Spacing="14">
+        <TextBlock Foreground="{ThemeResource Brush.FgDim}"
+                   TextWrapping="Wrap"
+                   Text="点「打开浏览器」会用系统默认浏览器打开微软授权页;登录完成后浏览器会停在一个 login.live.com 开头的地址,把那串完整链接复制下来粘贴到下面即可。" />
+
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button x:Name="OpenButton"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    Click="OnOpen">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE8A7;" FontSize="14" />
+                    <TextBlock Text="打开浏览器" />
+                </StackPanel>
+            </Button>
+            <Button Click="OnCopy">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE8C8;" FontSize="14" />
+                    <TextBlock Text="复制授权链接" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <TextBox x:Name="CallbackBox"
+                 PlaceholderText="粘贴 login.live.com/oauth20_desktop.srf 开头的完整回跳链接"
+                 TextWrapping="Wrap" />
+
+        <TextBlock x:Name="HintText"
+                   FontSize="11.5"
+                   Foreground="{ThemeResource Brush.FgFaint}"
+                   TextWrapping="Wrap"
+                   Text="也可以只粘链接里的 code 参数值;令牌只保存在本机。" />
+    </StackPanel>
+</ContentDialog>

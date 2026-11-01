@@ -11,10 +11,25 @@
             <TextBlock Text="用户协议与免责声明"
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
-            <TextBlock Text="版本 1.0 · 最近更新 2026 年 10 月 · 使用本软件即表示你已阅读并接受以下全部条款。"
-                       Foreground="{ThemeResource Brush.FgDim}"
-                       Margin="0,-12,0,4"
-                       TextWrapping="Wrap" />
+            <Grid ColumnSpacing="8" Margin="0,-12,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Background="{ThemeResource Brush.AccentSoft}"
+                        CornerRadius="4"
+                        Padding="7,2"
+                        VerticalAlignment="Center">
+                    <TextBlock x:Name="VersionLineText"
+                               FontSize="11"
+                               Foreground="{ThemeResource Brush.Accent}" />
+                </Border>
+                <TextBlock Grid.Column="1"
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource Brush.FgDim}"
+                           TextWrapping="Wrap"
+                           Text="最近更新 2026 年 10 月 · 使用本软件即表示你已阅读并接受以下全部条款。" />
+            </Grid>
 
             <!-- 要点速览 -->
             <Border Background="{ThemeResource Brush.Card}"

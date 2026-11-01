@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace SL.Core.Boot;
 
 /// <summary>
@@ -7,7 +9,18 @@ namespace SL.Core.Boot;
 public static class Runtime
 {
     public const string AppName = "Salmon Launcher";
-    public const string AppVersion = "1.0.0";
+
+    /// <summary>显示与上报用的版本号:取自程序集信息版本,避免与项目文件里的版本号各写一份。</summary>
+    public static string AppVersion { get; } = ResolveVersion();
+
+    private static string ResolveVersion()
+    {
+        var asm = Assembly.GetEntryAssembly() ?? typeof(Runtime).Assembly;
+        var info = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        if (!string.IsNullOrWhiteSpace(info))
+            return info.Split('+')[0];
+        return asm.GetName().Version is { } v ? v.ToString(3) : "1.0.0";
+    }
 
     public static string Root => Data.AppPaths.Root;
     public static string LogDir => Data.AppPaths.LogDir;

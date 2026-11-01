@@ -2,10 +2,11 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
+using SL.App.Infrastructure;
+using SL.App.Localization;
+using SL.App.Notify;
 using SL.Core.Account;
 using SL.Core.Logging;
-using SL.App.Infrastructure;
-using SL.App.Notify;
 
 namespace SL.App.Dialogs;
 
@@ -25,7 +26,12 @@ public sealed partial class BrowserLoginDialog : ContentDialog
     {
         InitializeComponent();
         _ui = DispatcherQueue.GetForCurrentThread();
-        Opened += async (_, _) => await StartAsync();
+        Opened += async (_, _) =>
+        {
+            Loc.ApplyTo(this);
+            FitToHost();
+            await StartAsync();
+        };
         Closed += (_, _) =>
         {
             _closed = true;
@@ -33,11 +39,21 @@ public sealed partial class BrowserLoginDialog : ContentDialog
         };
     }
 
+    /// <summary>按窗口大小给出内容尺寸:登录页需要比对话框模板默认上限更大的可用区域。</summary>
+    private void FitToHost()
+    {
+        if (XamlRoot is not { } root)
+            return;
+        var size = root.Size;
+        Body.Width = Math.Clamp(size.Width - 220, 480, 1040);
+        Body.Height = Math.Clamp(size.Height - 300, 320, 720);
+    }
+
     private async Task StartAsync()
     {
         try
         {
-            SetStatus("正在打开微软登录页;登录完成后本窗口会自动继续…", working: true);
+            SetStatus(Loc.T("正在打开微软登录页;登录完成后本窗口会自动继续…"), working: true);
             var req = MsAuth.BeginInteractive();
             _verifier = req.Verifier;
             Web.CoreWebView2Initialized += OnWebInitialized;
@@ -50,7 +66,7 @@ public sealed partial class BrowserLoginDialog : ContentDialog
         catch (Exception ex)
         {
             AppLog.Error("Account", ex);
-            SetStatus("无法打开内置浏览器:" + ex.Message, working: false, error: true);
+            SetStatus(Loc.T("无法打开内置浏览器:") + ex.Message, working: false, error: true);
         }
     }
 
@@ -59,7 +75,8 @@ public sealed partial class BrowserLoginDialog : ContentDialog
         if (args.Exception is null)
             return;
         _ui.TryEnqueue(() => SetStatus(
-            "WebView2 运行时初始化失败(" + args.Exception.Message + ");请改用设备码登录。",
+            Loc.T("WebView2 运行时初始化失败") + "(" + args.Exception.Message + ");"
+            + Loc.T("请改用设备码登录,或复制授权链接到系统浏览器打开。"),
             working: false, error: true));
     }
 
@@ -79,7 +96,7 @@ public sealed partial class BrowserLoginDialog : ContentDialog
     {
         try
         {
-            _ui.TryEnqueue(() => SetStatus("授权完成,正在换取令牌并读取档案…", working: true));
+            _ui.TryEnqueue(() => SetStatus(Loc.T("授权完成,正在换取令牌并读取档案…"), working: true));
             var code = MsAuth.ExtractAuthorizationCode(callbackUrl);
             var session = await MsAuth.CompleteInteractiveAsync(code, _verifier,
                 step => _ui.TryEnqueue(() => SetStatus(step, working: true)), _cts.Token).ConfigureAwait(true);

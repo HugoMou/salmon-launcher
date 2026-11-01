@@ -2,7 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SL.App.Infrastructure;
+using SL.App.Localization;
 using SL.App.Notify;
+using SL.Core.Boot;
 
 namespace SL.App.Pages;
 
@@ -12,7 +14,14 @@ public sealed partial class TermsPage : Page
     public TermsPage()
     {
         InitializeComponent();
+        SyncVersion();
         SyncState();
+        Loaded += (_, _) =>
+        {
+            SyncVersion();
+            Loc.Changed += SyncVersion;
+        };
+        Unloaded += (_, _) => Loc.Changed -= SyncVersion;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -20,6 +29,8 @@ public sealed partial class TermsPage : Page
         base.OnNavigatedTo(e);
         SyncState();
     }
+
+    private void SyncVersion() => VersionLineText.Text = $"{Loc.T("版本")} {Runtime.AppVersion}";
 
     private void SyncState()
     {

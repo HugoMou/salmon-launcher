@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="SL.App.Pages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -121,7 +121,7 @@
                                FontSize="11.5"
                                LineHeight="19"
                                TextWrapping="Wrap"
-                               Text="支持保存多个正版与离线账户并随时切换。点击「正版授权登录」可选择三种方式:内置浏览器授权、设备码登录、复制授权链接;令牌只保存在本机。" />
+                               Text="支持保存多个正版与离线账户并随时切换。点击「正版授权登录」可选择三种方式:内置浏览器授权、设备码登录、系统浏览器登录;令牌只保存在本机。" />
                 </StackPanel>
             </Border>
 
@@ -373,8 +373,8 @@
                 </Grid>
             </Border>
 
-            <!-- 危险操作:清除全部数据 -->
-            <Border Background="{ThemeResource Brush.DangerSoft}"
+            <!-- 清除全部数据 -->
+            <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Danger}"
                     BorderThickness="1"
                     CornerRadius="10"
@@ -386,7 +386,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <FontIcon Glyph="&#xE74D;" FontSize="20" Foreground="{ThemeResource Brush.Danger}" VerticalAlignment="Center" />
+                    <FontIcon Glyph="&#xE74D;" FontSize="20" Foreground="{ThemeResource Brush.Accent}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
                         <TextBlock Text="清除全部数据" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
                         <TextBlock FontSize="11.5"
