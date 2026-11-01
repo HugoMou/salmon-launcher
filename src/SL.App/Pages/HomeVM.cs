@@ -1,3 +1,18 @@
+// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// Copyright (C) 2026 Hugo Mou
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+// PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program. If not, see <https://www.gnu.org/licenses/>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 using System.Collections.ObjectModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -6,6 +21,7 @@ using SL.Core.Instances;
 using SL.Core.Launch;
 using SL.Core.Logging;
 using SL.App.Dialogs;
+using SL.App.Localization;
 using SL.App.Infrastructure;
 using SL.App.Notify;
 
@@ -17,7 +33,7 @@ public sealed class InstanceRow
     public InstanceRow(InstanceInfo info)
     {
         Id = info.InstanceId;
-        Detail = $"安装于 {info.InstalledAt:yyyy-MM-dd HH:mm} · {info.SizeMb} MB";
+        Detail = string.Format(Loc.T("安装于 {0} · {1} MB"), info.InstalledAt.ToString("yyyy-MM-dd HH:mm"), info.SizeMb);
     }
 
     public string Id { get; }
@@ -79,10 +95,10 @@ public sealed class HomeVM : VmBase
 
     public Visibility ProgressVisibility => Busy ? Visibility.Visible : Visibility.Collapsed;
 
-    private string _statusText = "就绪";
+    private string _statusText = Loc.T("就绪");
     public string StatusText { get => _statusText; private set => Set(ref _statusText, value); }
 
-    public string LaunchHint => Busy ? "正在启动,请稍候…" : "点击开始游戏 · 使用所选实例与当前账户";
+    public string LaunchHint => Busy ? Loc.T("正在启动,请稍候…") : Loc.T("点击开始游戏 · 使用所选实例与当前账户");
 
     private string _accountGlyph = "\uE77B";
     public string AccountGlyph { get => _accountGlyph; private set => Set(ref _accountGlyph, value); }
@@ -109,8 +125,8 @@ public sealed class HomeVM : VmBase
         _lastSelectedId = SelectedInstance?.Id;
 
         InstanceSummary = fresh.Count == 0
-            ? "尚无实例 · 可前往「下载 → 游戏版本」安装"
-            : $"共 {fresh.Count} 个实例 · 就绪";
+            ? Loc.T("尚无实例 · 可前往「下载 → 游戏版本」安装")
+            : string.Format(Loc.T("共 {0} 个实例 · 就绪"), fresh.Count);
 
         RefreshAccount();
     }
@@ -123,13 +139,13 @@ public sealed class HomeVM : VmBase
         {
             AccountGlyph = "\uE77B";
             AccountName = AppServices.Settings.Current.AccountName;
-            AccountDetail = "离线名 · 前往「外观与设置」管理账户";
+            AccountDetail = Loc.T("离线名 · 前往「外观与设置」管理账户");
         }
         else
         {
             AccountGlyph = active.Kind == "msa" ? "\uE8EA" : "\uE77B";
             AccountName = active.Name;
-            AccountDetail = (active.Kind == "msa" ? "正版账户" : "离线账户") + " · 点击前往账户管理";
+            AccountDetail = (active.Kind == "msa" ? Loc.T("正版账户") : Loc.T("离线账户")) + " · " + Loc.T("点击前往账户管理");
         }
     }
 
@@ -149,10 +165,10 @@ public sealed class HomeVM : VmBase
             {
                 if (active.Session is not { } session)
                 {
-                    AppServices.Notify.Publish(NotifyKind.Warning, $"账户 {active.Name} 缺少完整会话,请到「外观与设置」重新登录。");
+                    AppServices.Notify.Publish(NotifyKind.Warning, string.Format(Loc.T("账户 {0} 缺少完整会话,请到「外观与设置」重新登录。"), active.Name));
                     return;
                 }
-                StatusText = "正在准备正版会话…";
+                StatusText = Loc.T("正在准备正版会话…");
                 session = await MsAuth.EnsureFreshAsync(session,
                     step => _ui.TryEnqueue(() => StatusText = step)).ConfigureAwait(true);
                 AccountStore.UpsertMsa(session);
@@ -163,14 +179,14 @@ public sealed class HomeVM : VmBase
             var instanceId = SelectedInstance?.Id ?? LaunchPipeline.LatestInstanceId();
             if (string.IsNullOrEmpty(instanceId))
             {
-                await AppServices.Dialogs.AlertAsync("尚未安装任何版本",
-                    "请先到「下载 → 游戏版本」安装一个实例,再回到本页启动。",
+                await AppServices.Dialogs.AlertAsync(Loc.T("尚未安装任何版本"),
+                    Loc.T("请先到「下载 → 游戏版本」安装一个实例,再回到本页启动。"),
                     MsgMark.Info).ConfigureAwait(true);
                 return;
             }
 
             var cfg = AppServices.Settings.Current;
-            StatusText = $"正在准备实例 {instanceId}…";
+            StatusText = string.Format(Loc.T("正在准备实例 {0}…"), instanceId);
             LaunchPipeline.Step += OnPipelineStep;
             LaunchResult result;
             try
@@ -187,21 +203,21 @@ public sealed class HomeVM : VmBase
             if (result.Success)
             {
                 AppLog.Info("Launch", $"游戏已启动:{instanceId}(PID {result.ProcessId},{accountName})");
-                AppServices.Notify.Publish(NotifyKind.Success, "游戏已启动!");
-                StatusText = $"游戏运行中(PID {result.ProcessId}) · 关闭游戏后可继续操作";
+                AppServices.Notify.Publish(NotifyKind.Success, Loc.T("游戏已启动!"));
+                StatusText = string.Format(Loc.T("游戏运行中(PID {0}) · 关闭游戏后可继续操作"), result.ProcessId);
             }
             else
             {
                 AppLog.Info("Launch", "启动失败:" + result.Error);
-                AppServices.Notify.Publish(NotifyKind.Error, "启动失败:" + (result.Error ?? "未知原因"));
-                StatusText = "启动失败:" + (result.Error ?? "未知原因") + " · 可到「工具 → 崩溃诊断」分析日志";
+                AppServices.Notify.Publish(NotifyKind.Error, Loc.T("启动失败:") + (result.Error ?? Loc.T("未知原因")));
+                StatusText = Loc.T("启动失败:") + (result.Error ?? Loc.T("未知原因")) + Loc.T(" · 可到「工具 → 崩溃诊断」分析日志");
             }
         }
         catch (Exception ex)
         {
             AppLog.Error("Launch", ex);
-            AppServices.Notify.Publish(NotifyKind.Error, "启动失败:" + ex.Message);
-            StatusText = "启动失败:" + ex.Message;
+            AppServices.Notify.Publish(NotifyKind.Error, Loc.T("启动失败:") + ex.Message);
+            StatusText = Loc.T("启动失败:") + ex.Message;
         }
         finally
         {

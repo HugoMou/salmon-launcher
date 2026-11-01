@@ -1,3 +1,18 @@
+// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// Copyright (C) 2026 Hugo Mou
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+// PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program. If not, see <https://www.gnu.org/licenses/>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -35,11 +50,13 @@ public sealed partial class MainWindow : Window
         SetWindowIcon();
 
         BuildMenu();
+        Loc.ApplyTo(RootGrid);
         NotifyHost.ItemsSource = AppServices.Notify.Items;
 
         RootGrid.Loaded += async (_, _) =>
         {
             AppServices.Dialogs.Attach(RootGrid.XamlRoot);
+            Loc.ApplyTo(RootGrid);
             if (AppServices.Settings.Current.OnboardingCompleted)
                 await EnsureTermsAsync();
             else
@@ -85,7 +102,7 @@ public sealed partial class MainWindow : Window
             + "\n\n"
             + Loc.T("本软件不含任何统计、埋点或广告组件,不会收集你的设备信息、游戏行为或个人信息。仅在排查问题时,你主动分享的日志文件会被读取。")
             + "\n\n"
-            + Loc.T("版本 1.0 · 使用本软件即表示你已阅读并接受以下全部条款。"),
+            + $"{Loc.T("版本")} {Core.Boot.Runtime.AppVersion} · {Loc.T("使用本软件即表示你已阅读并接受以下全部条款。")}",
             MsgMark.Info,
             Loc.T("同意并继续"),
             Loc.T("关闭")).ConfigureAwait(true);

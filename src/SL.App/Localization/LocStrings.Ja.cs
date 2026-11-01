@@ -1,3 +1,18 @@
+﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// Copyright (C) 2026 Hugo Mou
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+// PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program. If not, see <https://www.gnu.org/licenses/>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 namespace SL.App.Localization;
 
 /// <summary>日文文案(键为简体中文原文)。</summary>
@@ -38,7 +53,6 @@ public static partial class Loc
         ["八、协议变更"] = "8. 規約の変更",
         ["把下面这行发给好友(局域网内可直接填 IP:端口)"] = "次の行をフレンドに送ってください（LAN なら IP:ポートで可）",
         ["版本"] = "バージョン",
-        ["版本 1.0 · 使用本软件即表示你已阅读并接受以下全部条款。"] = "バージョン 1.0 · 本ソフトの使用をもって、以下の規約に同意したものとみなします。",
         ["报告摘录"] = "レポート抜粋",
         ["备份存档"] = "セーブをバックアップ",
         ["备份全部"] = "すべてバックアップ",
@@ -382,5 +396,46 @@ public static partial class Loc
         ["模组镜像"] = "Mod ミラー",
         ["Modrinth 使用国内镜像"] = "Modrinth で中国国内ミラーを使用",
         ["检索与文件下载优先走镜像,失败时自动回退官方源;国内网络建议开启。"] = "検索とファイルのダウンロードはミラーを優先し、失敗時は公式ソースに戻ります。中国国内の回線では有効にすることをおすすめします。",
+
+        // ホームの動的文言(HomeVM)
+        ["就绪"] = "準備完了",
+        ["安装于 {0} · {1} MB"] = "インストール日時 {0} · {1} MB",
+        ["点击开始游戏 · 使用所选实例与当前账户"] = "ゲームを開始をクリック · 選択中のバージョンと現在のアカウントを使用",
+        ["正在启动,请稍候…"] = "起動中です。しばらくお待ちください…",
+        ["尚无实例 · 可前往「下载 → 游戏版本」安装"] = "バージョンがありません · 「ダウンロード → ゲームバージョン」からインストールできます",
+        ["共 {0} 个实例 · 就绪"] = "{0} 個のバージョン · 準備完了",
+        ["离线名 · 前往「外观与设置」管理账户"] = "オフライン名 · 「外観と設定」でアカウントを管理",
+        ["正版账户"] = "正規アカウント",
+        ["离线账户"] = "オフラインアカウント",
+        ["点击前往账户管理"] = "クリックしてアカウント管理へ",
+        ["账户 {0} 缺少完整会话,请到「外观与设置」重新登录。"] = "アカウント {0} のセッションが不完全です。「外観と設定」で再ログインしてください。",
+        ["正在准备正版会话…"] = "正規セッションを準備中…",
+        ["尚未安装任何版本"] = "まだバージョンがインストールされていません",
+        ["请先到「下载 → 游戏版本」安装一个实例,再回到本页启动。"] = "先に「ダウンロード → ゲームバージョン」でバージョンをインストールし、このページに戻って起動してください。",
+        ["正在准备实例 {0}…"] = "バージョン {0} を準備中…",
+        ["游戏已启动!"] = "ゲームを起動しました!",
+        ["游戏运行中(PID {0}) · 关闭游戏后可继续操作"] = "ゲーム実行中 (PID {0}) · ゲーム終了後に操作を続けられます",
+        ["启动失败:"] = "起動に失敗しました: ",
+        ["未知原因"] = "不明な原因",
+        [" · 可到「工具 → 崩溃诊断」分析日志"] = " · 「ツール → クラッシュ診断」でログを確認できます",
+        ["使用本软件即表示你已阅读并接受以下全部条款。"] = "本ソフトウェアを使用すると、以下のすべての条項を読み同意したものとみなされます。",
+
+        // マルチプレイのポート / 設定スイッチ / 規約の補足(SL 1.0 レビュー)
+        ["本机服务器端口"] = "ローカルサーバーポート",
+        ["对外端口(0 = 自动分配)"] = "公開ポート(0 = 自動割り当て)",
+        ["中继端口"] = "リレーポート",
+        ["本地端口"] = "ローカルポート",
+        ["复制地址"] = "アドレスをコピー",
+        ["全部断开"] = "すべて切断",
+        ["开"] = "オン",
+        ["关"] = "オフ",
+        ["已完成 0/4"] = "0/4 完了",
+
+        // 著作権 / GPL ライセンス(規約ページと概要ページ)
+        ["3. 本软件以 GNU General Public License(GPL)第 3 版或其更新版本许可发布;你可以自由运行、研究、修改与再分发本软件(包括收费分发),但须遵守 GPL 条款。"] = "3. 本ソフトウェアは GNU General Public License 第 3 版(またはそれ以降)で公開されています。GPL に従う限り、実行・研究・改変・再配布(有償配布を含む)が自由に認められます。",
+        ["4. 再分发时须保留版权声明与许可声明,并向接收者提供完整对应的源代码;许可证全文见项目根目录的 LICENSE 文件与 https://www.gnu.org/licenses/gpl-3.0.html。"] = "4. 再配布時は著作権表示とライセンス表示を保持し、受け取り手に対応する完全なソースコードを提供する必要があります。ライセンス全文はプロジェクト直下の LICENSE ファイルおよび https://www.gnu.org/licenses/gpl-3.0.html にあります。",
+        ["5. Copyright (C) 2026 Hugo Mou. Salmon Launcher 及其源代码的版权归作者所有,保留所有权利。"] = "5. Copyright (C) 2026 Hugo Mou. Salmon Launcher およびそのソースコードの著作権は作者に帰属し、すべての権利が保留されています。",
+        ["Copyright (C) 2026 Hugo Mou · 本项目以 GNU GPL v3 或更新版本发布;完整许可证见项目根目录 LICENSE,源代码见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · GNU GPL v3 以降で公開されています。ライセンス全文はプロジェクト直下の LICENSE、ソースコードはプロジェクトリポジトリにあります。",
+        ["Copyright (C) 2026 Hugo Mou · Salmon Launcher 以 GNU GPL v3 或更新版本许可发布;源代码与许可证全文见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · Salmon Launcher は GNU GPL v3 以降で公開されています。ソースコードとライセンス全文はプロジェクトリポジトリにあります。",
     };
 }

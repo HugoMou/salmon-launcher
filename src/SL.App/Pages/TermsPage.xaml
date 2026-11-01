@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  Copyright (C) 2026 Hugo Mou
+
+  This program is free software: you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  this program. If not, see <https://www.gnu.org/licenses/>.
+
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
 <Page
     x:Class="SL.App.Pages.TermsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -173,7 +191,11 @@
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
                                    Text="2. 启动器内置的壁纸与图标由本软件自行绘制,可随软件一起分发;Minecraft 的名称、纹理与相关资源归 Mojang Studios 所有。" />
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
-                                   Text="3. 本软件为免费软件,不提供任何形式的商业授权、转售许可或担保,你不得将本软件用于收费分发。" />
+                                   Text="3. 本软件以 GNU General Public License(GPL)第 3 版或其更新版本许可发布;你可以自由运行、研究、修改与再分发本软件(包括收费分发),但须遵守 GPL 条款。" />
+                        <TextBlock Style="{ThemeResource Style.TermsBody}"
+                                   Text="4. 再分发时须保留版权声明与许可声明,并向接收者提供完整对应的源代码;许可证全文见项目根目录的 LICENSE 文件与 https://www.gnu.org/licenses/gpl-3.0.html。" />
+                        <TextBlock Style="{ThemeResource Style.TermsBody}"
+                                   Text="5. Copyright (C) 2026 Hugo Mou. Salmon Launcher 及其源代码的版权归作者所有,保留所有权利。" />
                     </StackPanel>
 
                     <StackPanel Spacing="6">
@@ -205,6 +227,10 @@
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
                                    Text="2. 反馈时请附上版本号、系统版本与相关日志尾部,以便更快定位问题;请勿在公开反馈中粘贴账户令牌。" />
                     </StackPanel>
+
+                    <TextBlock Style="{ThemeResource Style.TermsBody}"
+                               Foreground="{ThemeResource Brush.FgFaint}"
+                               Text="Copyright (C) 2026 Hugo Mou · 本项目以 GNU GPL v3 或更新版本发布;完整许可证见项目根目录 LICENSE,源代码见项目仓库。" />
 
                 </StackPanel>
             </Border>

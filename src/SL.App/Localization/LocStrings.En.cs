@@ -1,3 +1,18 @@
+﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// Copyright (C) 2026 Hugo Mou
+//
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+// PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program. If not, see <https://www.gnu.org/licenses/>.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 namespace SL.App.Localization;
 
 /// <summary>英文文案(键为简体中文原文)。</summary>
@@ -38,7 +53,6 @@ public static partial class Loc
         ["八、协议变更"] = "8. Changes to this agreement",
         ["把下面这行发给好友(局域网内可直接填 IP:端口)"] = "Send the line below to your friends (LAN players can use IP:port directly)",
         ["版本"] = "Version",
-        ["版本 1.0 · 使用本软件即表示你已阅读并接受以下全部条款。"] = "Version 1.0 · Using this app means you have read and accept all terms below.",
         ["报告摘录"] = "Report excerpt",
         ["备份存档"] = "Back up saves",
         ["备份全部"] = "Back up all",
@@ -382,5 +396,46 @@ public static partial class Loc
         ["模组镜像"] = "Mod mirror",
         ["Modrinth 使用国内镜像"] = "Use a mainland China mirror for Modrinth",
         ["检索与文件下载优先走镜像,失败时自动回退官方源;国内网络建议开启。"] = "Search and downloads prefer the mirror and fall back to the official source on failure; recommended on Chinese networks.",
+
+        // 首页动态文案(HomeVM)
+        ["就绪"] = "Ready",
+        ["安装于 {0} · {1} MB"] = "Installed {0} · {1} MB",
+        ["点击开始游戏 · 使用所选实例与当前账户"] = "Click Start game · uses the selected instance and current account",
+        ["正在启动,请稍候…"] = "Launching, please wait…",
+        ["尚无实例 · 可前往「下载 → 游戏版本」安装"] = "No instances · install one under Download → Game versions",
+        ["共 {0} 个实例 · 就绪"] = "{0} instance(s) · ready",
+        ["离线名 · 前往「外观与设置」管理账户"] = "Offline name · manage accounts under Appearance & settings",
+        ["正版账户"] = "Premium account",
+        ["离线账户"] = "Offline account",
+        ["点击前往账户管理"] = "Click to manage accounts",
+        ["账户 {0} 缺少完整会话,请到「外观与设置」重新登录。"] = "Account {0} has no complete session. Sign in again under Appearance & settings.",
+        ["正在准备正版会话…"] = "Preparing your premium session…",
+        ["尚未安装任何版本"] = "No version installed yet",
+        ["请先到「下载 → 游戏版本」安装一个实例,再回到本页启动。"] = "Install a version under Download → Game versions first, then come back here to launch.",
+        ["正在准备实例 {0}…"] = "Preparing instance {0}…",
+        ["游戏已启动!"] = "Game launched!",
+        ["游戏运行中(PID {0}) · 关闭游戏后可继续操作"] = "Game running (PID {0}) · you can continue after it closes",
+        ["启动失败:"] = "Launch failed: ",
+        ["未知原因"] = "unknown cause",
+        [" · 可到「工具 → 崩溃诊断」分析日志"] = " · See Tools → Crash analysis to inspect the log",
+        ["使用本软件即表示你已阅读并接受以下全部条款。"] = "Using this app means you have read and accept all terms below.",
+
+        // 联机端口 / 设置开关 / 条款补充(SL 1.0 审查)
+        ["本机服务器端口"] = "Local server port",
+        ["对外端口(0 = 自动分配)"] = "Public port (0 = auto)",
+        ["中继端口"] = "Relay port",
+        ["本地端口"] = "Local port",
+        ["复制地址"] = "Copy address",
+        ["全部断开"] = "Disconnect all",
+        ["开"] = "On",
+        ["关"] = "Off",
+        ["已完成 0/4"] = "0/4 done",
+
+        // 版权 / GPL 许可(条款页与关于页)
+        ["3. 本软件以 GNU General Public License(GPL)第 3 版或其更新版本许可发布;你可以自由运行、研究、修改与再分发本软件(包括收费分发),但须遵守 GPL 条款。"] = "3. This app is released under the GNU General Public License, version 3 or any later version. You may run, study, modify and redistribute it freely, including for a fee, as long as you comply with the GPL.",
+        ["4. 再分发时须保留版权声明与许可声明,并向接收者提供完整对应的源代码;许可证全文见项目根目录的 LICENSE 文件与 https://www.gnu.org/licenses/gpl-3.0.html。"] = "4. Redistributions must keep the copyright and licence notices and give recipients the complete corresponding source code. The full licence is in the LICENSE file at the project root and at https://www.gnu.org/licenses/gpl-3.0.html.",
+        ["5. Copyright (C) 2026 Hugo Mou. Salmon Launcher 及其源代码的版权归作者所有,保留所有权利。"] = "5. Copyright (C) 2026 Hugo Mou. Salmon Launcher and its source code are the author's copyright, all rights reserved.",
+        ["Copyright (C) 2026 Hugo Mou · 本项目以 GNU GPL v3 或更新版本发布;完整许可证见项目根目录 LICENSE,源代码见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · Released under the GNU GPL v3 or later; the full licence is in LICENSE at the project root and the source code is in the project repository.",
+        ["Copyright (C) 2026 Hugo Mou · Salmon Launcher 以 GNU GPL v3 或更新版本许可发布;源代码与许可证全文见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · Salmon Launcher is released under the GNU GPL v3 or later; the source code and full licence text are in the project repository.",
     };
 }
