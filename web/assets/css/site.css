@@ -1513,6 +1513,70 @@ main {
   letter-spacing: 0.04em;
   line-height: 1.9;
 }
+
+/* ---------- release history ---------- */
+#history {
+  scroll-margin-top: 84px;
+}
+.rel-list {
+  border-top: 1px solid var(--line);
+}
+.rel-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.rel-tag {
+  font-family: var(--display);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  min-width: 76px;
+}
+.rel-row.latest .rel-tag {
+  color: var(--salmon);
+}
+.rel-date {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+}
+.rel-files {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.rel-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 7px 10px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.rel-dl:hover {
+  color: var(--text);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+.rel-dl em {
+  font-style: normal;
+  color: var(--dim);
+}
+@media (max-width: 560px) {
+  .rel-files {
+    margin-left: 0;
+    width: 100%;
+  }
+}
 .req-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2660,6 +2724,9 @@ html[data-theme="light"] .nav.scrolled {
 }
 html[data-theme="light"] .nav-links a:hover {
   background: rgba(18, 22, 28, 0.05);
+}
+html[data-theme="light"] .rel-dl:hover {
+  background: rgba(18, 22, 28, 0.04);
 }
 html[data-theme="light"] .brand img {
   filter: drop-shadow(0 0 10px rgba(201, 65, 43, 0.22));
