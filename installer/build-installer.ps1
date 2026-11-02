@@ -22,9 +22,50 @@ Write-Host "== 2/4 Publishing self-contained build" -ForegroundColor Cyan
     -r win-x64 --self-contained true -o $publish -v m
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed.' }
 
-Write-Host "== 3/4 Compiling installer" -ForegroundColor Cyan
-& $iscc "/DAppVersion=$Version" (Join-Path $root 'installer\SL.iss')
-if ($LASTEXITCODE -ne 0) { throw 'ISCC compilation failed.' }
+Write-Host "== 3/4 Compiling signed installer" -ForegroundColor Cyan
+# Resolve signtool.exe (Windows SDK)
+$signtool = $null
+foreach ($base in @('C:\Program Files (x86)\Windows Kits\10\bin','C:\Program Files\Windows Kits\10\bin')) {
+    if (Test-Path $base) {
+        $found = Get-ChildItem $base -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'x64' } | Sort-Object FullName -Descending | Select-Object -First 1
+        if ($found) { $signtool = $found.FullName; break }
+    }
+}
+if (-not $signtool) { throw 'signtool.exe not found. Install the Windows SDK.' }
+
+# Resolve or create the code-signing certificate (self-signed, test-only)
+$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert -ErrorAction SilentlyContinue |
+    Where-Object { $_.Subject -like '*SalmonLauncher*' } | Select-Object -First 1
+if (-not $cert) {
+    Write-Host "  Creating self-signed code-signing certificate (test-only)..." -ForegroundColor DarkGray
+    $cert = New-SelfSignedCertificate -Type CodeSigningCert `
+        -Subject 'CN=SalmonLauncher, O=Hugo Mou' `
+        -CertStoreLocation 'Cert:\CurrentUser\My' `
+        -KeyUsage DigitalSignature -KeyUsageProperty Sign `
+        -HashAlgorithm SHA256 -KeyLength 2048 `
+        -NotAfter (Get-Date).AddYears(10) `
+        -FriendlyName 'SalmonLauncher Code Signing'
+}
+$thumbprint = $cert.Thumbprint
+Write-Host "  signing with cert: $thumbprint" -ForegroundColor DarkGray
+
+# Inno Setup SignTool definition: $f is replaced by the file to sign
+# ISCC /S parameter contains quotes and spaces; use ProcessStartInfo to
+# bypass PowerShell 5.1 argument parsing for native executables.
+$issPath = Join-Path $root 'installer\SL.iss'
+$psi = New-Object System.Diagnostics.ProcessStartInfo
+$psi.FileName = $iscc
+$psi.Arguments = "/DAppVersion=$Version /S`"signtool=$signtool sign /sha1 $thumbprint /fd SHA256 `$f`" `"$issPath`""
+$psi.RedirectStandardOutput = $true
+$psi.RedirectStandardError = $true
+$psi.UseShellExecute = $false
+$psi.CreateNoWindow = $true
+$proc = [System.Diagnostics.Process]::Start($psi)
+$procOut = $proc.StandardOutput.ReadToEnd()
+$proc.WaitForExit()
+if ($proc.ExitCode -ne 0) { Write-Host $procOut; throw 'ISCC compilation failed.' }
+if ($procOut -match 'Successfully signed') { Write-Host '  installer + uninstaller signed OK' -ForegroundColor DarkGray }
 
 Write-Host "== 4/4 Creating portable package" -ForegroundColor Cyan
 Add-Type -AssemblyName System.IO.Compression.FileSystem
