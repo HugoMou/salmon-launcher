@@ -1,121 +1,121 @@
 # Salmon Launcher (SL)
 
-**简体中文** | [繁體中文](README.zh-Hant.md) | [English](README.en.md) | [日本語](README.ja.md)
+[简体中文](README.zh-CN.md) | [繁體中文](README.zh-Hant.md) | **English** | [日本語](README.ja.md)
 
-一个使用 **WinUI 3 / Windows App SDK** 与 **.NET 10** 构建的 Minecraft Java 版启动器。安装、启动、实例与模组、联机、皮肤预览、崩溃诊断与主题切换全部集成在一个双栏界面里。
+A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and **.NET 10**. Installation, launching, instances and mods, multiplayer, skin preview, crash analysis and theming all live inside one two-pane interface.
 
-- 版本：1.0.2
-- 平台：Windows 10 (2004+) / Windows 11，x64
-- 许可：GNU General Public License v3.0 或更新版本（GPL-3.0-or-later）
+- Version: 1.0.2
+- Platform: Windows 10 (2004+) / Windows 11, x64
+- Licence: GNU General Public License v3.0 or later (GPL-3.0-or-later)
 
 ---
 
-## 功能
+## Features
 
-| 模块 | 能力 |
+| Area | What it does |
 | --- | --- |
-| 启动管理 | 实例选择、内存与窗口尺寸、附加 JVM 参数、一键启动与运行状态提示 |
-| 下载安装 | Mojang 官方版本清单、加载器（Fabric / Quilt / Forge / NeoForge）、多源回退、断点续传、SHA-1 校验 |
-| 实例与模组 | 实例隔离目录、模组启停（`.jar` ↔ `.jar.disabled`）、导入本地模组、存档备份 |
-| 联机 | 自建中继、局域网扫描、手动中继三种接入方式 |
-| 内容仓库 | Modrinth 检索：模组 / 光影 / 资源包，按实例安装到对应目录 |
-| 外观 | 四种语言、深浅主题、自定义强调色、方块取色主题工坊、壁纸 |
-| 诊断 | 读取 `logs/latest.log` 尾部、崩溃签名匹配与中文处置建议 |
-| 账户 | 微软正版（内置浏览器 / 设备码 / 系统浏览器三种登录）与无限量离线账户 |
+| Launching | Instance picker, memory and window size, extra JVM arguments, one-click launch with live status |
+| Installation | Official Mojang version manifest, loaders (Fabric / Quilt / Forge / NeoForge), mirror fallback, resume, SHA-1 verification |
+| Instances and mods | Per-instance folders, mod toggling (`.jar` ↔ `.jar.disabled`), importing local mods, save backups |
+| Multiplayer | Self-hosted relay, LAN scanning and manual relay |
+| Content | Modrinth search for mods, shaders and resource packs, installed into the selected instance |
+| Appearance | Four languages, light and dark themes, custom accent colour, block-colour theme workshop, wallpapers |
+| Diagnostics | Reads the tail of `logs/latest.log`, matches crash signatures and suggests fixes |
+| Accounts | Microsoft sign-in (built-in browser, device code, system browser) and unlimited offline accounts |
 
-## 系统要求
+## Requirements
 
-- Windows 10 版本 2004（内部版本 19041）或更高，或 Windows 11；仅支持 x64。
-- 首次启动需联网获取版本清单；游戏本体、运行库与资源文件均从 Mojang 官方源或其公开镜像下载。
-- Java 运行时默认按需自动获取（Eclipse Temurin），也可使用本机已安装的 Java。
+- Windows 10 version 2004 (build 19041) or newer, or Windows 11; x64 only.
+- The first launch needs an internet connection to fetch the version manifest. Game files, libraries and assets come from Mojang's official sources or public mirrors.
+- Java is downloaded on demand (Eclipse Temurin) by default; an existing local Java installation can be used instead.
 
-## 下载与安装
+## Download and install
 
-**最新版本：v1.0.2**
+**Latest release: v1.0.2**
 
-| 形式 | 文件 | 说明 |
+| Package | File | Notes |
 | --- | --- | --- |
-| 安装包（推荐） | `SL-Setup-1.0.2-win64.exe` | 标准 Windows 安装向导，**提供简体中文 / 繁體中文 / English / 日本語 四种安装界面**，自动创建开始菜单快捷方式与卸载项；可选择仅为当前用户安装（无需管理员权限） |
-| 便携版 | `SL-1.0.2-portable-win64.zip` | 解压即用，不写入注册表；适合放在移动硬盘或 U 盘 |
+| Installer (recommended) | `SL-Setup-1.0.2-win64.exe` | Standard Windows setup wizard with **Simplified Chinese / Traditional Chinese / English / Japanese** UI; adds a Start menu shortcut and an uninstall entry; can install for the current user without administrator rights |
+| Portable | `SL-1.0.2-portable-win64.zip` | Unzip and run; writes nothing to the registry; handy on a USB drive |
 
-两个文件都包含完整的 .NET 10 与 Windows App SDK 运行时，**无需单独安装任何运行库**。下载地址：[GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
+Both packages bundle the complete .NET 10 and Windows App SDK runtimes, so **no separate runtime installation is needed**. Download: [GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases).
 
-安装包为未签名版本，首次运行时 Windows SmartScreen 可能提示「更多信息 → 仍要运行」。卸载程序会保留 `%APPDATA%\SalmonLauncher` 下的实例与存档。
+The installer is unsigned, so Windows SmartScreen may show "More info → Run anyway" on first launch. Uninstalling keeps instances and saves under `%APPDATA%\SalmonLauncher`.
 
-## 构建
+## Build
 
-需要 .NET 10 SDK 与 Windows App SDK 1.8（通过 NuGet 自动还原）。在仓库根目录执行：
+You need the .NET 10 SDK and Windows App SDK 1.8 (restored automatically through NuGet). From the repository root:
 
 ```powershell
 & "C:\Program Files\dotnet\dotnet.exe" build .\SalmonLauncher.sln -c Debug -p:Platform=x64
 ```
 
-产物位于：
+The output lands in:
 
 ```
 src\SL.App\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\SL.exe
 ```
 
-发布构建可加 `-c Release`。项目启用了 `TreatWarningsAsErrors`，任何警告都会中断构建。
+Use `-c Release` for a release build. `TreatWarningsAsErrors` is enabled, so any warning fails the build.
 
-### 生成安装包与便携版
+### Build the installer and portable package
 
 ```powershell
 .\installer\build-installer.ps1 -Version 1.0.2
 ```
 
-脚本会先执行 `dotnet publish`（Release、自包含），再用 Inno Setup 编译 `installer\SL.iss`，最后在 `dist\` 生成 `SL-Setup-<版本>-win64.exe` 与 `SL-<版本>-portable-win64.zip`。需要先安装 [Inno Setup 6](https://jrsoftware.org/isinfo.php)。
+The script runs `dotnet publish` (Release, self-contained), compiles `installer\SL.iss` with Inno Setup, and writes `SL-Setup-<version>-win64.exe` plus `SL-<version>-portable-win64.zip` into `dist\`. [Inno Setup 6](https://jrsoftware.org/isinfo.php) is required.
 
-## 项目结构
+## Project layout
 
 ```
-src\SL.App    表示层（WinUI 3 页面、控件、导航、本地化、主题）
-src\SL.Core   业务层（下载引擎、启动流水线、元数据、账户、诊断、联机）
-src\SL.Data   数据层（目录布局、原子写盘、设置与缓存）
+src\SL.App    Presentation (WinUI 3 pages, controls, navigation, localization, themes)
+src\SL.Core   Business logic (transfer engine, launch pipeline, metadata, accounts, diagnostics, multiplayer)
+src\SL.Data   Data layer (folder layout, atomic writes, settings and cache)
 ```
 
-三层严格单向引用：`SL.App → SL.Core → SL.Data`。
+Dependencies flow strictly one way: `SL.App → SL.Core → SL.Data`.
 
-## 数据目录
+## Data folder
 
-所有配置、账户、日志、实例与存档都保存在本机：
+Settings, accounts, logs, instances and worlds all stay on your machine:
 
 ```
 %APPDATA%\SalmonLauncher
 ```
 
-移动电脑时复制整个目录即可迁移；卸载本程序不会自动删除其中的实例与存档。
+Copy the whole folder to migrate to another PC. Uninstalling the app does not remove instances or worlds.
 
-## 下载源
+## Download sources
 
-- 官方源：`piston-meta.mojang.com`、`libraries.minecraft.net`、`resources.download.minecraft.net`
-- 国内镜像：`bmclapi2.bangbang93.com`（可在设置中切换优先镜像）
-- Java：`api.adoptium.net`、TUNA 镜像、GitHub Releases
-- Modrinth：官方 API 与国内镜像（可切换）
+- Official: `piston-meta.mojang.com`, `libraries.minecraft.net`, `resources.download.minecraft.net`
+- China mirror: `bmclapi2.bangbang93.com` (mirror-first can be toggled in settings)
+- Java: `api.adoptium.net`, TUNA mirror, GitHub Releases
+- Modrinth: official API and a China mirror (toggleable)
 
-所有下载文件最终都会做 SHA-1 或 SHA-256 校验，校验失败会重新下载。
+Every downloaded file is finally verified with SHA-1 or SHA-256, and is re-downloaded on mismatch.
 
-## 多语言
+## Languages
 
-界面提供 **简体中文**、**繁體中文**、**English**、**日本語** 四种语言，默认跟随系统，可在「外观与设置」中随时切换。许可与条款文本同样提供四种语言版本。
+The interface ships in **简体中文**, **繁體中文**, **English** and **日本語**, follows the system language by default, and can be switched anytime under Appearance & settings. The licence and terms texts are available in all four languages too.
 
-## 版权与许可
+## Copyright and licence
 
 ```
 Salmon Launcher (SL)
 Copyright (C) 2026 Hugo Mou
 
-本项目以 GNU General Public License 第 3 版（或任何更新版本）发布。
-完整许可证全文见仓库根目录的 LICENSE 文件，或访问
-https://www.gnu.org/licenses/gpl-3.0.html
+This project is released under the GNU General Public License, version 3
+or any later version. The full licence text is in the LICENSE file at the
+repository root, or at https://www.gnu.org/licenses/gpl-3.0.html
 ```
 
-你可以在 GPL 条款下自由运行、研究、修改与再分发本软件（包括收费分发），但必须保留版权与许可声明，并向接收者提供完整对应的源代码。
+Under the GPL you may run, study, modify and redistribute this software, including for a fee, as long as you keep the copyright and licence notices and give recipients the complete corresponding source code.
 
-## 免责声明
+## Disclaimer
 
-- 本软件为第三方免费工具，与 **Mojang Studios**、**Microsoft** 无任何隶属或授权关系；**Minecraft** 是 Mojang Studios 的商标。
-- 本软件不内置、不分发、不修改任何 Minecraft 游戏文件，游戏文件均从官方源或其公开镜像获取。
-- 模组、光影与资源包来自 Modrinth 等公开平台，版权归各自作者所有。
-- 软件按「现状」提供，不附带任何明示或暗示的担保；请在重要操作前自行备份存档与实例。
-- 使用本软件即表示你已阅读并同意软件内的《用户协议与免责声明》。
+- This is a free third-party tool with no affiliation or authorization from **Mojang Studios** or **Microsoft**. **Minecraft** is a trademark of Mojang Studios.
+- The app does not bundle, distribute or modify any Minecraft game files; they are fetched from official sources or public mirrors.
+- Mods, shaders and resource packs come from public platforms such as Modrinth and remain the property of their authors.
+- The software is provided "as is", without any express or implied warranty. Back up your worlds and instances before important operations.
+- Using this app means you have read and accepted the Terms of Use and Disclaimer shown inside the app.
