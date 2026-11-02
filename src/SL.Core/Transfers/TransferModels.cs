@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -15,7 +15,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 namespace SL.Core.Transfers;
 
-/// <summary>任务状态机:等待 → 下载中 →(校验中,阶段二)→ 完成;失败/暂停/取消为旁路。</summary>
+/// <summary>Task state machine: waiting → downloading → (verifying, stage 2) → completed; failed/paused/cancelled are side paths.</summary>
 public enum TransferState
 {
     Queued = 0,
@@ -29,14 +29,14 @@ public enum TransferState
 
 public enum TransferKind
 {
-    /// <summary>演示用模拟数据流(阶段一)</summary>
+    /// <summary>Simulated data flow for demos (stage 1)</summary>
     Simulated = 0,
 
-    /// <summary>真实 HTTP 下载(阶段二接入)</summary>
+    /// <summary>Real HTTP download (wired up in stage 2)</summary>
     Http,
 }
 
-/// <summary>多源列表中的一项:首位为主源,其后为镜像源(按历史成功率动态排序)。</summary>
+/// <summary>One entry of the multi-source list: the first is the primary source and the rest are mirrors (ordered dynamically by historical success rate).</summary>
 public sealed class TransferSourceSpec
 {
     public string Url { get; }
@@ -49,32 +49,32 @@ public sealed class TransferSourceSpec
     }
 }
 
-/// <summary>提交给引擎的任务描述(不可变入参)。</summary>
+/// <summary>Task description submitted to the engine (immutable input).</summary>
 public sealed class TransferSpec
 {
     public required string DisplayName { get; init; }
     public TransferKind Kind { get; init; } = TransferKind.Simulated;
 
-    /// <summary>优先级:数值越大越先调度(游戏核心文件 > 库 > 资源)</summary>
+    /// <summary>Priority: larger values are scheduled first (game core files > libraries > assets)</summary>
     public int Priority { get; init; } = TransferPriority.Normal;
 
     public IReadOnlyList<TransferSourceSpec> Sources { get; init; } = [];
     public string? ExpectedSha1 { get; init; }
 
-    /// <summary>Http 任务的落盘完整路径(Simulated 任务忽略)。阶段二接入。</summary>
+    /// <summary>Full on-disk path of an Http task (ignored by Simulated tasks). Wired up in stage 2.</summary>
     public string? DestPath { get; init; }
 
-    /// <summary>后台隐藏任务(资产补齐 / Java 获取等批量文件):不进任务中心列表,仅聚合成汇总。</summary>
+    /// <summary>Hidden background task (asset backfill / Java provisioning and similar batch files): not listed in the task center, only aggregated into a summary.</summary>
     public bool Hidden { get; init; }
 
-    /// <summary>总字节数;-1 表示未知(驱动不定长进度条)</summary>
+    /// <summary>Total bytes; -1 means unknown (drives an indeterminate progress bar)</summary>
     public long BytesTotal { get; init; } = -1;
 
-    /// <summary>Simulated 任务的模拟速率(字节/秒)</summary>
+    /// <summary>Simulated rate for Simulated tasks (bytes/second)</summary>
     public double SimulatedSpeed { get; init; } = 1_500_000;
 }
 
-/// <summary>优先级约定常量(业务层可自定义数值)。</summary>
+/// <summary>Priority convention constants (the business layer may define its own values).</summary>
 public static class TransferPriority
 {
     public const int CoreGameFile = 50;
@@ -86,8 +86,8 @@ public static class TransferPriority
 }
 
 /// <summary>
-/// 引擎运行的任务单元:描述字段不可变,运行时字段只允许引擎(同程序集)写入;
-/// UI 一律经由不可变的 TransferSnapshot 读取,避免跨线程竞态。
+/// Task unit run by the engine: description fields are immutable; runtime fields may only be written by the engine (same assembly);
+/// the UI always reads through an immutable TransferSnapshot to avoid cross-thread races.
 /// </summary>
 public sealed class TransferTask
 {
@@ -101,7 +101,7 @@ public sealed class TransferTask
         Sequence = sequence;
     }
 
-    // —— 引擎运行时状态(internal set,同程序集可写)——
+    // —— Engine runtime state (internal set, writable within the same assembly) ——
     public TransferState State { get; internal set; } = TransferState.Queued;
     public long BytesReceived { get; internal set; }
     public double SpeedBytesPerSecond { get; internal set; }
@@ -109,16 +109,16 @@ public sealed class TransferTask
     public int Attempt { get; internal set; } = 1;
     public string CurrentSource { get; internal set; } = "";
 
-    /// <summary>Pause(id) 置位;worker 被中断后据此区分「暂停」与「取消」并复位</summary>
+    /// <summary>Set by Pause(id); after the worker is interrupted it tells "pause" and "cancel" apart, then resets</summary>
     internal bool PauseRequested { get; set; }
 
     public bool IsActive => State is TransferState.Queued or TransferState.Downloading or TransferState.Verifying;
 
-    /// <summary>终态:可从任务面板清除</summary>
+    /// <summary>Terminal state: can be cleared from the task panel</summary>
     public bool IsFinished => State is TransferState.Completed or TransferState.Failed or TransferState.Cancelled;
 }
 
-/// <summary>发给 UI 的只读快照。</summary>
+/// <summary>Read-only snapshot sent to the UI.</summary>
 public sealed record TransferSnapshot(
     string Id,
     string DisplayName,
@@ -133,25 +133,25 @@ public sealed record TransferSnapshot(
     int Priority,
     bool Hidden = false)
 {
-    /// <summary>是否应显示为「活动中」(用于排序)</summary>
+    /// <summary>Whether it should be displayed as "active" (used for sorting)</summary>
     public bool ActiveLike => State is TransferState.Queued or TransferState.Downloading or TransferState.Verifying;
 }
 
-/// <summary>引擎参数(可运行时调整)。</summary>
+/// <summary>Engine parameters (adjustable at runtime).</summary>
 public sealed class TransferOptions
 {
     private int _maxConcurrency = 6;
 
-    /// <summary>并发上限,默认 6,范围 2–16</summary>
+    /// <summary>Concurrency limit, default 6, range 2–16</summary>
     public int MaxConcurrency
     {
         get => _maxConcurrency;
         set => _maxConcurrency = Math.Clamp(value, 2, 16);
     }
 
-    /// <summary>单个来源的最大尝试次数,超过后切换下一来源</summary>
+    /// <summary>Max attempts per source; after that, move on to the next source</summary>
     public int MaxAttemptsPerSource { get; set; } = 3;
 
-    /// <summary>重试基础退避(毫秒),按次数指数增长</summary>
+    /// <summary>Base retry backoff (milliseconds), growing exponentially with the attempt count</summary>
     public int RetryBaseDelayMs { get; set; } = 500;
 }

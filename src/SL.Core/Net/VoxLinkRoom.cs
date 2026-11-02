@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,14 +20,14 @@ using System.Text;
 
 namespace SL.Core.Net;
 
-/// <summary>房间成员信息。</summary>
+/// <summary>Room member information.</summary>
 /// <param name="Name"></param>
-/// <param name="Endpoint">回环端点(演示通道)</param>
+/// <param name="Endpoint">Loopback endpoint (demo channel)</param>
 public sealed record VoxLinkMember(string Name, string Endpoint);
 
 /// <summary>
-/// 阶段六:VoxLink 本地信令演示通路(TCP 回环)。
-/// 真实公网穿透需要中继服务器,阶段七接出;当前实现保证"创建房间/邀请码/加入/消息"全链路真实工作(本机)。
+/// Stage 6: VoxLink local signaling demo path (TCP loopback).
+/// Real public-network traversal needs a relay server and will be added in stage 7; the current implementation makes the whole "create room / invite code / join / message" chain work for real (on this machine).
 /// </summary>
 public sealed class VoxLinkHost : IDisposable
 {
@@ -35,7 +35,7 @@ public sealed class VoxLinkHost : IDisposable
     private readonly List<TcpClient> _clients = [];
     private readonly object _gate = new();
 
-    /// <summary>成员变动 / 收到消息(线程池线程触发,订阅方自行调度 UI)。</summary>
+    /// <summary>Member change / message received (fires on thread-pool threads; subscribers marshal to the UI themselves).</summary>
     public event Action<VoxLinkMember>? Joined;
     public event Action<string>? Message;
     public event Action? Stopped;
@@ -51,8 +51,8 @@ public sealed class VoxLinkHost : IDisposable
         _listener = new TcpListener(IPAddress.Loopback, 0);
         _listener.Start();
         Port = ((IPEndPoint)_listener.LocalEndpoint).Port;
-        // 邀请码 = SLROOM-<端口 36 进制大写>-<房间名长度 16 进制>(本地演示)
-        // 注:Convert.ToString(v,36) 不支持 36 进制(仅 2/8/10/16),这里用自有编码
+        // invite code = SLROOM-<port in uppercase base 36>-<room name length in hex> (local demo)
+        // note: Convert.ToString(v,36) does not support base 36 (only 2/8/10/16), so a custom encoding is used here
         InviteCode = $"SLROOM-{ToBase36(Port)}-{roomName.Length:X2}";
         Active = true;
         _ = AcceptLoopAsync();
@@ -97,7 +97,7 @@ public sealed class VoxLinkHost : IDisposable
         }
     }
 
-    /// <summary>向所有已连接成员广播。</summary>
+    /// <summary>Broadcast to every connected member.</summary>
     public async void Broadcast(string message)
     {
         if (!Active)
@@ -144,12 +144,12 @@ public sealed class VoxLinkHost : IDisposable
     }
 }
 
-/// <summary>加入房间(本地信令演示):解析邀请码 → 连接回环端口 → 发送"加入"消息。</summary>
+/// <summary>Join a room (local signaling demo): parse the invite code → connect to the loopback port → send the "join" message.</summary>
 public sealed class VoxLinkGuest : IDisposable
 {
     private TcpClient? _client;
 
-    /// <summary>收到房主消息。</summary>
+    /// <summary>A message from the host was received.</summary>
     public event Action<string>? Message;
 
     public async Task<bool> ConnectAsync(string inviteCode, string myName, CancellationToken cancellation = default)

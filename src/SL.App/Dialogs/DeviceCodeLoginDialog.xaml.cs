@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -25,7 +25,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace SL.App.Dialogs;
 
-/// <summary>设备码登录:大字展示 user_code,复制后到 microsoft.com/link 粘贴;对话框内轮询至授权完成并续跑全链路。</summary>
+/// <summary>Device code login: shows user_code in large text to copy into microsoft.com/link; the dialog polls until authorization completes and the whole flow continues.</summary>
 public sealed partial class DeviceCodeLoginDialog : ContentDialog
 {
     private readonly CancellationTokenSource _cts = new();
@@ -76,7 +76,7 @@ public sealed partial class DeviceCodeLoginDialog : ContentDialog
         }
         catch (OperationCanceledException)
         {
-            // 用户关闭对话框:静默退出
+            // User closed the dialog: exit silently
         }
         catch (Exception ex)
         {

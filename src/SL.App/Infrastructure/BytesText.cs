@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -15,7 +15,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 namespace SL.App.Infrastructure;
 
-/// <summary>字节量/速率的人类可读格式化(与旧版 SL.Pres 行为一致)。</summary>
+/// <summary>Human-readable formatting for byte sizes and rates (same behavior as the legacy SL.Pres).</summary>
 public static class BytesText
 {
     public static string FormatBytes(long bytes)

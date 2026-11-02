@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -17,7 +17,7 @@ using System.Windows.Input;
 
 namespace SL.App.Infrastructure;
 
-/// <summary>WinUI 3 无 CommandManager,手动 NotifyCanExecuteChanged 刷新按钮可用态。</summary>
+/// <summary>WinUI 3 has no CommandManager; call NotifyCanExecuteChanged manually to refresh the button's enabled state.</summary>
 public sealed class RelayCommand : ICommand
 {
     private readonly Action<object?> _execute;

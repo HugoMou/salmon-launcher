@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -31,7 +31,7 @@
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
 
-            <!-- 启动横幅 -->
+            <!-- Launch banner -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -131,7 +131,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 快捷入口 -->
+            <!-- Quick shortcuts -->
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -208,7 +208,7 @@
                 </Button>
             </Grid>
 
-            <!-- 公告 -->
+            <!-- Announcement -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"

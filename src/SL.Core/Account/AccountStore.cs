@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,20 +18,20 @@ using System.Text.Json;
 
 namespace SL.Core.Account;
 
-/// <summary>一条账户记录:离线账户只有名字;正版账户内嵌完整微软会话。</summary>
+/// <summary>One account record: an offline account has only a name; a premium account embeds the full Microsoft session.</summary>
 public sealed record AccountEntry
 {
-    /// <summary>稳定 Id:"msa:&lt;uuid&gt;" 或 "offline:&lt;玩家名&gt;"。</summary>
+    /// <summary>Stable Id: "msa:&lt;uuid&gt;" or "offline:&lt;player name&gt;".</summary>
     public string Id { get; init; } = "";
-    /// <summary>"offline"(离线)或 "msa"(微软正版)。</summary>
+    /// <summary>"offline" (offline account) or "msa" (Microsoft premium).</summary>
     public string Kind { get; init; } = "offline";
     public string Name { get; init; } = "";
-    /// <summary>正版账户的完整会话(含 refresh_token);离线为 null。</summary>
+    /// <summary>Full session of a premium account (includes refresh_token); null for offline.</summary>
     public MsSession? Session { get; init; }
     public DateTimeOffset SavedAt { get; init; } = DateTimeOffset.Now;
 }
 
-/// <summary>accounts\accounts.json 的仓库形态:账户集合 + 活动账户 Id。</summary>
+/// <summary>On-disk shape of accounts\accounts.json: the account collection plus the active account Id.</summary>
 public sealed record AccountRepository
 {
     public List<AccountEntry> Accounts { get; init; } = [];
@@ -39,8 +39,8 @@ public sealed record AccountRepository
 }
 
 /// <summary>
-/// 多账户仓库:正版(可多个微软账户)与离线账户混合存储,支持添加/更新/删除/切换。
-/// 旧版单会话 msa.json 在首次读取时自动迁移为仓库中的一条正版账户。
+/// Multi-account store: premium (multiple Microsoft accounts) and offline accounts stored together, with add/update/remove/switch.
+/// The legacy single-session msa.json is migrated automatically into one premium account on first read.
 /// </summary>
 public static class AccountStore
 {
@@ -55,7 +55,7 @@ public static class AccountStore
                 var path = RepositoryPath();
                 if (!File.Exists(path))
                 {
-                    // 迁移:旧版只有 accounts\msa.json 单会话,转成仓库的第一条正版账户
+                    // Migration: the legacy build only had the single-session accounts\msa.json; turn it into the first premium account of the store
                     var legacy = MsAuth.LoadSession();
                     if (legacy is { Uuid.Length: > 0 })
                     {
@@ -87,7 +87,7 @@ public static class AccountStore
         }
     }
 
-    /// <summary>新增或按 Id 更新正版账户并设为活动。</summary>
+    /// <summary>Add a premium account or update one by Id, then make it active.</summary>
     public static AccountEntry UpsertMsa(MsSession session)
     {
         lock (Gate)
@@ -109,7 +109,7 @@ public static class AccountStore
         }
     }
 
-    /// <summary>添加(或选中已存在的)离线账户并设为活动。</summary>
+    /// <summary>Add (or select an existing) offline account and make it active.</summary>
     public static AccountEntry AddOffline(string name)
     {
         lock (Gate)
@@ -130,7 +130,7 @@ public static class AccountStore
         }
     }
 
-    /// <summary>删除账户;若删的是活动账户,活动位顺延到剩余第一个(可能为空)。</summary>
+    /// <summary>Delete an account; if the active account is deleted, the active slot moves to the first remaining account (may be empty).</summary>
     public static void Remove(string id)
     {
         lock (Gate)
@@ -153,7 +153,7 @@ public static class AccountStore
         }
     }
 
-    /// <summary>当前活动账户;仓库为空时返回 null(调用方回退离线名)。</summary>
+    /// <summary>Current active account; null when the store is empty (callers fall back to the offline name).</summary>
     public static AccountEntry? Active()
     {
         var repo = Load();

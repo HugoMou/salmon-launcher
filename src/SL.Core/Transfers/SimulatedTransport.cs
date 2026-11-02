@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,9 +18,9 @@ using System.Security.Cryptography;
 namespace SL.Core.Transfers;
 
 /// <summary>
-/// 阶段一的演示传输:按指定速率产生数据流,支持从断点(ResumeBytes)继续,
-/// 并确定性地注入偶发失败以演练「单源重试 → 多源回退 → 最终成功」链路。
-/// 失败注入规则:同一来源的最后一次尝试必定成功 ⇒ 任务最终必然完成。
+/// Stage 1 demo transport: produces a data stream at a given rate and can continue from a resume point (ResumeBytes),
+/// injecting occasional failures deterministically to exercise the "single-source retry → multi-source fallback → eventual success" chain.
+/// Failure injection rule: the last attempt of each source always succeeds ⇒ the task always completes eventually.
 /// </summary>
 public sealed class SimulatedTransport : ITransport
 {
@@ -30,16 +30,16 @@ public sealed class SimulatedTransport : ITransport
         long total = task.Spec.BytesTotal;
         if (total <= 0)
         {
-            // 未给出总量时按 Id 哈希在 8–48MB 间取定值,保证多次续传一致
+            // when no total is given, derive a fixed value from the Id hash between 8–48MB so repeated resumes stay consistent
             total = 8_000_000 + (Math.Abs((int)PseudoHash(task.Id)) % 40_000_000);
             total -= total % 1000;
         }
 
         long position = Math.Clamp(context.ResumeBytes, 0, total);
         double speed = task.Spec.SimulatedSpeed <= 0 ? 1_500_000 : task.Spec.SimulatedSpeed;
-        speed *= 0.92 + pseudoRandom(context.SourceUrl) * 0.16; // ±8% 抖动
+        speed *= 0.92 + pseudoRandom(context.SourceUrl) * 0.16; // ±8% jitter
 
-        // 确定性失败注入:非最后一次尝试时约 20% 概率失败
+        // deterministic failure injection: about 20% chance of failure on attempts that are not the last
         bool injectFailure =
             context.AttemptNumber < 3
             && PseudoHash(task.Id + "|" + context.SourceUrl + "|" + context.AttemptNumber) % 100 < 20;
@@ -48,7 +48,7 @@ public sealed class SimulatedTransport : ITransport
 
         if (injectFailure)
         {
-            // 稍作进度后失败,便于在 UI 观察到来源切换
+            // fail after a little progress so the source switch is visible in the UI
             await Simulate(position, Math.Min(position + partial, total), speed, context, cancellation).ConfigureAwait(false);
             return TransportResult.Fail("演示:模拟来源超时,建议切换镜像");
         }

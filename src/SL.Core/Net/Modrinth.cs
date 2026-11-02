@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,18 +20,18 @@ using System.Text.Json;
 
 namespace SL.Core.Net;
 
-/// <summary>Modrinth 资源分类:决定检索 facets 与安装目标目录。</summary>
+/// <summary>Modrinth resource category: determines the search facets and the install target directory.</summary>
 public enum ModrinthCategory
 {
-    /// <summary>模组(需 game_versions + loader 过滤,装到 mods)。</summary>
+    /// <summary>Mods (need game_versions + loader filtering, installed into mods).</summary>
     Mods,
-    /// <summary>光影包(project_type:shader,通用 Iris 光影,装到 shaderpacks)。</summary>
+    /// <summary>Shader packs (project_type:shader, generic Iris shaders, installed into shaderpacks).</summary>
     Shaders,
-    /// <summary>资源包(project_type:resourcepack,装到 resourcepacks)。</summary>
+    /// <summary>Resource packs (project_type:resourcepack, installed into resourcepacks).</summary>
     ResourcePacks,
 }
 
-/// <summary>阶段四:Modrinth v2 检索(模组仓库页)。全部为真实 HTTP 调用。</summary>
+/// <summary>Stage 4: Modrinth v2 search (the mod repository page). Every call is real HTTP.</summary>
 public static class Modrinth
 {
     private static readonly HttpClient Client = CreateClient();
@@ -44,12 +44,12 @@ public static class Modrinth
             ConnectTimeout = TimeSpan.FromSeconds(15),
         };
         var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("SalmonLauncher/0.3 (Salmon Launcher Launcher)");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("SalmonLauncher/0.3 (SalmonLauncher Launcher)");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
         return client;
     }
 
-    /// <summary>镜像优先(国内网络)。由设置项 ModrinthMirror 驱动。</summary>
+    /// <summary>Mirror first (for networks in China). Driven by the ModrinthMirror setting.</summary>
     public static bool PreferMirror { get; set; } = true;
 
     private const string OfficialApi = "https://api.modrinth.com/v2";
@@ -60,7 +60,7 @@ public static class Modrinth
     private static IEnumerable<string> ApiOrder()
         => PreferMirror ? [MirrorApi, OfficialApi] : [OfficialApi, MirrorApi];
 
-    /// <summary>按当前偏好顺序尝试官方接口与镜像,任一成功即返回。</summary>
+    /// <summary>Try the official API and the mirror in the current preference order; return as soon as one succeeds.</summary>
     private static async Task<JsonDocument> GetJsonAsync(string pathAndQuery, CancellationToken cancellation)
     {
         Exception? last = null;
@@ -84,17 +84,17 @@ public static class Modrinth
         throw new InvalidOperationException("Modrinth 接口不可达(网络受限时可切换镜像或稍后重试)", last);
     }
 
-    /// <summary>搜索结果行。</summary>
-    /// <param name="Slug">项目标识(下载文件时再查 versions)</param>
-    /// <param name="Title">显示名</param>
-    /// <param name="Description">一句话简介</param>
+    /// <summary>A search result row.</summary>
+    /// <param name="Slug">Project identifier (versions are queried later when downloading a file)</param>
+    /// <param name="Title">Display name</param>
+    /// <param name="Description">One-sentence summary</param>
     /// <param name="Author"></param>
-    /// <param name="DownloadsText">下载量(已格式化)</param>
-    /// <param name="Categories">前三个分类 tag</param>
+    /// <param name="DownloadsText">Download count (pre-formatted)</param>
+    /// <param name="Categories">First three category tags</param>
     public sealed record ProjectHit(string Slug, string Title, string Description, string Author,
         string DownloadsText, IReadOnlyList<string> Categories);
 
-    /// <summary>某项目针对 {gameVersion, loader} 的最新可用文件。</summary>
+    /// <summary>Latest available file of a project for {gameVersion, loader}.</summary>
     public sealed record VersionFile(string FileName, string Url, long Size, string? Sha1)
     {
         public string SizeText => Size >= 1 << 20 ? $"{Size / (1024.0 * 1024.0):F1} MB" : $"{Size / 1024.0:F0} KB";
@@ -106,12 +106,12 @@ public static class Modrinth
     public static Task<IReadOnlyList<ProjectHit>> SearchAsync(
         string query, string gameVersion, string loader, CancellationToken cancellation)
     {
-        // Modrinth facets:两层嵌套数组 [["versions:26.3"],["categories:fabric"]](组内 AND,组间 OR)
+        // Modrinth facets: a two-level nested array [["versions:26.3"],["categories:fabric"]] (AND within a group, OR between groups)
         var facets = $"[[\"versions:{gameVersion}\"],[\"categories:{loader}\"]]";
         return SearchByFacetsAsync(query, facets, cancellation);
     }
 
-    /// <summary>按自定义 facets 检索(光影/资源包传 ["project_type:..."],不过滤 game_versions)。</summary>
+    /// <summary>Search with custom facets (shaders/resource packs pass ["project_type:..."], without game_versions filtering).</summary>
     public static async Task<IReadOnlyList<ProjectHit>> SearchByFacetsAsync(
         string query, string facets, CancellationToken cancellation)
     {
@@ -144,7 +144,7 @@ public static class Modrinth
         return list;
     }
 
-    /// <summary>取 {slug} 的最新主文件(不过滤版本/加载器 —— 光影、资源包等通用资源使用)。</summary>
+    /// <summary>Latest primary file of {slug} (no version/loader filtering — used for generic resources such as shaders and resource packs).</summary>
     public static async Task<VersionFile?> LatestVersionFileAsync(string slug, CancellationToken cancellation)
     {
         var url = $"/project/{Uri.EscapeDataString(slug)}/version";
@@ -152,7 +152,7 @@ public static class Modrinth
         return FirstPrimaryFile(doc);
     }
 
-    /// <summary>取 {slug} 在指定版本/加载器下的最新主文件。</summary>
+    /// <summary>Latest primary file of {slug} for the given version/loader.</summary>
     public static async Task<VersionFile?> LatestVersionFileAsync(
         string slug, string gameVersion, string loader, CancellationToken cancellation)
     {
@@ -179,12 +179,12 @@ public static class Modrinth
                     f.TryGetProperty("size", out var sz) && sz.TryGetInt64(out var size) ? size : -1,
                     f.TryGetProperty("hashes", out var hs) && hs.TryGetProperty("sha1", out var sh) ? sh.GetString() : null);
             }
-            // 这一级没有 primary 文件就继续找下一个版本
+            // when this level has no primary file, keep looking at the next version
         }
         return null;
     }
 
-    /// <summary>Modrinth CDN 的镜像地址(下载时作为第二来源);非 CDN 链接返回 null。</summary>
+    /// <summary>Mirror URL of the Modrinth CDN (used as the second download source); returns null for non-CDN links.</summary>
     public static string? MirrorOf(string url)
         => url.StartsWith(OfficialCdn + "/", StringComparison.OrdinalIgnoreCase)
             ? MirrorCdn + url[OfficialCdn.Length..]

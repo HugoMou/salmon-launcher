@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,8 +18,8 @@ using SL.Core.Instances;
 namespace SL.App.Instances;
 
 /// <summary>
-/// 当前实例上下文:实例相关页面共用同一个「正在查看的实例」,
-/// 切换后所有页面同步刷新,默认取最近安装的实例。
+/// Current instance context: instance pages share the same "instance being viewed";
+/// switching it refreshes all pages, and it defaults to the most recently installed instance.
 /// </summary>
 public static class InstanceContext
 {
@@ -29,7 +29,7 @@ public static class InstanceContext
 
     public static IReadOnlyList<InstanceInfo> All => InstanceRegistry.List();
 
-    /// <summary>刷新实例列表并保证 CurrentId 有效(失效时回落到最新实例)。</summary>
+    /// <summary>Refresh the instance list and keep CurrentId valid (falls back to the newest instance when stale).</summary>
     public static IReadOnlyList<InstanceInfo> Refresh()
     {
         var all = InstanceRegistry.List();

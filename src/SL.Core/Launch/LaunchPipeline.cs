@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,26 +20,26 @@ using System.Text.Json;
 
 namespace SL.Core.Launch;
 
-/// <summary>启动结果。</summary>
-/// <param name="Success">是否成功拉起进程</param>
-/// <param name="ProcessId">游戏进程 PID(失败为 0)</param>
-/// <param name="Error">失败原因</param>
+/// <summary>Launch result.</summary>
+/// <param name="Success">Whether the process was started successfully</param>
+/// <param name="ProcessId">Game process PID (0 on failure)</param>
+/// <param name="Error">Failure reason</param>
 public sealed record LaunchResult(bool Success, int ProcessId, string? Error);
 
 /// <summary>
-/// 阶段三:真实 Minecraft 启动流水线。
-/// 版本解析 → 库/依赖校验(缺失走主源+镜像补齐) → natives 解压 → 资产对象差量补齐
-/// → Java 定位(不足时自动下载 Temurin) → 参数组装(旧/新参数格式) → 进程启动(输出重定向到实例日志)。
+/// Stage 3: the real Minecraft launch pipeline.
+/// Version resolution → library/dependency check (missing ones filled from the primary source + mirror) → natives extraction → differential asset fill
+/// → Java lookup (auto-download Temurin when missing) → argument assembly (legacy/current argument formats) → process start (output redirected to the instance log).
 /// </summary>
 public static class LaunchPipeline
 {
-    /// <summary>步骤日志(字符串直接可展示给用户)。</summary>
+    /// <summary>Step log (the strings can be shown to the user as-is).</summary>
     public static event Action<string>? Step;
 
-    /// <summary>游戏进程退出(诊断用)。</summary>
+    /// <summary>Game process exited (for diagnostics).</summary>
     public static event Action<int>? GameExited;
 
-    /// <summary>实例发现(阶段三最小能力):磁盘上最新安装完成(有核心 jar)的实例 ID。</summary>
+    /// <summary>Instance discovery (the minimal stage-3 capability): ID of the most recently installed instance on disk (one that has a core jar).</summary>
     public static string? LatestInstanceId()
     {
         var root = Boot.Runtime.InstancesDir;
@@ -68,10 +68,10 @@ public static class LaunchPipeline
     {
         Core.Logging.AppLog.Info("Launch", message);
         try { Step?.Invoke(message); }
-        catch { /* 订阅方异常不阻断流水线 */ }
+        catch { /* a subscriber exception must not abort the pipeline */ }
     }
 
-    /// <summary>启动身份:正版(msa)传真实 uuid/token;离线传 null(回退 OfflineUuid)。</summary>
+    /// <summary>Launch identity: premium (msa) passes a real uuid/token; offline passes null (falls back to OfflineUuid).</summary>
     public sealed record LaunchIdentity(string Name, string Uuid, string AccessToken, string UserType);
 
     public static async Task<LaunchResult> StartAsync(
@@ -88,7 +88,7 @@ public static class LaunchPipeline
         var metaFile = Path.Combine(instanceDir, "meta", instanceId + ".json");
         var clientJar = Path.Combine(instanceDir, "versions", instanceId + ".jar");
 
-        // ============================== 版本解析 ==============================
+        // ============================== Version resolution ==============================
         Raise("解析版本元数据…");
         if (!File.Exists(metaFile))
             return new LaunchResult(false, 0, $"实例 {instanceId} 缺少版本元数据({metaFile})");
@@ -106,9 +106,9 @@ public static class LaunchPipeline
         if (detail.Client is null || detail.MainClass.Length == 0)
             return new LaunchResult(false, 0, "版本 JSON 不完整(缺少 client 或 mainClass)");
 
-        // ============================== 客户端核心 jar 完整性 ==============================
-        // 下载中断或被杀进程都会留下"存在但不是有效 jar"的文件,直接启动只会得到
-        // ClassNotFoundException;这里先校验大小/SHA-1/zip 结构,不通过就自动重下。
+        // ============================== Client core jar integrity ==============================
+        // An interrupted download or a killed process leaves a file that "exists but is not a valid jar"; launching it only yields
+        // ClassNotFoundException; so validate size/SHA-1/zip structure first and re-download automatically when it fails.
         if (!IsValidClientJar(clientJar, detail.Client.Sha1, detail.Client.Size))
         {
             Raise("游戏核心 jar 不完整,正在重新下载…");
@@ -125,7 +125,7 @@ public static class LaunchPipeline
             Raise("游戏核心 jar 已修复");
         }
 
-        // ============================== 库/依赖校验 ==============================
+        // ============================== Library/dependency check ==============================
         Raise($"校验 {detail.Libraries.Count} 个库文件…");
         var missingLibs = detail.Libraries
             .Where(l => !string.IsNullOrEmpty(l.RelativePath))
@@ -153,15 +153,15 @@ public static class LaunchPipeline
             }
         }
 
-        // ============================== natives 解压 ==============================
+        // ============================== natives extraction ==============================
         var nativesDir = Path.Combine(instanceDir, "natives");
         if (Directory.Exists(nativesDir))
         {
-            // 每次启动全部重建,避免旧 natives(例如历史上误装的 ARM64 版本)残留
+            // Rebuild everything on each launch so stale natives (e.g. an ARM64 build installed by mistake in the past) never linger
             Directory.Delete(nativesDir, recursive: true);
         }
         Directory.CreateDirectory(nativesDir);
-        // 2026 参数布局:-Djava.library.path=<natives>/java;jna/lwjgl/netty 各有子目录
+        // 2026 argument layout: -Djava.library.path=<natives>/java; jna/lwjgl/netty each have their own subdirectory
         var nativesJavaDir = Path.Combine(nativesDir, "java");
         Directory.CreateDirectory(nativesJavaDir);
         foreach (var sub in new[] { "jna", "lwjgl", "netty" })
@@ -176,7 +176,7 @@ public static class LaunchPipeline
                 return new LaunchResult(false, 0, $"natives 包缺失:{native.RelativePath}");
             ExtractNatives(jar, nativesDir);
         }
-        // 汇集所有 dll 到 <natives>/java(java.library.path 实际指向处)
+        // Collect every dll into <natives>/java (where java.library.path actually points)
         foreach (var dll in Directory.EnumerateFiles(nativesDir, "*.dll", SearchOption.AllDirectories))
         {
             var target = Path.Combine(nativesJavaDir, Path.GetFileName(dll));
@@ -184,7 +184,7 @@ public static class LaunchPipeline
                 File.Copy(dll, target);
         }
 
-        // ============================== 资产对象差量补齐 ==============================
+        // ============================== Differential asset fill ==============================
         var assetIndexFile = Path.Combine(Boot.Runtime.AssetsDir, "indexes", detail.AssetId + ".json");
         if (detail.AssetIndex is not null && File.Exists(assetIndexFile))
         {
@@ -209,7 +209,7 @@ public static class LaunchPipeline
                 Raise($"资源对象补齐完成({missingAssets} 个文件)");
         }
 
-        // ============================== Java 定位 ==============================
+        // ============================== Java lookup ==============================
         Raise($"定位 Java {detail.JavaMajor}+ …");
         var javaHome = await Launch.JavaFetch.EnsureJavaAsync(detail.JavaMajor, cancellation).ConfigureAwait(false);
         if (string.IsNullOrEmpty(javaHome))
@@ -218,7 +218,7 @@ public static class LaunchPipeline
         if (!File.Exists(javaExe))
             javaExe = Path.Combine(javaHome, "bin", "java.exe");
 
-        // ============================== 参数组装 ==============================
+        // ============================== Argument assembly ==============================
         Raise("组装启动参数…");
         var classpath = BuildClasspath(detail, clientJar);
         Logging.AppLog.Info("Launch",
@@ -236,7 +236,7 @@ public static class LaunchPipeline
         }
         var gameDir = instanceDir;
 
-        // ============================== 进程启动 ==============================
+        // ============================== Process start ==============================
         Raise("启动游戏进程…");
         var psi = new ProcessStartInfo
         {
@@ -251,8 +251,8 @@ public static class LaunchPipeline
             psi.ArgumentList.Add(a);
 
         Directory.CreateDirectory(Path.Combine(gameDir, "logs"));
-        // 不抢占游戏自己的 latest.log:控制台输出写到独立文件,
-        // 并允许共享读写,避免上一次进程尚未退出时无法启动。
+        // Do not take over the game own latest.log: console output goes to a separate file,
+        // and shared read/write is allowed so a previous process that has not exited yet does not block launching.
         var consoleLogPath = Path.Combine(gameDir, "logs", "launcher-console.log");
         var logStream = new StreamWriter(
             new FileStream(consoleLogPath,
@@ -289,7 +289,7 @@ public static class LaunchPipeline
         return new LaunchResult(true, process.Id, null);
     }
 
-    // ------------------------------------------------------------ 内部
+    // ------------------------------------------------------------ Internals
 
     private static async Task PumpOutputAsync(StreamReader reader, StreamWriter sink, CancellationToken ct)
     {
@@ -307,7 +307,7 @@ public static class LaunchPipeline
         if (string.IsNullOrEmpty(url))
             return null;
 
-        // BMCLAPI 官方映射:host 置换,路径保持;资源对象特殊换段
+        // BMCLAPI official mapping: replace the host, keep the path; asset objects use a special segment
         return url switch
         {
             var u when u.Contains("piston-meta.mojang.com", StringComparison.Ordinal)
@@ -330,7 +330,7 @@ public static class LaunchPipeline
         };
     }
 
-    /// <summary>只允许官方域与 BMCLAPI 镜像 contem 执行落盘下载(安全护栏)。</summary>
+    /// <summary>Only official domains and the BMCLAPI mirror may be downloaded to disk (safety guard).</summary>
     private static bool IsAllowedSource(string? url) => !string.IsNullOrEmpty(url) && (url
             .Contains(".mojang.com", StringComparison.Ordinal)
             || url.Contains("minecraft.net", StringComparison.Ordinal)
@@ -338,7 +338,7 @@ public static class LaunchPipeline
             || url.Contains("api.adoptium.net", StringComparison.Ordinal)
             || url.Contains("github.com", StringComparison.Ordinal)
             || url.Contains("piston-meta", StringComparison.Ordinal)
-            // 加载器相关仓库(Fabric / Quilt / Forge / NeoForge / Maven Central)
+            // Loader-related repositories (Fabric / Quilt / Forge / NeoForge / Maven Central)
             || url.Contains("meta.fabricmc.net", StringComparison.Ordinal)
             || url.Contains("maven.fabricmc.net", StringComparison.Ordinal)
             || url.Contains("meta.quiltmc.org", StringComparison.Ordinal)
@@ -348,7 +348,7 @@ public static class LaunchPipeline
             || url.Contains("repo1.maven.org", StringComparison.Ordinal)
             || url.Contains("libraries.minecraft.net", StringComparison.Ordinal));
 
-    /// <summary>客户端 jar 是否完整可用:大小、SHA-1 与 zip 结构(必须含主类)。</summary>
+    /// <summary>Whether the client jar is complete and usable: size, SHA-1 and zip structure (must contain the main class).</summary>
     private static bool IsValidClientJar(string path, string? sha1, long size)
     {
         try
@@ -401,7 +401,7 @@ public static class LaunchPipeline
         {
             if (string.IsNullOrEmpty(entry.Name) || entry.FullName.EndsWith("/"))
                 continue;
-            // 保留 jar 内子路径(jna / lwjgl / 深层结构),根级 dll 平铺到 nativesDir
+            // Keep the sub-paths inside the jar (jna / lwjgl / deep structures); root-level dlls are copied flat into nativesDir
             var relative = entry.FullName.Replace('/', Path.DirectorySeparatorChar);
             if (relative.StartsWith('\\'))
                 relative = relative.TrimStart('\\');
@@ -460,7 +460,7 @@ public static class LaunchPipeline
             ["${user_properties}"] = "{}",
         };
 
-        // 正版身份覆盖离线默认(名/uuid/真实令牌/msa 类型)
+        // Premium identity overrides the offline default (name/uuid/real token/msa type)
         if (identity is not null)
         {
             map["${auth_player_name}"] = identity.Name;
@@ -471,12 +471,12 @@ public static class LaunchPipeline
 
         var args = new List<string>();
 
-        var natives = nativesDir.Replace(Path.DirectorySeparatorChar, '/'); // Windows 也接受
+        var natives = nativesDir.Replace(Path.DirectorySeparatorChar, '/'); // Windows accepts this as well
         args.Add($"-Djava.library.path={natives}");
 
         if (root.TryGetProperty("arguments", out var arguments) && arguments.ValueKind == JsonValueKind.Object)
         {
-            // —— JVM 参数(新格式) ——
+            // —— JVM arguments (new format) ——
             if (arguments.TryGetProperty("jvm", out var jvm) && jvm.ValueKind == JsonValueKind.Array)
             {
                 foreach (var item in jvm.EnumerateArray())
@@ -484,14 +484,14 @@ public static class LaunchPipeline
             }
             else
             {
-                // 旧格式兜底
+                // legacy format fallback
                 args.Add("-cp");
                 args.Add(classpath);
             }
 
             args.Add(detail.MainClass);
 
-            // —— 游戏参数 ——
+            // —— Game arguments ——
             if (arguments.TryGetProperty("game", out var game) && game.ValueKind == JsonValueKind.Array)
             {
                 foreach (var item in game.EnumerateArray())
@@ -555,8 +555,8 @@ public static class LaunchPipeline
         }
     }
 
-    /// <summary>arguments.* 的 windows / 无 feature 规则判定(阶段三与 library rules 同一策略)。
-    /// 语义与官方一致:仅当存在命中的 allow 且无命中的 deny 时启用;无任何命中 → 跳过。</summary>
+    /// <summary>windows / no-feature rule evaluation for arguments.* (same strategy as library rules, stage 3).
+    /// Semantics match the official launcher: enabled only when at least one allow rule matches and no deny rule matches; no match → skipped.</summary>
     private static bool EvaluateArgsRules(JsonElement rules)
     {
         bool? allowed = null;

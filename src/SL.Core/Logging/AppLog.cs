@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -16,8 +16,8 @@
 namespace SL.Core.Logging;
 
 /// <summary>
-/// 全局应用日志:启动器自身异常、关键动作的落盘记录。
-/// 每天一个文件,写入失败时静默降级(日志系统自身不允许抛出异常打断业务)。
+/// Global application log: on-disk record of launcher errors and key actions.
+/// One file per day; a write failure degrades silently (the logging system itself must never throw and interrupt business logic).
 /// </summary>
 public static class AppLog
 {
@@ -25,7 +25,7 @@ public static class AppLog
 
     public static string CurrentFile { get; private set; } = "";
 
-    /// <summary>启动时调用一次,建立当日日志文件</summary>
+    /// <summary>Called once at startup to create today log file</summary>
     public static void Initialize()
     {
         try
@@ -33,11 +33,11 @@ public static class AppLog
             Core.Boot.Runtime.EnsureBaseDirectories();
             var dir = Core.Boot.Runtime.LogDir;
             CurrentFile = Path.Combine(dir, $"app-{DateTime.Now:yyyyMMdd}.log");
-            Info("Log", "=== Salmon Launcher 启动 ===");
+            Info("Log", "=== SalmonLauncher 启动 ===");
         }
         catch
         {
-            // 忽略:日志系统不可用时保持静默
+            // Ignore: stay silent while the logging system is unavailable
         }
     }
 
@@ -60,7 +60,7 @@ public static class AppLog
         }
         catch
         {
-            // 忽略
+            // Ignore
         }
     }
 }

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -15,7 +15,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 namespace SL.App.Navigation;
 
-/// <summary>页面注册项:Key 即路由,Title 用于标题栏与面包屑,Hint 为占位说明,PageType 供 Frame 导航。</summary>
+/// <summary>Page registration entry: Key is the route, Title feeds the title bar and breadcrumbs, Hint is placeholder copy, PageType is used by Frame navigation.</summary>
 public sealed record PageSpec(string Key, string Title, string Hint, Type PageType);
 
 public static class PageCatalog
@@ -51,7 +51,7 @@ public static class PageCatalog
     public static PageSpec Get(string key) => All[key];
 }
 
-/// <summary>左导航静态分组(与旧版 NavVM 分组一致,WinUI NavigationView 直接消费)。</summary>
+/// <summary>Static left-nav groups (same grouping as the old NavVM; WinUI NavigationView consumes them directly).</summary>
 public static class NavGroups
 {
     public sealed record Item(string Key, string Label, string Glyph);

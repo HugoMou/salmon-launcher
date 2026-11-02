@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,28 +21,28 @@ using System.Text.RegularExpressions;
 
 namespace SL.Core.Launch;
 
-/// <summary>加载器安装结果:实例 id + 待下载文件清单。</summary>
+/// <summary>Loader install result: instance id + list of files still to download.</summary>
 public sealed record LoaderInstallPlan(
     string InstanceId,
     string MetaPath,
     string JarPath,
     IReadOnlyList<LoaderFile> Files);
 
-/// <summary>加载器安装需要补齐的一个文件。</summary>
+/// <summary>One file that the loader installation needs to fill in.</summary>
 public sealed record LoaderFile(string DisplayName, string Url, string DestPath, string? Sha1, long Size, bool IsLibrary);
 
 /// <summary>
-/// 加载器一键安装:
-/// - Fabric / Quilt:拉取官方 profile JSON,与原版版本 JSON 合并成可直接启动的实例元数据;
-/// - Forge / NeoForge:下载官方 installer 并以 --installClient 就地安装,再合并其产出的版本 JSON。
-/// 两条路径最终都输出「实例元数据 + 核心 jar + 待补齐库清单」。
+/// One-click loader installation:
+/// - Fabric / Quilt: fetch the official profile JSON and merge it with the vanilla version JSON into launch-ready instance metadata;
+/// - Forge / NeoForge: download the official installer, run it in place with --installClient, then merge the version JSON it produces.
+/// Both paths finally output "instance metadata + core jar + list of libraries to fill in".
 /// </summary>
 public static class LoaderInstall
 {
     private static readonly HttpClient Http = CreateHttp(TimeSpan.FromSeconds(30));
     private static readonly HttpClient Downloader = CreateHttp(TimeSpan.FromMinutes(10));
 
-    /// <summary>BMCLAPI 等代理对缺少 User-Agent 的请求直接回 403,必须带上。</summary>
+    /// <summary>Proxies such as BMCLAPI answer 403 outright to requests without a User-Agent, so it must be sent.</summary>
     private static HttpClient CreateHttp(TimeSpan timeout)
     {
         var client = new HttpClient { Timeout = timeout };
@@ -59,10 +59,10 @@ public static class LoaderInstall
     private const string NeoForgeMetadata = "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml";
     private const string NeoForgeInstaller = "https://maven.neoforged.net/releases/net/neoforged/neoforge/{0}/neoforge-{0}-installer.jar";
 
-    /// <summary>BMCLAPI 的 maven 代理(同时覆盖 Forge / NeoForge / Mojang 库)。</summary>
+    /// <summary>BMCLAPI maven proxy (also covers Forge / NeoForge / Mojang libraries).</summary>
     private const string BmclMaven = "https://bmclapi2.bangbang93.com/maven";
 
-    /// <summary>Forge / NeoForge maven 地址 → BMCLAPI 代理;其它地址返回 null。</summary>
+    /// <summary>Forge / NeoForge maven URL → BMCLAPI proxy; other URLs return null.</summary>
     private static string? MirrorUrl(string url)
     {
         if (url.Contains("maven.minecraftforge.net/", StringComparison.Ordinal))
@@ -74,7 +74,7 @@ public static class LoaderInstall
         return null;
     }
 
-    /// <summary>取加载器最新版本号(取不到返回 null)。</summary>
+    /// <summary>Get the latest loader version string (null when unavailable).</summary>
     public static async Task<string?> LatestLoaderAsync(string loader, CancellationToken ct)
     {
         var url = loader.Equals("Quilt", StringComparison.OrdinalIgnoreCase) ? QuiltLoaderList : FabricLoaderList;
@@ -89,21 +89,21 @@ public static class LoaderInstall
                 if (stable && !string.IsNullOrWhiteSpace(version))
                     return version;
             }
-            // 没有标记 stable 的:取第一条
+            // entries not marked stable: take the first one
             if (doc.RootElement.GetArrayLength() > 0
                 && doc.RootElement[0].TryGetProperty("version", out var first))
                 return first.GetString();
         }
         catch
         {
-            // 交给上层提示
+            // leave the hint to the caller
         }
         return null;
     }
 
     /// <summary>
-    /// 生成合并后的实例(元数据 + 核心 jar 副本),返回待下载清单。
-    /// vanillaJson / vanillaJar 指向已安装的原版实例。
+    /// Build the merged instance (metadata + a copy of the core jar) and return the list of files to download.
+    /// vanillaJson / vanillaJar point at the already installed vanilla instance.
     /// </summary>
     public static async Task<LoaderInstallPlan> BuildPlanAsync(
         string loader, string game, string? loaderVersion,
@@ -139,12 +139,12 @@ public static class LoaderInstall
         await File.WriteAllTextAsync(metaPath, merged.ToJsonString(new JsonSerializerOptions { WriteIndented = true }), ct)
             .ConfigureAwait(false);
 
-        // 加载器没有自己的核心 jar,复制原版 jar 作为实例核心
+        // the loader has no core jar of its own, so copy the vanilla jar as the instance core
         var jarPath = Path.Combine(versionDir, instanceId + ".jar");
         if (!File.Exists(jarPath))
         {
             File.Copy(vanillaJarPath, jarPath, overwrite: true);
-            // 复制会沿用原版 jar 的时间戳,这里改成当前时间,否则新实例不会排在实例列表最前
+            // the copy would inherit the vanilla jar timestamp; set it to now, otherwise the new instance will not sort first in the instance list
             File.SetLastWriteTimeUtc(jarPath, DateTime.UtcNow);
         }
 
@@ -169,7 +169,7 @@ public static class LoaderInstall
             ["libraries"] = MergeLibraries(vanilla["libraries"], profile["libraries"]),
         };
 
-        // 新格式(arguments.jvm/game)与原版合并;老版本 Forge 只有 minecraftArguments,原样带上
+        // merge the new format (arguments.jvm/game) with vanilla; old Forge only has minecraftArguments, so carry it over unchanged
         var mergedArgs = MergeArguments(vanilla["arguments"], profile["arguments"]);
         if (mergedArgs["jvm"]!.AsArray().Count > 0 || mergedArgs["game"]!.AsArray().Count > 0)
             merged["arguments"] = mergedArgs;
@@ -179,7 +179,7 @@ public static class LoaderInstall
         return merged;
     }
 
-    /// <summary>加载器参数在前,原版参数在后;两边都是对象形式的 { jvm:[], game:[] }。</summary>
+    /// <summary>Loader arguments first, vanilla arguments after; both sides are in object form { jvm:[], game:[] }.</summary>
     private static JsonObject MergeArguments(JsonNode? vanilla, JsonNode? profile)
     {
         var result = new JsonObject { ["jvm"] = new JsonArray(), ["game"] = new JsonArray() };
@@ -202,7 +202,7 @@ public static class LoaderInstall
         return result;
     }
 
-    /// <summary>加载器库在前(同名覆盖原版),原版库在后;按 name 去重。</summary>
+    /// <summary>Loader libraries first (same name overrides vanilla), vanilla libraries after; deduplicate by name.</summary>
     private static JsonArray MergeLibraries(JsonNode? vanilla, JsonNode? profile)
     {
         var result = new JsonArray();
@@ -215,8 +215,8 @@ public static class LoaderInstall
             var name = lib["name"]?.GetValue<string>() ?? "";
             if (name.Length == 0)
                 return;
-            // 按 group:artifact[:classifier] 去重:同一依赖只留加载器指定的版本,
-            // 否则原版自带的 asm 9.6 会和加载器的 9.10.1 同时在 classpath,Fabric 会拒绝启动。
+            // deduplicate by group:artifact[:classifier]: keep only the version the loader specifies for a dependency,
+            // otherwise vanilla own asm 9.6 and the loader 9.10.1 would both sit on the classpath and Fabric would refuse to start.
             if (!seen.Add(DependencyKey(name)))
                 return;
             result.Add(lib.DeepClone());
@@ -233,7 +233,7 @@ public static class LoaderInstall
         return result;
     }
 
-    /// <summary>maven 坐标的依赖键(忽略版本,保留 classifier)。</summary>
+    /// <summary>Dependency key of a maven coordinate (version ignored, classifier kept).</summary>
     private static string DependencyKey(string name)
     {
         var main = name.Split('@')[0];
@@ -245,9 +245,9 @@ public static class LoaderInstall
     }
 
     /// <summary>
-    /// Fabric / Quilt 的 profile 只给 maven 坐标(name + 仓库根 url),没有 downloads.artifact;
-    /// Forge 产出的元数据里也会出现 artifact 缺 url 的条目。
-    /// 这里统一按坐标补出 artifact(path/url),否则启动器既不会下载也放不进 classpath。
+    /// Fabric / Quilt profiles only give maven coordinates (name + repository root url), without downloads.artifact;
+    /// Forge metadata can also contain entries whose artifact lacks a url.
+    /// Here the artifact (path/url) is synthesized from the coordinate, otherwise the launcher neither downloads it nor puts it on the classpath.
     /// </summary>
     private static void NormalizeArtifacts(JsonArray libraries)
     {
@@ -273,8 +273,8 @@ public static class LoaderInstall
             var downloads = lib["downloads"] as JsonObject ?? new JsonObject();
             if (downloads["artifact"] is JsonObject artifactNode)
             {
-                // 已有 artifact 就不猜 URL:Forge 里 url 为空的条目是安装器 processors
-                // 本地生成的产物(如 forge client jar),填 maven 地址反而会 404。
+                // do not guess a URL when an artifact already exists: entries with an empty url under Forge are installer processors
+                // locally generated products (e.g. the forge client jar); filling in the maven URL would only cause a 404.
                 if (string.IsNullOrWhiteSpace(artifactNode["path"]?.GetValue<string>()))
                     artifactNode["path"] = relative;
             }
@@ -292,7 +292,7 @@ public static class LoaderInstall
         }
     }
 
-    /// <summary>按 groupId 推断 Maven 仓库根。</summary>
+    /// <summary>Infer the Maven repository root from the groupId.</summary>
     private static string RepoFor(string group) => group switch
     {
         var g when g.StartsWith("net.minecraftforge", StringComparison.Ordinal) => "https://maven.minecraftforge.net/",
@@ -302,7 +302,7 @@ public static class LoaderInstall
         _ => "https://repo1.maven.org/maven2/",
     };
 
-    /// <summary>从合并结果里取出需要下载的文件(仅取 artifact,不含 natives 分类器)。</summary>
+    /// <summary>Extract the files that need downloading from the merged result (artifacts only, no natives classifiers).</summary>
     private static List<LoaderFile> CollectFiles(JsonObject merged)
     {
         var files = new List<LoaderFile>();
@@ -335,9 +335,9 @@ public static class LoaderInstall
     // ------------------------------------------------------------ Forge / NeoForge
 
     /// <summary>
-    /// Forge / NeoForge:官方没有独立 profile 接口,只能靠 installer。
-    /// 下载 installer → 用 Java 以 --installClient 装进启动器根目录(库落到共享 libraries)
-    /// → 读取它产出的版本 JSON(带 inheritsFrom)→ 与原版合并成本实例元数据。
+    /// Forge / NeoForge: there is no standalone profile endpoint, only the installer.
+    /// Download the installer → run it with Java and --installClient into the launcher root (libraries land in the shared libraries)
+    /// → read the version JSON it produces (with inheritsFrom) → merge it with vanilla into this instance metadata.
     /// </summary>
     private static async Task<LoaderInstallPlan> InstallWithOfficialInstallerAsync(
         string loader, string game, string? loaderVersion,
@@ -373,8 +373,8 @@ public static class LoaderInstall
         if (!File.Exists(javaExe))
             javaExe = Path.Combine(javaHome, "bin", "javaw.exe");
 
-        // 安装器把目标目录当成 .minecraft:库直接落进共享 libraries,
-        // 版本 JSON 落在 versions\<id>,随后再搬到实例目录。
+        // the installer treats the target directory as .minecraft: libraries go straight into the shared libraries,
+        // and the version JSON lands in versions\<id>, then gets moved into the instance directory.
         var installRoot = Boot.Runtime.Root;
         var profilesFile = Path.Combine(installRoot, "launcher_profiles.json");
         if (!File.Exists(profilesFile))
@@ -382,8 +382,8 @@ public static class LoaderInstall
                 "{\"profiles\":{},\"settings\":{},\"version\":3}", ct).ConfigureAwait(false);
 
         var before = SnapshotVersionDirs(installRoot);
-        // 安装器的库全部来自 maven.neoforged.net / libraries.minecraft.net,国内直连常被拒;
-        // 先用镜像把这些库补进共享 libraries,安装器校验通过后就不会再联网下载。
+        // the installer libraries all come from maven.neoforged.net / libraries.minecraft.net, and direct connections from China are often refused;
+        // pre-fill these libraries into the shared libraries through the mirror, so the installer verifies them without downloading again.
         await PrefetchInstallerLibrariesAsync(installerPath, step, ct).ConfigureAwait(false);
 
         step?.Invoke($"正在运行 {loader} 安装器(会下载数百 MB 依赖,请耐心等待)…");
@@ -410,7 +410,7 @@ public static class LoaderInstall
         await File.WriteAllTextAsync(metaPath,
             merged.ToJsonString(new JsonSerializerOptions { WriteIndented = true }), ct).ConfigureAwait(false);
 
-        // 新版 Forge 不产出客户端 jar(沿用原版);老版本会产出 patch 过的 jar
+        // new Forge does not produce a client jar (it reuses the vanilla one); old versions produce a patched jar
         var jarPath = Path.Combine(versionDir, instanceId + ".jar");
         var installerJar = Path.ChangeExtension(generated, ".jar");
         if (File.Exists(installerJar) && new FileInfo(installerJar).Length > 64 * 1024)
@@ -422,7 +422,7 @@ public static class LoaderInstall
         return new LoaderInstallPlan(instanceId, metaPath, jarPath, CollectFiles(merged));
     }
 
-    /// <summary>从 maven-metadata.xml 里挑出适配该游戏版本的最新加载器版本。</summary>
+    /// <summary>Pick the newest loader version that fits the game version from maven-metadata.xml.</summary>
     private static async Task<string?> ResolveInstallerVersionAsync(bool isNeo, string game, CancellationToken ct)
     {
         var xml = await FetchTextAsync(isNeo ? NeoForgeMetadata : ForgeMetadata, ct).ConfigureAwait(false);
@@ -441,7 +441,7 @@ public static class LoaderInstall
                 .FirstOrDefault();
         }
 
-        // NeoForge 的版本号去掉 1.x 前缀:1.21.5 → 21.5.x
+        // NeoForge version numbers drop the 1.x prefix: 1.21.5 → 21.5.x
         var parts = game.Split('.');
         if (parts.Length < 3)
             return null;
@@ -468,7 +468,7 @@ public static class LoaderInstall
         return 0;
     }
 
-    /// <summary>安装器所需 Java 主版本(1.18+ → 17,1.20.5+ → 21,更早 → 8)。</summary>
+    /// <summary>Java major version required by the installer (1.18+ → 17, 1.20.5+ → 21, earlier → 8).</summary>
     private static int RequiredJavaMajor(string game)
     {
         var parts = game.Split('.');
@@ -561,7 +561,7 @@ public static class LoaderInstall
         }
     }
 
-    /// <summary>取文本:镜像优先,失败再试官方源(每个源各重试一次)。</summary>
+    /// <summary>Fetch text: mirror first, then the official source on failure (each source retried once).</summary>
     private static async Task<string> FetchTextAsync(string url, CancellationToken ct)
     {
         var sources = new List<string>();
@@ -594,8 +594,8 @@ public static class LoaderInstall
     }
 
     /// <summary>
-    /// 读取安装器内的 install_profile.json,把其中列出的库预先补进共享 libraries。
-    /// 安装器随后会校验 sha1 并直接复用,从而绕开被墙的官方 maven。
+    /// Read install_profile.json inside the installer and pre-fill the libraries it lists into the shared libraries.
+    /// The installer then verifies the sha1 and reuses them directly, bypassing the blocked official maven.
     /// </summary>
     private static async Task PrefetchInstallerLibrariesAsync(string installerPath,
         Action<string>? step, CancellationToken ct)
@@ -637,7 +637,7 @@ public static class LoaderInstall
         }
         catch (Exception ex)
         {
-            // install_profile.json 结构异常时不阻断安装器自身流程
+            // a malformed install_profile.json must not break the installer own flow
             Logging.AppLog.Warn("LoaderInstall", "读取 install_profile.json 失败:" + ex.Message);
             return;
         }
@@ -659,7 +659,7 @@ public static class LoaderInstall
         }
     }
 
-    /// <summary>优先走 BMCLAPI 镜像下载单个库,失败再试原始地址;落盘后校验 sha1。</summary>
+    /// <summary>Download a single library through the BMCLAPI mirror first, then the original URL on failure; verify sha1 after writing.</summary>
     private static async Task<bool> TryFetchLibraryAsync(string url, string dest, string sha1, CancellationToken ct)
     {
         var sources = new List<string>();
@@ -667,7 +667,7 @@ public static class LoaderInstall
             sources.Add(mirrorUrl);
         sources.Add(url);
 
-        // 镜像代理偶尔会返回 5xx(上游抖动),每个源重试三次并稍作停顿
+        // the mirror proxy occasionally returns 5xx (upstream hiccup), so retry each source three times with a short pause
         foreach (var source in sources)
         {
             for (var attempt = 1; attempt <= 3; attempt++)

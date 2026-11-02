@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,14 +18,14 @@ using System.Reflection;
 namespace SL.Core.Boot;
 
 /// <summary>
-/// 业务层对本地目录的统一入口。表示层只依赖本类型,
-/// 不直接接触 Data 层的路径类型,以维持 Pres → Core → Data 的单向依赖。
+/// The business layer single entry point for local directories. The presentation layer depends only on this type,
+/// never touching Data-layer path types, which keeps the one-way Pres → Core → Data dependency.
 /// </summary>
 public static class Runtime
 {
-    public const string AppName = "Salmon Launcher";
+    public const string AppName = "SalmonLauncher";
 
-    /// <summary>显示与上报用的版本号:取自程序集信息版本,避免与项目文件里的版本号各写一份。</summary>
+    /// <summary>Version string for display and reporting: read from the assembly info so it is not written twice alongside the project file version.</summary>
     public static string AppVersion { get; } = ResolveVersion();
 
     private static string ResolveVersion()

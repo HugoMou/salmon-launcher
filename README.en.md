@@ -1,4 +1,4 @@
-# Salmon Launcher (SL)
+# SalmonLauncher (SL)
 
 This English README now lives at the repository root: **[README.md](README.md)**.
 

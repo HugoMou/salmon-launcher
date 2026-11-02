@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -26,7 +26,7 @@ using SL.App.Themes;
 
 namespace SL.App.Pages;
 
-/// <summary>配色方案卡片。</summary>
+/// <summary>Color scheme card.</summary>
 public sealed class PaletteCardVM
 {
     public PaletteCardVM(ThemePalette palette, string currentId)
@@ -54,7 +54,7 @@ public sealed class PaletteCardVM
     private static Brush Solid(string hex) => new SolidColorBrush(ThemeManager.FromHex(hex));
 }
 
-/// <summary>强调色圆点。</summary>
+/// <summary>Accent color dot.</summary>
 public sealed class AccentCardVM
 {
     public AccentCardVM(AccentChoice accent, string currentId)
@@ -73,7 +73,7 @@ public sealed class AccentCardVM
     public Visibility RingVisibility { get; }
 }
 
-/// <summary>外观与设置:账户、主题(深浅/配色/强调)、下载并发与协议状态。</summary>
+/// <summary>Appearance and settings: account, theme (light / dark / color scheme / accent), download concurrency, and policy status.</summary>
 public sealed partial class SettingsPage : Page
 {
     private readonly AccountVM _account = new();
@@ -136,7 +136,7 @@ public sealed partial class SettingsPage : Page
         _loading = false;
     }
 
-    /// <summary>显示当前生效的主题组合,便于确认切换结果。</summary>
+    /// <summary>Shows the currently active theme combination to confirm the switch result.</summary>
     private void UpdateThemeSummary(SL.Core.Settings.AppConfig c)
     {
         var palette = ThemeManager.Palettes.FirstOrDefault(p => p.Id == c.Palette) is { } p ? Loc.T(p.Name) : Loc.T("默认");
@@ -184,7 +184,7 @@ public sealed partial class SettingsPage : Page
         Rebuild();
     }
 
-    /// <summary>配色变化后刷新卡片选中态(保持列表数据与主题同步)。</summary>
+    /// <summary>Refresh the card selection state after a color scheme change (keeps list data and theme in sync).</summary>
     private void Rebuild()
     {
         var c = AppServices.Settings.Current;
@@ -214,9 +214,9 @@ public sealed partial class SettingsPage : Page
         AppServices.Settings.Update(c => c.ModrinthMirror = MirrorToggle.IsOn);
     }
 
-    // ---------------------------------------------------------- 清除全部数据
+    // ---------------------------------------------------------- Clear all data
 
-    /// <summary>顺带清除的可选类目:勾选即删,不勾则按 TopEntries 保留对应顶层项。</summary>
+    /// <summary>Optional categories to clear as well: checked means deleted; unchecked keeps the corresponding top-level entries per TopEntries.</summary>
     private sealed record ScopeOption(string Label, string Detail, string[] TopEntries);
 
     private static readonly ScopeOption[] Scopes =
@@ -227,15 +227,15 @@ public sealed partial class SettingsPage : Page
         new("下载与图片缓存", "cache 下的元数据与缩略图", ["cache"]),
     ];
 
-    /// <summary>清除全部数据:先选择顺带清除范围,再经 10 秒冷静期确认,最后清除并退出。</summary>
+    /// <summary>Clear all data: choose the additional scope first, confirm after a 10-second cooling-off period, then clear and exit.</summary>
     private async void OnClearAllData(object sender, RoutedEventArgs e)
     {
-        // 第一步:选择除了启动器数据还顺带清除什么(不选即只清启动器数据)
+        // Step 1: choose what to clear in addition to launcher data (selecting nothing clears only launcher data)
         var keep = await ShowScopeAsync().ConfigureAwait(true);
         if (keep is null)
             return;
 
-        // 第二步:10 秒冷静期,倒计时结束前无法确认
+        // Step 2: 10-second cooling-off period; confirmation is blocked until the countdown ends
         if (!await ShowCooldownAsync(keep).ConfigureAwait(true))
             return;
 
@@ -251,7 +251,7 @@ public sealed partial class SettingsPage : Page
         Application.Current.Exit();
     }
 
-    /// <summary>第一步:勾选要顺带清除的数据;返回要保留的顶层项,null 表示取消。</summary>
+    /// <summary>Step 1: check the data to clear as well; returns the top-level entries to keep, or null if canceled.</summary>
     private async Task<List<string>?> ShowScopeAsync()
     {
         var panel = new StackPanel { Spacing = 12 };
@@ -303,7 +303,7 @@ public sealed partial class SettingsPage : Page
         return keep;
     }
 
-    /// <summary>第二步:10 秒冷静期;期间交代后果并锁住确认按钮,倒计时结束后才允许确认。</summary>
+    /// <summary>Step 2: 10-second cooling-off period; consequences are explained and the confirm button is locked until the countdown ends.</summary>
     private async Task<bool> ShowCooldownAsync(IReadOnlyList<string> keep)
     {
         bool Kept(ScopeOption s) => s.TopEntries.All(e => keep.Contains(e, StringComparer.OrdinalIgnoreCase));
@@ -379,7 +379,7 @@ public sealed partial class SettingsPage : Page
         return result == ContentDialogResult.Primary;
     }
 
-    /// <summary>切换界面语言:保存设置并就地刷新整棵树(菜单/页面/提示)。</summary>
+    /// <summary>Switch UI language: save settings and refresh the whole visual tree in place (menus / pages / tooltips).</summary>
     private void OnLanguageChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_loading || LanguageBox.SelectedIndex < 0 || LanguageBox.SelectedIndex >= Loc.Languages.Count)

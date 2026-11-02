@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,7 +18,7 @@ using System.Runtime.CompilerServices;
 
 namespace SL.App.Infrastructure;
 
-/// <summary>全部 ViewModel 的基类:最小 INPC 实现。</summary>
+/// <summary>Base class for all ViewModels: a minimal INPC implementation.</summary>
 public abstract class VmBase : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -57,7 +57,7 @@ public partial class App : Application
 
     private void Startup()
     {
-        // 上次「清除全部数据」若有被占用删不掉的残留,先补删,再进入正常初始化
+        // If the previous "clear all data" left behind files that were in use and could not be deleted, delete them first, then continue with normal initialization
         Core.Boot.DataReset.RunPending();
 
         Core.Boot.Runtime.EnsureBaseDirectories();

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -28,7 +28,7 @@ using SL.App.Notify;
 
 namespace SL.App.Pages;
 
-/// <summary>模组行(绑定模组列表)。</summary>
+/// <summary>Mod row (bound to the mod list).</summary>
 public sealed class ModRow
 {
     public ModRow(ModInfo info)
@@ -48,7 +48,7 @@ public sealed class ModRow
     public string Glyph { get; }
 }
 
-/// <summary>模组管理页:启停(改 .disabled 后缀)、删除与从本地导入。</summary>
+/// <summary>Mod management page: enable / disable (via the .disabled suffix), delete, and import from local files.</summary>
 public sealed partial class InstanceModsPage : Page
 {
     private readonly ObservableCollection<InstancePick> _picks = [];

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -27,7 +27,7 @@ using SL.App.Notify;
 
 namespace SL.App.Pages;
 
-/// <summary>实例列表中的一行。</summary>
+/// <summary>A row in the instance list.</summary>
 public sealed class InstanceRow
 {
     public InstanceRow(InstanceInfo info)
@@ -42,7 +42,7 @@ public sealed class InstanceRow
     public override string ToString() => Id;
 }
 
-/// <summary>主页视图模型:实例选择、账户身份、一键启动与快捷入口。</summary>
+/// <summary>Home view model: instance selection, account identity, one-click launch, and shortcuts.</summary>
 public sealed class HomeVM : VmBase
 {
     private readonly DispatcherQueue _ui = DispatcherQueue.GetForCurrentThread();
@@ -55,7 +55,7 @@ public sealed class HomeVM : VmBase
         OpenDiagCommand = new RelayCommand(() => AppServices.Nav.Navigate("tools.diag"));
         OpenLogsCommand = new RelayCommand(() => AppServices.Nav.Navigate("tools.log"));
         OpenAccountCommand = new RelayCommand(() => AppServices.Nav.Navigate("st.launch"));
-        //欢迎页里创建/登录账户后主页卡片要立即跟上(此时还没离开过主页,不会走再入刷新)
+        // After creating / signing in to an account in the welcome page, the home card must update immediately (the user has not left home yet, so re-entry refresh will not run)
         AppServices.Settings.Changed += _ => RefreshAccount();
         Refresh();
     }
@@ -119,7 +119,7 @@ public sealed class HomeVM : VmBase
         foreach (var row in fresh)
             Instances.Add(row);
 
-        // 集合重建后强制通知一次,避免 ComboBox 先绑定 SelectedItem 时丢选中
+        // Force one notification after rebuilding the collection to avoid losing selection when the ComboBox binds SelectedItem first
         SelectedInstance = null;
         SelectedInstance = fresh.FirstOrDefault(r => r.Id == _lastSelectedId) ?? fresh.FirstOrDefault();
         _lastSelectedId = SelectedInstance?.Id;

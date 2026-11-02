@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,8 +18,8 @@ using SL.Core.Boot;
 namespace SL.Core.Settings;
 
 /// <summary>
-/// 配置服务:包装 Data 层的原子 JSON 存储。
-/// UI 或其他模块修改配置时统一经过此处,保证落盘与变更通知一致。
+/// Settings service: wraps the atomic JSON store of the Data layer.
+/// The UI and other modules always change configuration through this class, keeping persistence and change notification consistent.
 /// </summary>
 public sealed class SettingsService : ISettingsService
 {
@@ -42,7 +42,7 @@ public sealed class SettingsService : ISettingsService
         AppConfig before = Clone(_current);
         mutate(_current);
 
-        // 原子落盘(失败时不抛出致命异常,仅记录日志:配置丢失不应打断用户操作)
+        // atomic write (no fatal exception on failure, only a log entry: losing config must not interrupt the user operation)
         try
         {
             _store.Save(Map(_current));

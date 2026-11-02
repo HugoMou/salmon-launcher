@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -19,21 +19,21 @@ using Windows.Storage.Streams;
 
 namespace SL.App.Themes;
 
-/// <summary>一个可取的 Minecraft 方块纹理。</summary>
+/// <summary>A selectable Minecraft block texture.</summary>
 public sealed record BlockSource(string Id, string Name, string File, string Hint);
 
-/// <summary>从一个方块纹理里提取出的配色方案。</summary>
+/// <summary>A color scheme extracted from a block texture.</summary>
 public sealed record BlockThemeResult(string DominantHex, ThemePalette Palette, AccentChoice Accent);
 
 /// <summary>
-/// 主题工坊:从 Minecraft 客户端 jar 或在线材质镜像取出方块纹理,
-/// 统计主色后推导出一整套界面配色(深色 + 浅色),交给 ThemeManager 应用。
+/// Theme workshop: fetch block textures from the Minecraft client jar or online asset mirrors,
+/// then derive a full UI color scheme (dark + light) from the dominant color and hand it to ThemeManager to apply.
 /// </summary>
 public static class BlockTheme
 {
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(8) };
 
-    /// <summary>在线材质镜像(按版本目录组织,取第一个可用的)。</summary>
+    /// <summary>Online asset mirrors (organized by version directory; the first available one is used).</summary>
     private static readonly string[] Mirrors =
     [
         "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.4/assets/minecraft/textures/block/{0}",
@@ -41,7 +41,7 @@ public static class BlockTheme
         "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.4/assets/minecraft/textures/block/{0}",
     ];
 
-    /// <summary>可供取色的方块清单。</summary>
+    /// <summary>List of blocks available for color sampling.</summary>
     public static IReadOnlyList<BlockSource> Blocks { get; } =
     [
         new("grass", "草方块", "grass_block_top.png", "地表绿"),
@@ -62,7 +62,7 @@ public static class BlockTheme
         new("copper", "铜块", "copper_block.png", "氧化铜橙"),
     ];
 
-    /// <summary>纹理缓存目录。</summary>
+    /// <summary>Texture cache directory.</summary>
     private static string CacheDir
     {
         get
@@ -74,8 +74,8 @@ public static class BlockTheme
     }
 
     /// <summary>
-    /// 取到纹理文件(优先已安装客户端的原始贴图,没有安装时改用在线材质镜像)。
-    /// 返回本地 png 路径;都失败返回 null。
+    /// Obtain the texture file (preferring the original texture from an installed client, falling back to online mirrors when none is installed).
+    /// Returns the local png path; returns null if all attempts fail.
     /// </summary>
     public static async Task<string?> EnsureTextureAsync(BlockSource block, CancellationToken ct = default)
     {
@@ -83,11 +83,11 @@ public static class BlockTheme
         if (File.Exists(dest) && new FileInfo(dest).Length > 1024)
             return dest;
 
-        // 1) 本地客户端 jar(即时且离线可用)
+        // 1) Local client jar (immediate and available offline)
         if (TryExtractFromJar(block.File, dest))
             return dest;
 
-        // 2) 在线镜像
+        // 2) Online mirrors
         foreach (var mirror in Mirrors)
         {
             var url = string.Format(mirror, block.File);
@@ -102,7 +102,7 @@ public static class BlockTheme
             }
             catch
             {
-                // 换下一个镜像
+                // Try the next mirror
             }
         }
 
@@ -124,7 +124,7 @@ public static class BlockTheme
             }
             catch
             {
-                // 忽略损坏的 jar
+                // Ignore corrupted jars
             }
         }
         return false;
@@ -146,7 +146,7 @@ public static class BlockTheme
         }
     }
 
-    /// <summary>读取纹理主色(统计不透明像素的平均色)。</summary>
+    /// <summary>Read the texture's dominant color (average color of opaque pixels).</summary>
     public static async Task<(byte R, byte G, byte B)?> AverageColorAsync(string path)
     {
         try
@@ -192,7 +192,7 @@ public static class BlockTheme
         }
     }
 
-    /// <summary>根据方块主色生成一整套主题(深/浅两套色板 + 强调色)。</summary>
+    /// <summary>Generate a full theme from the block's dominant color (dark/light palettes + accent).</summary>
     public static BlockThemeResult Build(string blockId, string blockName, byte r, byte g, byte b)
     {
         var (h, s, _) = ToHsl(r, g, b);
@@ -242,7 +242,7 @@ public static class BlockTheme
         return new BlockThemeResult(Hsl(h, s, 0.55), palette, accent);
     }
 
-    // ---------------------------------------------------------- 颜色换算
+    // ---------------------------------------------------------- Color conversion
 
     private static (double H, double S, double L) ToHsl(byte r, byte g, byte b)
     {

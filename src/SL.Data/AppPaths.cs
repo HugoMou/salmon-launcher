@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -16,8 +16,8 @@
 namespace SL.Data;
 
 /// <summary>
-/// 启动器本地目录布局。所有持久化数据都集中在此根目录下,按功能分目录。
-/// 数据访问层只负责提供路径与目录初始化,不关心用途。
+/// Launcher local directory layout. All persisted data is stored under this root, organized into subdirectories by function.
+/// The data access layer only provides paths and directory initialization; it does not care about their purpose.
 /// </summary>
 public static class AppPaths
 {

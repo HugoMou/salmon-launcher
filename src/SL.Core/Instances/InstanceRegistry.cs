@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -17,23 +17,23 @@ using System.IO;
 
 namespace SL.Core.Instances;
 
-/// <summary>已安装实例(磁盘事实,非演示)。</summary>
-/// <param name="InstanceId">目录名 = 版本 ID</param>
-/// <param name="InstalledAt">核心 jar 落盘时间</param>
-/// <param name="SizeMb">实例目录近似体积</param>
+/// <summary>An installed instance (disk fact, not demo data).</summary>
+/// <param name="InstanceId">Directory name = version ID</param>
+/// <param name="InstalledAt">When the core jar was written to disk</param>
+/// <param name="SizeMb">Approximate size of the instance directory</param>
 public sealed record InstanceInfo(string InstanceId, DateTimeOffset InstalledAt, long SizeMb);
 
-/// <summary>实例内的模组(mods 目录下的 .jar / .disabled)。</summary>
-/// <param name="FileName">实际文件名(含 .disabled 后缀)</param>
-/// <param name="BaseName">去掉 .disabled 的显示名</param>
+/// <summary>Mods inside an instance (.jar / .disabled under the mods directory).</summary>
+/// <param name="FileName">Actual file name (including the .disabled suffix)</param>
+/// <param name="BaseName">Display name with .disabled removed</param>
 /// <param name="SizeBytes"></param>
-/// <param name="Enabled">.disabled 后缀不存在即为启用</param>
+/// <param name="Enabled">Enabled means the .disabled suffix is absent</param>
 /// <param name="ModifiedAt"></param>
 public sealed record ModInfo(string FileName, string BaseName, long SizeBytes, bool Enabled, DateTimeOffset ModifiedAt);
 
 /// <summary>
-/// 阶段四:实例注册表。阶段二建立的三层目录事实为准;
-/// 模组文件启用/停用(改 .disabled 后缀)/删除/导入都在本层收口,Pres 只调用。
+/// Stage 4: instance registry. The three-tier directory layout established in stage 2 is the source of truth;
+/// mod enable/disable (renaming the .disabled suffix) / delete / import all converge in this layer, and Pres only calls it.
 /// </summary>
 public static class InstanceRegistry
 {
@@ -65,14 +65,14 @@ public static class InstanceRegistry
         return list.OrderByDescending(i => i.InstalledAt).ToList();
     }
 
-    /// <summary>最近安装完成的实例(启动流水线默认目标)。</summary>
+    /// <summary>Most recently installed instance (default target of the launch pipeline).</summary>
     public static InstanceInfo? Latest()
     {
         var all = List();
         return all.Count > 0 ? all[0] : null;
     }
 
-    // ------------------------------------------------------------ 模组
+    // ------------------------------------------------------------ Mods
 
     public static string ModsDirOf(string instanceId)
         => Path.Combine(Boot.Runtime.InstancesDir, instanceId, "mods");
@@ -99,7 +99,7 @@ public static class InstanceRegistry
         return list.OrderByDescending(m => m.Enabled).ThenByDescending(m => m.ModifiedAt).ToList();
     }
 
-    /// <summary>切启用/停用:追加或去掉 .disabled 后缀(文件系统即状态)。返回切换后的启用态。</summary>
+    /// <summary>Toggle enable/disable: append or strip the .disabled suffix (the file system is the state). Returns the enabled state after toggling.</summary>
     public static bool ToggleMod(string instanceId, string fileName)
     {
         var dir = ModsDirOf(instanceId);
@@ -113,14 +113,14 @@ public static class InstanceRegistry
             if (File.Exists(renamed))
                 throw new IOException($"目标已存在:{Path.GetFileName(renamed)}");
             Directory.Move(path, renamed);
-            return true; // 重命名后即启用
+            return true; // enabled as soon as the rename succeeds
         }
 
         var disabled = path + ".disabled";
         if (File.Exists(disabled))
             throw new IOException($"目标已存在:{Path.GetFileName(disabled)}");
         Directory.Move(path, disabled);
-        return false; // 停用成功
+        return false; // disable succeeded
     }
 
     public static void DeleteMod(string instanceId, string fileName)
@@ -130,7 +130,7 @@ public static class InstanceRegistry
             File.Delete(path);
     }
 
-    /// <summary>从本地导入(复制,不移动;同名 → 覆盖前重命名 带序号)。</summary>
+    /// <summary>Import from a local file (copy, never move; on a name clash, rename with a sequence number before overwriting).</summary>
     public static string ImportMod(string instanceId, string sourcePath)
     {
         if (!File.Exists(sourcePath))
@@ -154,12 +154,12 @@ public static class InstanceRegistry
     public static string InstanceDirOf(string instanceId)
         => Path.Combine(Boot.Runtime.InstancesDir, instanceId);
 
-    // ------------------------------------------------------------ 存档(阶段四收尾)
+    // ------------------------------------------------------------ Saves (stage 4 wrap-up)
 
-    /// <summary>存档条目。</summary>
-    /// <param name="Name">世界名(saves 下的目录名)</param>
-    /// <param name="LastPlayed">目录最近写入时间</param>
-    /// <param name="SizeMb">世界目录体积</param>
+    /// <summary>A save entry.</summary>
+    /// <param name="Name">World name (directory name under saves)</param>
+    /// <param name="LastPlayed">Last write time of the directory</param>
+    /// <param name="SizeMb">Size of the world directory</param>
     public sealed record SaveInfo(string Name, DateTimeOffset LastPlayed, long SizeMb);
 
     public static IReadOnlyList<SaveInfo> ListSaves(string instanceId)
@@ -186,7 +186,7 @@ public static class InstanceRegistry
         return list.OrderByDescending(s => s.LastPlayed).ToList();
     }
 
-    /// <summary>备份 saves 目录为 zip(backups/saves-yyyyMMdd-HHmmss.zip);返回备份路径;无存档返回 null。</summary>
+    /// <summary>Back up the saves directory as a zip (backups/saves-yyyyMMdd-HHmmss.zip); returns the backup path, or null when there are no saves.</summary>
     public static string? BackupSaves(string instanceId, CancellationToken cancellation = default)
     {
         var savesDir = Path.Combine(InstanceDirOf(instanceId), "saves");

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -19,15 +19,15 @@ using SL.App.Localization;
 namespace SL.App.Infrastructure;
 
 /// <summary>
-/// Java 环境状态:应用启动时后台扫描一次,结果供启动面板 / 实例概览展示。
-/// 异步推送通过 Changed 事件触发绑定刷新,不阻塞启动。
+/// Java environment state: scanned once in the background at app startup; results are shown in the launch panel / instance overview.
+/// Asynchronous updates raise the Changed event to refresh bindings without blocking startup.
 /// </summary>
 public static class JavaEnv
 {
     private static string _statusText = Loc.T("Java:扫描中…");
     private static string _detailText = "";
 
-    /// <summary>一句话状态(启动面板显示)。</summary>
+    /// <summary>One-line status (shown in the launch panel).</summary>
     public static string StatusText
     {
         get => _statusText;
@@ -41,7 +41,7 @@ public static class JavaEnv
         }
     }
 
-    /// <summary>附加详情(首选路径 / 数量)。</summary>
+    /// <summary>Additional details (preferred path / count).</summary>
     public static string DetailText
     {
         get => _detailText;
@@ -52,15 +52,15 @@ public static class JavaEnv
         }
     }
 
-    /// <summary>最近一次扫描到的最佳运行时(启动流程使用)。</summary>
+    /// <summary>Best runtime found by the latest scan (used by the launch flow).</summary>
     public static JavaInstall? Best { get; private set; }
 
     public static event Action? Changed;
 
-    /// <summary>启动时扫描一次(不抛出)。</summary>
+    /// <summary>Scan once at startup (does not throw).</summary>
     public static async void Warm() => await RescanAsync().ConfigureAwait(true);
 
-    /// <summary>重新扫描(自动装完 JDK / 游戏退出后调用,状态推给绑定)。不抛出。</summary>
+    /// <summary>Rescan (called after auto-installing a JDK / when the game exits; status is pushed to bindings). Does not throw.</summary>
     public static async Task RescanAsync()
     {
         try

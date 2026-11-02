@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -19,8 +19,8 @@ using System.Text;
 namespace SL.Data.Storage;
 
 /// <summary>
-/// 网络图片的本地文件缓存,按 URL 哈希组织文件名。
-/// 由业务层封装后供 MyImage 等控件使用。
+/// Local file cache for network images, with file names derived from URL hashes.
+/// Wrapped by the business layer for use by controls such as MyImage.
 /// </summary>
 public sealed class ImageCache
 {
@@ -64,7 +64,7 @@ public sealed class ImageCache
         }
         catch
         {
-            // 缓存写入失败不致命:下次仍会走网络。
+            // A failed cache write is not fatal: the next request will hit the network again.
         }
     }
 }

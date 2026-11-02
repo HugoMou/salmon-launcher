@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -228,8 +228,8 @@ public static partial class Loc
         ["Java 环境"] = "Java 環境",
         ["latest.log 尾部查看"] = "latest.log の末尾を表示",
         ["MB(建议 4096;模组较多可上调)"] = "MB（4096 推奨、Mod が多い場合は増やす）",
-        ["Salmon Launcher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。"] = "Salmon Launcher は無償の第三者ツールで、Mojang Studios や Microsoft との提携・許諾関係はありません。Minecraft は Mojang Studios の商標です。",
-        ["Salmon Launcher(以下简称「本软件」)是一款用于管理、安装与启动 Minecraft 的第三方桌面工具。本协议是你与本软件作者之间关于使用本软件的约定。若你不同意其中任何条款,请停止使用并删除本软件。"] = "Salmon Launcher（以下「本ソフト」）は Minecraft の管理・導入・起動を行う第三者のデスクトップツールです。本規約はあなたと作者との間の合意です。同意できない場合は使用を中止し、本ソフトを削除してください。",
+        ["SalmonLauncher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。"] = "SalmonLauncher は無償の第三者ツールで、Mojang Studios や Microsoft との提携・許諾関係はありません。Minecraft は Mojang Studios の商標です。",
+        ["SalmonLauncher(以下简称「本软件」)是一款用于管理、安装与启动 Minecraft 的第三方桌面工具。本协议是你与本软件作者之间关于使用本软件的约定。若你不同意其中任何条款,请停止使用并删除本软件。"] = "SalmonLauncher（以下「本ソフト」）は Minecraft の管理・導入・起動を行う第三者のデスクトップツールです。本規約はあなたと作者との間の合意です。同意できない場合は使用を中止し、本ソフトを削除してください。",
 
         // ナビゲーション
         ["启动"] = "起動",
@@ -280,7 +280,7 @@ public static partial class Loc
         ["退出"] = "終了",
         ["当前:"] = "現在: ",
         ["安装概览"] = "インストール内容の確認",
-        ["欢迎使用 Salmon Launcher"] = "Salmon Launcher へようこそ",
+        ["欢迎使用 SalmonLauncher"] = "SalmonLauncher へようこそ",
         ["选择语言"] = "言語を選択",
         ["选择启动器的界面语言,选择后立即生效;之后可随时在「外观与设置」中更改。"] = "ランチャーの表示言語を選択してください。すぐに反映され、「外観と設定」でいつでも変更できます。",
         ["条款"] = "規約",
@@ -296,7 +296,7 @@ public static partial class Loc
         ["上一步"] = "戻る",
         ["开始使用"] = "使い始める",
         ["已完成"] = "完了",
-        ["恭喜你完成所有设置了,你现在可以使用 Salmon Launcher 了"] = "すべての設定が完了しました。Salmon Launcher を使い始められます！",
+        ["恭喜你完成所有设置了,你现在可以使用 SalmonLauncher 了"] = "すべての設定が完了しました。SalmonLauncher を使い始められます！",
         ["语言、条款、账户与主题都已配置完成,现在可以开始使用了。"] = "言語、規約、アカウント、テーマの設定が完了しました。すぐに使い始められます。",
 
         // ウェルカム画面のテーマ手順(テーマ工房)
@@ -312,7 +312,7 @@ public static partial class Loc
         ["· 游戏文件从官方源与公开镜像下载,本软件不内置、不分发游戏本体。"] = "· ゲームファイルは公式と公開ミラーから取得し、ゲーム本体の同梱・配布は行いません。",
         ["· 软件按「现状」提供,重要操作前请自行备份存档与实例。"] = "· 本ソフトは現状のまま提供されます。重要な操作の前にセーブとインスタンスをバックアップしてください。",
         ["一、总则与适用范围"] = "1. 総則と適用範囲",
-        ["1. Salmon Launcher(以下简称「本软件」)是一款用于管理、安装与启动 Minecraft 的第三方桌面工具。本协议是你与本软件作者之间关于使用本软件的约定。若你不同意其中任何条款,请停止使用并删除本软件。"] = "1. Salmon Launcher（以下「本ソフト」）は、Minecraft の管理・導入・起動を行う無償の第三者デスクトップツールです。本規約はあなたと作者との間の合意です。同意できない条項がある場合は使用を中止し、本ソフトを削除してください。",
+        ["1. SalmonLauncher(以下简称「本软件」)是一款用于管理、安装与启动 Minecraft 的第三方桌面工具。本协议是你与本软件作者之间关于使用本软件的约定。若你不同意其中任何条款,请停止使用并删除本软件。"] = "1. SalmonLauncher（以下「本ソフト」）は、Minecraft の管理・導入・起動を行う無償の第三者デスクトップツールです。本規約はあなたと作者との間の合意です。同意できない条項がある場合は使用を中止し、本ソフトを削除してください。",
         ["1. 本软件会访问 Mojang 版本元数据、BMCLAPI 镜像、Modrinth 接口、GitHub 与 Eclipse Temurin 等第三方服务。这些服务由其运营方独立提供,并适用各自的条款与隐私政策,本软件不对其可用性与内容承担责任。"] = "1. 本ソフトは Mojang のメタデータ、BMCLAPI、Modrinth、GitHub、Eclipse Temurin などの第三者サービスを利用します。これらは各運営者が独自に提供するもので、可用性や内容について本ソフトは責任を負いません。",
         ["2. 本协议适用于启动器本体及其提供的全部功能,包括版本安装、实例管理、内容下载、账户管理、联机、主题与崩溃诊断。游戏本体不在本协议范围内,其使用须遵守 Mojang Studios 的最终用户许可协议。"] = "2. 本規約はランチャー本体と、バージョン導入・インスタンス管理・コンテンツ取得・アカウント・マルチプレイ・テーマ・クラッシュ解析を含む全機能に適用されます。ゲーム本体は対象外で、Mojang Studios の使用許諾契約に従います。",
         ["3. 本协议自你首次安装或首次启动本软件之日起生效;当前条款版本 1.0,最近更新于 2026 年 10 月。"] = "3. 本規約は本ソフトを最初にインストールまたは起動した日から有効になります。現行版は 1.0、最終更新は 2026 年 10 月です。",
@@ -434,9 +434,9 @@ public static partial class Loc
         // 著作権 / GPL ライセンス(規約ページと概要ページ)
         ["3. 本软件以 GNU General Public License(GPL)第 3 版或其更新版本许可发布;你可以自由运行、研究、修改与再分发本软件(包括收费分发),但须遵守 GPL 条款。"] = "3. 本ソフトウェアは GNU General Public License 第 3 版(またはそれ以降)で公開されています。GPL に従う限り、実行・研究・改変・再配布(有償配布を含む)が自由に認められます。",
         ["4. 再分发时须保留版权声明与许可声明,并向接收者提供完整对应的源代码;许可证全文见项目根目录的 LICENSE 文件与 https://www.gnu.org/licenses/gpl-3.0.html。"] = "4. 再配布時は著作権表示とライセンス表示を保持し、受け取り手に対応する完全なソースコードを提供する必要があります。ライセンス全文はプロジェクト直下の LICENSE ファイルおよび https://www.gnu.org/licenses/gpl-3.0.html にあります。",
-        ["5. Copyright (C) 2026 Hugo Mou. Salmon Launcher 及其源代码的版权归作者所有,保留所有权利。"] = "5. Copyright (C) 2026 Hugo Mou. Salmon Launcher およびそのソースコードの著作権は作者に帰属し、すべての権利が保留されています。",
+        ["5. Copyright (C) 2026 Hugo Mou. SalmonLauncher 及其源代码的版权归作者所有,保留所有权利。"] = "5. Copyright (C) 2026 Hugo Mou. SalmonLauncher およびそのソースコードの著作権は作者に帰属し、すべての権利が保留されています。",
         ["Copyright (C) 2026 Hugo Mou · 本项目以 GNU GPL v3 或更新版本发布;完整许可证见项目根目录 LICENSE,源代码见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · GNU GPL v3 以降で公開されています。ライセンス全文はプロジェクト直下の LICENSE、ソースコードはプロジェクトリポジトリにあります。",
-        ["Copyright (C) 2026 Hugo Mou · Salmon Launcher 以 GNU GPL v3 或更新版本许可发布;源代码与许可证全文见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · Salmon Launcher は GNU GPL v3 以降で公開されています。ソースコードとライセンス全文はプロジェクトリポジトリにあります。",
+        ["Copyright (C) 2026 Hugo Mou · SalmonLauncher 以 GNU GPL v3 或更新版本许可发布;源代码与许可证全文见项目仓库。"] = "Copyright (C) 2026 Hugo Mou · SalmonLauncher は GNU GPL v3 以降で公開されています。ソースコードとライセンス全文はプロジェクトリポジトリにあります。",
         [" · 当前使用"] = " · 使用中",
         [" · 已停用"] = " · 無効",
         [" · 已选 {0}"] = " · 選択中 {0}",

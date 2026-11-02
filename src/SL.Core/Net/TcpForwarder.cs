@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,10 +20,10 @@ using System.Text;
 namespace SL.Core.Net;
 
 /// <summary>
-/// TCP 端口转发 —— 联机功能的实际承载:
-/// 在本机监听一个端口,把每条外部连接双向转发到目标 host:port。
-/// 「自建中继」转发到本机服务器,「添加中继服务器」转发到远端中继地址。
-/// 只搬运字节流,不解析游戏协议。
+/// TCP port forwarding — the actual carrier of the multiplayer feature:
+/// listen on one port on this machine and forward every inbound connection bidirectionally to the target host:port.
+/// "Self-hosted relay" forwards to a local server; "Add relay server" forwards to a remote relay address.
+/// Only bytes are moved; the game protocol is never parsed.
 /// </summary>
 public sealed class TcpForwarder : IDisposable
 {
@@ -52,7 +52,7 @@ public sealed class TcpForwarder : IDisposable
     public long UpBytes => Interlocked.Read(ref _upBytes);
     public long DownBytes => Interlocked.Read(ref _downBytes);
 
-    /// <summary>启动监听;listenPort 传 0 由系统分配。失败原因写入 error。</summary>
+    /// <summary>Start listening; listenPort 0 lets the system assign a port. The failure reason is written to error.</summary>
     public bool Start(int listenPort, string targetHost, int targetPort, out string error)
     {
         error = "";
@@ -75,7 +75,7 @@ public sealed class TcpForwarder : IDisposable
             _listener.Start();
             ListenPort = ((IPEndPoint)_listener.LocalEndpoint).Port;
 
-            // 本机目标 + 同端口 = 自我回环,会把连接无限复制下去,直接拒绝
+            // local target + same port = a self-loop that would replicate connections forever, so reject it outright
             if (IsLoopback(_targetHost) && ListenPort == _targetPort)
             {
                 _listener.Stop();
@@ -178,7 +178,7 @@ public sealed class TcpForwarder : IDisposable
         catch (Exception) { }
         finally
         {
-            // 单向结束后通知对端半关闭,让另一方自然收尾
+            // once one direction ends, half-close the peer so the other side can wind down naturally
             try { to.Socket.Shutdown(SocketShutdown.Send); } catch { }
         }
     }
@@ -210,10 +210,10 @@ public sealed class TcpForwarder : IDisposable
     private sealed record Connection(TcpClient Inbound, TcpClient Outbound);
 }
 
-/// <summary>局域网里被玩家「对局域网开放」的存档(来自 Minecraft 的组播公告)。</summary>
-/// <param name="Address">房主 IP</param>
-/// <param name="Port">房间端口</param>
-/// <param name="Motd">存档/房间名</param>
+/// <summary>Worlds opened to LAN by a player (from Minecraft multicast announcements).</summary>
+/// <param name="Address">Host IP</param>
+/// <param name="Port">Room port</param>
+/// <param name="Motd">Save/room name</param>
 public sealed record McLanWorld(string Address, int Port, string Motd)
 {
     public string Key => $"{Address}:{Port}";
@@ -221,8 +221,8 @@ public sealed record McLanWorld(string Address, int Port, string Motd)
 }
 
 /// <summary>
-/// Minecraft 原生局域网发现:监听 224.0.2.60:4445 的组播公告
-/// (<c>[MOTD]名称[/MOTD][AD]端口[/AD]</c>),即游戏「对局域网开放」后广播的内容。
+/// Minecraft native LAN discovery: listen for multicast announcements on 224.0.2.60:4445
+/// (<c>[MOTD]name[/MOTD][AD]port[/AD]</c>), i.e. what the game broadcasts after "Open to LAN".
 /// </summary>
 public sealed class McLanScanner : IDisposable
 {
@@ -232,10 +232,10 @@ public sealed class McLanScanner : IDisposable
     private UdpClient? _udp;
     private CancellationTokenSource? _cts;
 
-    /// <summary>发现房间(线程池线程触发,订阅方自行调度 UI)。</summary>
+    /// <summary>Discover rooms (fires on thread-pool threads; subscribers marshal to the UI themselves).</summary>
     public event Action<McLanWorld>? Found;
 
-    /// <summary>扫描不可用(端口被占用等)时回调原因。</summary>
+    /// <summary>Reason callback when scanning is unavailable (port already in use, etc.).</summary>
     public event Action<string>? Failed;
 
     public bool Running => _udp is not null;
@@ -286,13 +286,13 @@ public sealed class McLanScanner : IDisposable
                 }
                 catch (Exception)
                 {
-                    // 单条坏包不影响后续监听
+                    // one bad packet does not affect subsequent listening
                 }
             }
         }, token);
     }
 
-    /// <summary>解析 MC 组播公告,格式: [MOTD]名称[/MOTD][AD]端口[/AD]</summary>
+    /// <summary>Parse an MC multicast announcement, format: [MOTD]name[/MOTD][AD]port[/AD]</summary>
     public static McLanWorld? Parse(string payload, IPAddress source)
     {
         var motd = Between(payload, "[MOTD]", "[/MOTD]");

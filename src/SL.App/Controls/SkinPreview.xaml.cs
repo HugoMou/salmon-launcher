@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -27,8 +27,8 @@ using Windows.UI;
 namespace SL.App.Controls;
 
 /// <summary>
-/// 皮肤 3D 预览:按 Minecraft 皮肤 UV 布局把 6 个长方体(头/身/双臂/双腿)拆成小色块,
-/// 用画布多边形做正交投影 + 画家算法排序,拖动可水平旋转。不依赖第三方 3D 库。
+/// Skin 3D preview: splits the six cuboids (head/body/arms/legs) into small color cells following the Minecraft skin UV layout,
+/// then renders canvas polygons with orthographic projection and painter's-algorithm sorting; drag to rotate horizontally. No third-party 3D library.
 /// </summary>
 public sealed partial class SkinPreview : UserControl
 {
@@ -48,7 +48,7 @@ public sealed partial class SkinPreview : UserControl
         InitializeComponent();
     }
 
-    /// <summary>载入皮肤文件并渲染。</summary>
+    /// <summary>Load a skin file and render it.</summary>
     public async Task LoadAsync(string path)
     {
         try
@@ -85,7 +85,7 @@ public sealed partial class SkinPreview : UserControl
         Surface.Children.Clear();
     }
 
-    // ------------------------------------------------------------ 交互
+    // ------------------------------------------------------------ Interaction
 
     private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
     {
@@ -118,7 +118,7 @@ public sealed partial class SkinPreview : UserControl
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e) => Render();
 
-    // ------------------------------------------------------------ 渲染
+    // ------------------------------------------------------------ Rendering
 
     private sealed record Part(string Name, double X, double Y, double Z,
         double W, double H, double D, int U, int V);
@@ -154,7 +154,7 @@ public sealed partial class SkinPreview : UserControl
 
         (double X, double Y, double Z) Project(double x, double y, double z)
         {
-            // 模型居中:身体纵向 -8..24 → 平移 -8
+            // Center the model: body spans -8..24 vertically → shift by -8
             y -= 8;
             var x1 = x * cosY - z * sinY;
             var z1 = x * sinY + z * cosY;
@@ -169,7 +169,7 @@ public sealed partial class SkinPreview : UserControl
             var hy = part.H / 2;
             var hz = part.D / 2;
 
-            // UV 块:宽 = 2w+2d,高 = h+2d
+            // UV block: width = 2w+2d, height = h+2d
             var u = part.U;
             var v = part.V;
             var d = (int)part.D;
@@ -199,7 +199,7 @@ public sealed partial class SkinPreview : UserControl
 
             foreach (var face in faceDefs)
             {
-                // 法线朝向剔除
+                // Cull back-facing normals
                 var (nx1, _, nz1) = RotateNormal(face.Normal, cosY, sinY, cosP, sinP);
                 if (nz1 <= 0.001)
                     continue;
@@ -252,7 +252,7 @@ public sealed partial class SkinPreview : UserControl
             }
         }
 
-        // 画家算法:远(深度小)先画
+        // Painter's algorithm: draw far faces (small depth) first
         foreach (var (polygon, _) in faces.OrderBy(f => f.Depth))
             Surface.Children.Add(polygon);
     }
@@ -272,7 +272,7 @@ public sealed partial class SkinPreview : UserControl
         (double X, double Y, double Z) p2, (double X, double Y, double Z) p3,
         double s, double t)
     {
-        // p0=左上 p1=右上 p2=右下 p3=左下
+        // p0=top-left p1=top-right p2=bottom-right p3=bottom-left
         var topX = p0.X + (p1.X - p0.X) * s;
         var topY = p0.Y + (p1.Y - p0.Y) * s;
         var bottomX = p3.X + (p2.X - p3.X) * s;

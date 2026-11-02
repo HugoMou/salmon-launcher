@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -28,7 +28,7 @@ using SL.App.Notify;
 
 namespace SL.App.Pages;
 
-/// <summary>侧边栏用户条目(来自本机账户仓库)。</summary>
+/// <summary>Sidebar user entry (from the local account repository).</summary>
 public sealed class SkinUserRow
 {
     public SkinUserRow(string id, string name, string detail, string glyph)
@@ -45,7 +45,7 @@ public sealed class SkinUserRow
     public string Glyph { get; }
 }
 
-/// <summary>皮肤列表条目。</summary>
+/// <summary>Skin list entry.</summary>
 public sealed class SkinRow
 {
     public SkinRow(SkinItem item)
@@ -61,8 +61,8 @@ public sealed class SkinRow
 }
 
 /// <summary>
-/// 皮肤站:左侧按用户(账户)分栏,选中用户即可查看其保存的皮肤;
-/// 右侧对所选皮肤做 3D 方块模型预览,可拖动旋转。
+/// Skin station: the left side is grouped by user (account); selecting a user shows their saved skins;
+/// the right side previews the selected skin as a 3D block model that can be dragged to rotate.
 /// </summary>
 public sealed partial class SkinStationPage : Page
 {

@@ -1,10 +1,10 @@
-# Salmon Launcher (SL)
+# SalmonLauncher (SL)
 
-[简体中文](README.zh-CN.md) | **繁體中文** | [English](README.md) | [日本語](README.ja.md)
+[English](README.md) | [简体中文](README.zh-CN.md) | **繁體中文** | [日本語](README.ja.md)
 
 一個以 **WinUI 3 / Windows App SDK** 與 **.NET 10** 打造的 Minecraft Java 版啟動器。安裝、啟動、實例與模組、連線、皮膚預覽、崩潰診斷與主題切換全部整合在一個雙欄介面裡。
 
-- 版本：1.0.2
+- 版本：1.0.3
 - 平台：Windows 10 (2004+) / Windows 11，x64
 - 授權：GNU General Public License v3.0 或更新版本（GPL-3.0-or-later）
 
@@ -31,12 +31,12 @@
 
 ## 下載與安裝
 
-**最新版本：v1.0.2**
+**最新版本：v1.0.3**
 
 | 形式 | 檔案 | 說明 |
 | --- | --- | --- |
-| 安裝包（推薦） | `SL-Setup-1.0.2-win64.exe` | 標準 Windows 安裝精靈，**提供简体中文 / 繁體中文 / English / 日本語 四種安裝介面**，自動建立開始功能表捷徑與卸載項目；可選擇僅為目前使用者安裝（無需系統管理員權限） |
-| 免安裝版 | `SL-1.0.2-portable-win64.zip` | 解壓即用，不寫入登錄檔；適合放在隨身碟 |
+| 安裝包（推薦） | `SL-Setup-1.0.3-win64.exe` | 標準 Windows 安裝精靈，**提供简体中文 / 繁體中文 / English / 日本語 四種安裝介面**，自動建立開始功能表捷徑與卸載項目；可選擇僅為目前使用者安裝（無需系統管理員權限） |
+| 免安裝版 | `SL-1.0.3-portable-win64.zip` | 解壓即用，不寫入登錄檔；適合放在隨身碟 |
 
 兩者都包含完整的 .NET 10 與 Windows App SDK 執行階段，**無需另外安裝任何執行階段**。下載位址：[GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
 
@@ -61,7 +61,7 @@ src\SL.App\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\SL.exe
 ### 產生安裝包與免安裝版
 
 ```powershell
-.\installer\build-installer.ps1 -Version 1.0.2
+.\installer\build-installer.ps1 -Version 1.0.3
 ```
 
 腳本會先執行 `dotnet publish`（Release、自包含），再用 Inno Setup 編譯 `installer\SL.iss`，最後在 `dist\` 產生 `SL-Setup-<版本>-win64.exe` 與 `SL-<版本>-portable-win64.zip`。需先安裝 [Inno Setup 6](https://jrsoftware.org/isinfo.php)。
@@ -102,7 +102,7 @@ src\SL.Data   資料層（目錄配置、原子寫入、設定與快取）
 ## 版權與授權
 
 ```
-Salmon Launcher (SL)
+SalmonLauncher (SL)
 Copyright (C) 2026 Hugo Mou
 
 本專案以 GNU General Public License 第 3 版（或任何更新版本）發佈。

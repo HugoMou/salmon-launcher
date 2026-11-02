@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace SL.App.Pages;
 
-/// <summary>局域网发现的开放世界行。</summary>
+/// <summary>Row for an open world discovered on the LAN.</summary>
 public sealed class McLanRow
 {
     public McLanRow(McLanWorld world, Action<McLanWorld> copy)
@@ -45,7 +45,7 @@ public sealed class McLanRow
     public RelayCommand CopyCommand { get; }
 }
 
-/// <summary>收藏的中继服务器行。</summary>
+/// <summary>Row for a favorite relay server.</summary>
 public sealed class SavedRelayRow
 {
     public SavedRelayRow(RelayEndpoint endpoint, Action<RelayEndpoint> connect, Action<RelayEndpoint> remove)
@@ -63,10 +63,10 @@ public sealed class SavedRelayRow
 }
 
 /// <summary>
-/// 联机页:三种接入方式都基于真实的 TCP 端口转发。
-/// - 自建中继:把本机服务器端口(25565)转发到对外端口,好友直连;
-/// - 局域网:监听 Minecraft 原生组播公告,列出同网段已开放的世界;
-/// - 添加中继服务器:连别人开的中继,在本机再开一个本地端口供游戏连接。
+/// Multiplayer page: all three connection modes are based on real TCP port forwarding.
+/// - Self-hosted relay: forward the local server port (25565) to an external port so friends can connect directly;
+/// - LAN: listen for Minecraft native multicast announcements and list open worlds on the same subnet;
+/// - Add relay server: connect to a relay hosted by someone else and open a local port on this machine for the game to join.
 /// </summary>
 public sealed partial class MultiplayerPage : Page
 {
@@ -109,7 +109,7 @@ public sealed partial class MultiplayerPage : Page
         StopScanner();
     }
 
-    // ------------------------------------------------------------ 模式切换
+    // ------------------------------------------------------------ Mode switching
 
     private void OnModeChecked(object sender, RoutedEventArgs e)
     {
@@ -127,7 +127,7 @@ public sealed partial class MultiplayerPage : Page
             StopScanner();
     }
 
-    // ------------------------------------------------------------ 模式一:自建中继
+    // ------------------------------------------------------------ Mode 1: self-hosted relay
 
     private void OnStartHost(object sender, RoutedEventArgs e)
     {
@@ -190,7 +190,7 @@ public sealed partial class MultiplayerPage : Page
         StatusText.Text = Loc.T("中继已停止");
     }
 
-    /// <summary>本机在局域网内的 IPv4(优先非回环、非虚拟网卡)。</summary>
+    /// <summary>LAN IPv4 address of this machine (prefers non-loopback, non-virtual adapters).</summary>
     private static string LocalAddress()
     {
         try
@@ -212,7 +212,7 @@ public sealed partial class MultiplayerPage : Page
         return "127.0.0.1";
     }
 
-    // ------------------------------------------------------------ 模式二:局域网
+    // ------------------------------------------------------------ Mode 2: LAN
 
     private void StartScanner()
     {
@@ -260,7 +260,7 @@ public sealed partial class MultiplayerPage : Page
         StatusText.Text = Loc.T("正在重新扫描局域网…");
     }
 
-    // ------------------------------------------------------------ 模式三:添加中继服务器
+    // ------------------------------------------------------------ Mode 3: add relay server
 
     private void OnConnectManual(object sender, RoutedEventArgs e)
     {
@@ -333,7 +333,7 @@ public sealed partial class MultiplayerPage : Page
         AddLog(Loc.T("[收藏] 已移除 ") + endpoint.Display);
     }
 
-    // ------------------------------------------------------------ 断开
+    // ------------------------------------------------------------ Disconnect
 
     private void OnDisconnect(object sender, RoutedEventArgs e)
     {
@@ -344,11 +344,11 @@ public sealed partial class MultiplayerPage : Page
         StatusText.Text = Loc.T("已断开全部联机通道");
     }
 
-    // ------------------------------------------------------------ 基础设施
+    // ------------------------------------------------------------ Infrastructure
 
     private static int ReadPort(NumberBox box, int fallback)
     {
-        // 用户可能刚输入完数值、还没离开输入框(Value 尚未提交),优先读输入框文本
+        // The user may have just typed a value without leaving the input box (Value not committed yet), so read the input text first
         if (double.TryParse(box.Text, out var typed))
             return (int)Math.Clamp(typed, box.Minimum, box.Maximum);
         if (!double.IsNaN(box.Value))

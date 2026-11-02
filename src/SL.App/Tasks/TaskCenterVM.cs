@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,7 +21,7 @@ using SL.App.Localization;
 
 namespace SL.App.Tasks;
 
-/// <summary>任务卡行视图模型:引擎快照 → UI 可绑定投影(与旧版 SL.Pres 字段一致)。</summary>
+/// <summary>Task-row view model: engine snapshot → bindable UI projection (fields match the old SL.Pres version).</summary>
 public sealed class TaskRowVM : VmBase
 {
     public string Id { get; }
@@ -69,7 +69,7 @@ public sealed class TaskRowVM : VmBase
 
     public string Title => _snap.DisplayName;
 
-    /// <summary>标题旁的运行标识:完成时显示"完成",其余为空</summary>
+    /// <summary>Run badge next to the title: "Done" when completed, empty otherwise</summary>
     public string RunBadge => _snap.State == TransferState.Completed ? Loc.T("完成") : "";
 
     public string StateText => _snap.State switch
@@ -84,7 +84,7 @@ public sealed class TaskRowVM : VmBase
         _ => "",
     };
 
-    /// <summary>总大小未知(-1)且活动中:进度条走不确定态</summary>
+    /// <summary>Total size unknown (-1) while active: the progress bar runs indeterminate</summary>
     public bool IsIndeterminate => _snap.BytesTotal < 0 && _snap.ActiveLike;
 
     public double Progress
@@ -127,7 +127,7 @@ public sealed class TaskRowVM : VmBase
     public string? ErrorText => _snap.Error;
 }
 
-/// <summary>任务中心视图模型:聚合引擎任务列表,提供批量操作命令。</summary>
+/// <summary>Task center view model: aggregates the engine task list and exposes bulk-operation commands.</summary>
 public sealed class TaskCenterVM : VmBase, IRefreshable
 {
     private readonly DispatcherQueue _ui = DispatcherQueue.GetForCurrentThread();
@@ -160,7 +160,7 @@ public sealed class TaskCenterVM : VmBase, IRefreshable
         }
     }
 
-    /// <summary>进入页面时重建快照(引擎可能在别处提交了任务)。</summary>
+    /// <summary>Rebuild snapshots when entering the page (the engine may have submitted tasks elsewhere).</summary>
     public void RefreshData() => _ui.TryEnqueue(Rebuild);
 
     private void OnEngineUpdated(TransferSnapshot snap)
@@ -187,7 +187,7 @@ public sealed class TaskCenterVM : VmBase, IRefreshable
         On(nameof(EmptyVisibility));
     }
 
-    /// <summary>列表为空时显示空状态卡。</summary>
+    /// <summary>Show the empty-state card when the list is empty.</summary>
     public Microsoft.UI.Xaml.Visibility EmptyVisibility
         => Rows.Count == 0 ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
 }

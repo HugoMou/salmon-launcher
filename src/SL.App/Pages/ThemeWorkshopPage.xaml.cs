@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,7 +21,7 @@ using SL.App.Themes;
 
 namespace SL.App.Pages;
 
-/// <summary>主题工坊:游戏画面壁纸 + 自动取色,一起做成整套主题。</summary>
+/// <summary>Theme workshop: game screenshot wallpaper plus automatic color extraction, combined into a full theme.</summary>
 public sealed partial class ThemeWorkshopPage : Page
 {
     private readonly List<WallpaperCard> _cards = [];

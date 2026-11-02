@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,14 +20,14 @@ using SL.App.Localization;
 
 namespace SL.App.Navigation;
 
-/// <summary>基于 Frame 的路由导航:Navigate 按 Key 跳转,Frame 日志提供返回栈。</summary>
+/// <summary>Frame-based routing: Navigate jumps by Key, and the Frame journal provides the back stack.</summary>
 public sealed class NavService
 {
     private Frame _frame = null!;
 
     public string CurrentKey { get; private set; } = "launch.home";
 
-    /// <summary>当前页变化(含返回)时触发,用于同步 NavigationView 选中态与标题。</summary>
+    /// <summary>Raised when the current page changes (including going back); keeps the NavigationView selection and title in sync.</summary>
     public event Action? CurrentChanged;
 
     public void Attach(Frame frame)
@@ -52,7 +52,7 @@ public sealed class NavService
         }
     }
 
-    /// <summary>按当前语言重新加载当前页(语言切换后调用)。</summary>
+    /// <summary>Reload the current page in the current language (called after a language switch).</summary>
     public void ReloadCurrent()
     {
         if (PageCatalog.All.TryGetValue(CurrentKey, out var spec) && _frame.Content is not null)

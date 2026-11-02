@@ -1,10 +1,10 @@
-# Salmon Launcher (SL)
+# SalmonLauncher (SL)
 
-[简体中文](README.zh-CN.md) | [繁體中文](README.zh-Hant.md) | **English** | [日本語](README.ja.md)
+**English** | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-Hant.md) | [日本語](README.ja.md)
 
 A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and **.NET 10**. Installation, launching, instances and mods, multiplayer, skin preview, crash analysis and theming all live inside one two-pane interface.
 
-- Version: 1.0.2
+- Version: 1.0.3
 - Platform: Windows 10 (2004+) / Windows 11, x64
 - Licence: GNU General Public License v3.0 or later (GPL-3.0-or-later)
 
@@ -31,12 +31,12 @@ A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and *
 
 ## Download and install
 
-**Latest release: v1.0.2**
+**Latest release: v1.0.3**
 
 | Package | File | Notes |
 | --- | --- | --- |
-| Installer (recommended) | `SL-Setup-1.0.2-win64.exe` | Standard Windows setup wizard with **Simplified Chinese / Traditional Chinese / English / Japanese** UI; adds a Start menu shortcut and an uninstall entry; can install for the current user without administrator rights |
-| Portable | `SL-1.0.2-portable-win64.zip` | Unzip and run; writes nothing to the registry; handy on a USB drive |
+| Installer (recommended) | `SL-Setup-1.0.3-win64.exe` | Standard Windows setup wizard with **Simplified Chinese / Traditional Chinese / English / Japanese** UI; adds a Start menu shortcut and an uninstall entry; can install for the current user without administrator rights |
+| Portable | `SL-1.0.3-portable-win64.zip` | Unzip and run; writes nothing to the registry; handy on a USB drive |
 
 Both packages bundle the complete .NET 10 and Windows App SDK runtimes, so **no separate runtime installation is needed**. Download: [GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases).
 
@@ -61,7 +61,7 @@ Use `-c Release` for a release build. `TreatWarningsAsErrors` is enabled, so any
 ### Build the installer and portable package
 
 ```powershell
-.\installer\build-installer.ps1 -Version 1.0.2
+.\installer\build-installer.ps1 -Version 1.0.3
 ```
 
 The script runs `dotnet publish` (Release, self-contained), compiles `installer\SL.iss` with Inno Setup, and writes `SL-Setup-<version>-win64.exe` plus `SL-<version>-portable-win64.zip` into `dist\`. [Inno Setup 6](https://jrsoftware.org/isinfo.php) is required.
@@ -102,7 +102,7 @@ The interface ships in **简体中文**, **繁體中文**, **English** and **日
 ## Copyright and licence
 
 ```
-Salmon Launcher (SL)
+SalmonLauncher (SL)
 Copyright (C) 2026 Hugo Mou
 
 This project is released under the GNU General Public License, version 3

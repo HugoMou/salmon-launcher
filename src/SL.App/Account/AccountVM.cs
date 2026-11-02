@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -26,7 +26,7 @@ using SL.App.Localization;
 
 namespace SL.App.Account;
 
-/// <summary>账户列表中的一行:正版或离线账户,支持切换为活动与删除。</summary>
+/// <summary>A row in the account list: a premium or offline account, which can be set active or deleted.</summary>
 public sealed class AccountRowVM : VmBase
 {
     private readonly AccountVM _owner;
@@ -73,7 +73,7 @@ public sealed class AccountRowVM : VmBase
     public ICommand DeleteCommand { get; }
 }
 
-/// <summary>账户区视图模型:多账户仓库(正版 + 离线混合)的展示、切换、删除与两种正版登录入口。</summary>
+/// <summary>Account-area view model: displays, switches, and deletes entries in a multi-account store (premium + offline mixed), plus the two premium login entry points.</summary>
 public sealed class AccountVM : VmBase
 {
     private readonly ISettingsService _settings;
@@ -149,7 +149,7 @@ public sealed class AccountVM : VmBase
         Refresh();
     }
 
-    /// <summary>正版登录:先选择登录方式(内置浏览器 / 设备码 / 复制授权链接)。</summary>
+    /// <summary>Premium login: first choose a login method (built-in browser / device code / copy authorization link).</summary>
     private async Task LoginChoiceAsync()
     {
         if (Busy)
@@ -189,7 +189,7 @@ public sealed class AccountVM : VmBase
         }
     }
 
-    /// <summary>复制授权链接:链接进剪贴板并直接唤起系统浏览器,登录完成后把回跳链接粘回来换取会话。</summary>
+    /// <summary>Copy authorization link: copy the link to the clipboard and launch the system browser; after login, paste the callback link back to exchange it for a session.</summary>
     private async Task LoginByUrlAsync()
     {
         var req = MsAuth.BeginInteractive();

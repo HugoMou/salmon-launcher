@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,12 +18,12 @@ using Windows.Storage;
 
 namespace SL.App.Themes;
 
-/// <summary>一个内置壁纸场景。</summary>
+/// <summary>A built-in wallpaper scene.</summary>
 public sealed record WallpaperScene(string Id, string Name, string FileName);
 
 /// <summary>
-/// 内置 Minecraft 风格壁纸:用像素画方式绘制天空、云、地形与植被,
-/// 首次使用时生成 PNG 缓存,再交给 ImageTheme 取色成主题。
+/// Built-in Minecraft-style wallpapers: draw the sky, clouds, terrain, and vegetation in a pixel-art style,
+/// generate a PNG cache on first use, then hand it to ImageTheme for color sampling into a theme.
 /// </summary>
 public static class WallpaperFactory
 {
@@ -54,7 +54,7 @@ public static class WallpaperFactory
         }
     }
 
-    /// <summary>确保壁纸已生成,返回本地路径。</summary>
+    /// <summary>Ensure the wallpaper has been generated and return its local path.</summary>
     public static async Task<string> EnsureAsync(WallpaperScene scene)
     {
         var path = Path.Combine(Dir, scene.FileName);
@@ -80,7 +80,7 @@ public static class WallpaperFactory
         return path;
     }
 
-    /// <summary>把用户选的图片复制进壁纸库,返回副本路径。</summary>
+    /// <summary>Copy the user-selected image into the wallpaper library and return the copy's path.</summary>
     public static async Task<string> ImportAsync(string sourcePath)
     {
         var name = $"user-{DateTime.Now:yyyyMMdd-HHmmss}-{Path.GetFileNameWithoutExtension(sourcePath)}";
@@ -113,7 +113,7 @@ public static class WallpaperFactory
         await encoder.FlushAsync();
     }
 
-    // ============================================================ 像素画布
+    // ============================================================ Pixel canvas
 
     private sealed class Canvas
     {
@@ -168,7 +168,7 @@ public static class WallpaperFactory
                     Blend(x + dx, y + dy, color.R, color.G, color.B, alpha);
         }
 
-        /// <summary>竖直渐变天空。</summary>
+        /// <summary>Vertical gradient sky.</summary>
         public void Sky((byte R, byte G, byte B) top, (byte R, byte G, byte B) bottom)
         {
             for (var y = 0; y < Height; y++)
@@ -182,7 +182,7 @@ public static class WallpaperFactory
             }
         }
 
-        /// <summary>像素圆(太阳/月亮)。</summary>
+        /// <summary>Pixel circle (sun/moon).</summary>
         public void Disc(int cx, int cy, int radius, (byte R, byte G, byte B) color, double alpha = 1)
         {
             for (var y = -radius; y <= radius; y++)
@@ -194,7 +194,7 @@ public static class WallpaperFactory
                 }
         }
 
-        /// <summary>云朵:若干横向方块叠出 Minecraft 的方云。</summary>
+        /// <summary>Clouds: stack several horizontal blocks into a Minecraft-style square cloud.</summary>
         public void Cloud(int x, int y, int scale, double alpha)
         {
             var blocks = new (int X, int Y, int W, int H)[]
@@ -205,7 +205,7 @@ public static class WallpaperFactory
                 RectAlpha(x + bx * scale, y + by * scale, bw * scale, bh * scale, (255, 255, 255), alpha);
         }
 
-        /// <summary>远景山:梯形/三角形堆叠。</summary>
+        /// <summary>Distant hills: stacked trapezoids/triangles.</summary>
         public void Hill(int cx, int baseY, int halfWidth, int peak, (byte R, byte G, byte B) color, double alpha = 1)
         {
             for (var y = 0; y < peak; y++)
@@ -217,7 +217,7 @@ public static class WallpaperFactory
             }
         }
 
-        /// <summary>方块噪点地面(草地/沙地/雪地)。</summary>
+        /// <summary>Blocky noisy ground (grass/sand/snow).</summary>
         public void Ground(int top, (byte R, byte G, byte B) baseColor, (byte R, byte G, byte B) altColor, int block = 8)
         {
             for (var y = top; y < Height; y += block)
@@ -233,7 +233,7 @@ public static class WallpaperFactory
                 }
         }
 
-        /// <summary>Minecraft 风格的树:一根树干 + 方块状树冠。</summary>
+        /// <summary>Minecraft-style tree: one trunk + a blocky crown.</summary>
         public void Tree(int x, int groundY, int scale, (byte R, byte G, byte B) leaf, (byte R, byte G, byte B) leafDark,
             (byte R, byte G, byte B) trunk)
         {
@@ -261,7 +261,7 @@ public static class WallpaperFactory
         }
     }
 
-    // ============================================================ 场景
+    // ============================================================ Scenes
 
     private static void Plains(Canvas c)
     {
@@ -400,12 +400,12 @@ public static class WallpaperFactory
         c.Cloud(420, 62, 7, 0.6);
         c.Hill(320, 206, 300, 36, (0x8F, 0xAE, 0x74), 0.85);
         c.Ground(204, (0xC8, 0xB0, 0x54), (0xB7, 0x9C, 0x44));
-        // 简易房屋
+        // Simple house
         c.Rect(120, 190, 96, 60, (0x9A, 0x6B, 0x43));
         c.Rect(120, 178, 96, 14, (0x7A, 0x4A, 0x2E));
         c.Rect(150, 214, 22, 36, (0x6B, 0x4A, 0x2E));
         c.Rect(196, 206, 16, 16, (0x8E, 0xC8, 0xE8));
-        // 麦田
+        // Wheat field
         for (var x = 260; x < 620; x += 10)
             c.Rect(x, 214, 5, 26, (0xD8, 0xC0, 0x4A));
         c.Rect(380, 170, 10, 44, (0x6B, 0x4A, 0x2E));
@@ -416,17 +416,17 @@ public static class WallpaperFactory
     {
         c.Sky((0x10, 0x12, 0x16), (0x1E, 0x22, 0x28));
         c.Ground(0, (0x2A, 0x2C, 0x30), (0x22, 0x24, 0x28), 12);
-        // 矿洞轮廓
+        // Cave outline
         c.Hill(90, 360, 240, 300, (0x1A, 0x1C, 0x20), 1);
         c.Hill(560, 360, 260, 260, (0x16, 0x18, 0x1C), 1);
-        // 萤石
+        // Glowstone
         foreach (var (x, y) in new[] { (180, 120), (300, 90), (430, 150), (520, 100), (250, 200), (400, 240) })
         {
             c.Disc(x, y, 16, (0xE8, 0xD0, 0x6A), 0.35);
             c.Rect(x - 6, y - 6, 12, 12, (0xF2, 0xDF, 0x8A));
             c.Rect(x - 4, y - 4, 8, 8, (0xFF, 0xF2, 0xB0));
         }
-        // 铁矿石点缀
+        // Iron ore accents
         c.Rect(220, 280, 10, 10, (0xC8, 0xB8, 0xA0));
         c.Rect(340, 310, 8, 8, (0xC8, 0xB8, 0xA0));
     }

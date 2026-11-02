@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,7 +21,7 @@ using SL.App.Themes;
 
 namespace SL.App.Infrastructure;
 
-/// <summary>组合根:服务对象在应用启动时创建,页面仅通过本静态类获取依赖。</summary>
+/// <summary>Composition root: services are created when the app starts; pages obtain dependencies only through this static class.</summary>
 public static class AppServices
 {
     public static Core.Settings.ISettingsService Settings { get; private set; } = null!;
@@ -52,7 +52,7 @@ public static class AppServices
         TaskCenter = new TaskCenterVM();
         Nav = new NavService();
 
-        // 配置变更联动:引擎并发数 + 主题(配色/强调色/深浅) + Modrinth 镜像
+        // Config change propagation: engine concurrency + theme (palette/accent/light-dark) + Modrinth mirror
         Core.Net.Modrinth.PreferMirror = Settings.Current.ModrinthMirror;
         Settings.Changed += cfg =>
         {

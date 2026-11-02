@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,17 +20,17 @@ using System.Text;
 namespace SL.Core.Launch;
 
 /// <summary>
-/// Java 运行时确保:本机扫描满足要求 → 直接用;
-/// 不满足 → 从 Adoptium 下载对应主版本的 JDK(显示字节进度),解压到 java\ 后返回。
+/// Java runtime provisioning: if the local scan meets the requirement → use it directly;
+/// otherwise download the matching major-version JDK from Adoptium (showing byte progress) and unpack it to java\ before returning.
 /// </summary>
 public static class JavaFetch
 {
-    /// <summary>下载进度(字节)。Pres 节流后展示。</summary>
+    /// <summary>Download progress (bytes). Pres throttles it for display.</summary>
     public static event Action<long, long>? DownloadProgress;
 
     public static async Task<string?> EnsureJavaAsync(int minMajor, CancellationToken cancellation)
     {
-        // 1. 本机已有
+        // 1. Already available locally
         var list = await SL.Core.Java.JavaScan.ScanAsync(cancellation).ConfigureAwait(false);
         var usable = list
             .Where(j => j.MajorVersion >= minMajor)
@@ -39,7 +39,7 @@ public static class JavaFetch
         if (usable.Count > 0)
             return usable[0].HomePath;
 
-        // 2. 下载 Temurin JDK(Adoptium API)
+        // 2. Download the Temurin JDK (Adoptium API)
         return await DownloadTemurinAsync(minMajor, cancellation).ConfigureAwait(false);
     }
 
@@ -64,7 +64,7 @@ public static class JavaFetch
             json = await apiClient.GetStringAsync(string.Format(api, major), cancellation).ConfigureAwait(false);
         }
 
-        // 取第一个 jdk 二进制包(zip 的 link / sha256)
+        // take the first jdk binary package (zip link / sha256)
         string? link = null, checksum = null, fileName = null;
         using (var doc = System.Text.Json.JsonDocument.Parse(json))
         {
@@ -88,7 +88,7 @@ public static class JavaFetch
         var zipTarget = Path.Combine(JavaRoot, fileName);
         var bytesOnDisk = File.Exists(zipTarget) ? new FileInfo(zipTarget).Length : 0;
 
-        // 下载:强制 HTTP/1.1(HTTP/2 对 GitHub 大文件存在挂流风险),看门狗 + 断点续传 + 重试
+        // Download: force HTTP/1.1 (HTTP/2 can stall on large GitHub files), with watchdog + byte-range resume + retries
         using var handler = new SocketsHttpHandler
         {
             AutomaticDecompression = System.Net.DecompressionMethods.None,
@@ -108,7 +108,7 @@ public static class JavaFetch
         catch (OperationCanceledException) { throw; }
         catch (Exception)
         {
-            total = -1; // HEAD 失败不致命
+            total = -1; // a failed HEAD request is not fatal
         }
 
         const int maxAttempts = 4;
@@ -127,7 +127,7 @@ public static class JavaFetch
                 {
                     using var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url)
                     {
-                        // 强制 HTTP/1.1:HTTP/2 对 GitHub 大文件偶发挂流
+                        // Force HTTP/1.1: HTTP/2 occasionally stalls on large GitHub files
                         Version = System.Net.HttpVersion.Version11,
                         VersionPolicy = System.Net.Http.HttpVersionPolicy.RequestVersionExact,
                     };
@@ -155,7 +155,7 @@ public static class JavaFetch
                     var grandTotal = total0 > 0 ? appended + total0 : -1;
                     while (true)
                     {
-                        // 看门狗:60s 无字节进度则放弃本次尝试(涓流由换源兜底)
+                        // Watchdog: abandon this attempt after 60s without byte progress (a trickle is covered by switching sources)
                         var readTask = stream.ReadAsync(buffer, attemptCts.Token).AsTask();
                         var done = await Task.WhenAny(readTask, Task.Delay(TimeSpan.FromSeconds(60), attemptCts.Token))
                             .ConfigureAwait(false);
@@ -194,7 +194,7 @@ public static class JavaFetch
             }
         }
 
-        // 源顺序:TUNA 镜像(国内速度优) → Adoptium/GitHub 官方
+        // Source order: TUNA mirror (faster in China) → Adoptium/GitHub official
         var sources = new List<(string Url, string Label)>
         {
             ($"https://mirrors.tuna.tsinghua.edu.cn/Adoptium/{major}/jdk/x64/windows/{fileName}", "TUNA 镜像"),
@@ -225,7 +225,7 @@ public static class JavaFetch
         if (!downloaded)
             throw new InvalidOperationException("所有 JDK 源均下载失败", lastError);
 
-        // SHA-256 整体校验(Adoptium 提供;SHA-1 不适用此处)
+        // Whole-file SHA-256 verification (provided by Adoptium; SHA-1 does not apply here)
         var expectedFileSha = checksum;
         if (!string.IsNullOrEmpty(expectedFileSha))
         {
@@ -236,14 +236,14 @@ public static class JavaFetch
                 throw new InvalidOperationException("JDK 包 SHA-256 校验失败,已中止");
         }
 
-        // 解压(去掉 zip 内首个顶层目录)
+        // Unpack (drop the single top-level directory inside the zip)
         var extractDir = Path.Combine(JavaRoot, $"temurin-{major}");
         if (Directory.Exists(extractDir))
             Directory.Delete(extractDir, recursive: true);
         Directory.CreateDirectory(extractDir);
         System.IO.Compression.ZipFile.ExtractToDirectory(zipTarget, extractDir, overwriteFiles: true);
 
-        // zip 里可能是 jdk-25.0.1+8 → 把子目录上提一层
+        // the zip may contain jdk-25.0.1+8 → move that subdirectory up one level
         var javaExe = Path.Combine(extractDir, "bin", "java.exe");
         if (!File.Exists(javaExe))
         {
@@ -255,13 +255,13 @@ public static class JavaFetch
             Directory.Delete(sub, recursive: false);
             if (!File.Exists(Path.Combine(extractDir, "bin", "java.exe")))
                 throw new InvalidOperationException("JDK 上提失败");
-            // 上提后删除 zip 内已迁移的目录自身(替代:直接把 zip 保留也无妨)
+            // after flattening, delete the zip directory that was just migrated (alternatively, keeping the zip is also fine)
         }
 
         return extractDir;
     }
 
-    /// <summary>离线账户 UUID:UUID v3(MD5 of "OfflinePlayer:<name>")。</summary>
+    /// <summary>Offline account UUID: UUID v3 (MD5 of "OfflinePlayer:<name>").</summary>
     public static string OfflineUuid(string name)
     {
         var bytes = MD5.HashData(Encoding.UTF8.GetBytes("OfflinePlayer:" + name));

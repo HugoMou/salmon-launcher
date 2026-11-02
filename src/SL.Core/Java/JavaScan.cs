@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -17,14 +17,14 @@ using System.IO;
 
 namespace SL.Core.Java;
 
-/// <summary>已安装的 Java 运行时。</summary>
-/// <param name="HomePath">JAVA_HOME 目录(包含 bin/java.exe)</param>
-/// <param name="VersionText">如 "21.0.4"、"17.0.2"</param>
-/// <param name="Vendor">如 "Eclipse Adoptium"</param>
+/// <summary>An installed Java runtime.</summary>
+/// <param name="HomePath">JAVA_HOME directory (contains bin/java.exe)</param>
+/// <param name="VersionText">e.g. "21.0.4", "17.0.2"</param>
+/// <param name="Vendor">e.g. "Eclipse Adoptium"</param>
 /// <param name="Architecture">"x64" / "aarch64"</param>
 public sealed record JavaInstall(string HomePath, string VersionText, string Vendor, string Architecture)
 {
-    /// <summary>主版本号(解析失败为 0;Minecraft 1.20+ 需要 17+,1.20.5+ 需要 21+)。</summary>
+    /// <summary>Major version (0 when parsing fails; Minecraft 1.20+ needs 17+, 1.20.5+ needs 21+).</summary>
     public int MajorVersion
     {
         get
@@ -36,8 +36,8 @@ public sealed record JavaInstall(string HomePath, string VersionText, string Ven
 }
 
 /// <summary>
-/// 本机 Java 自动扫描(阶段二):遍历常见安装位置,读 release 文件判定版本,
-/// 全程零进程启动(毫秒级完成,不触发 java.exe)。
+/// Automatic local Java scan (stage 2): walk common install locations and read the release file to determine the version,
+/// with zero process launches (finishes in milliseconds, never spawns java.exe).
 /// </summary>
 public static class JavaScan
 {
@@ -89,7 +89,7 @@ public static class JavaScan
             catch (UnauthorizedAccessException) { }
         }
 
-        // JAVA_HOME 本身(直接是 home 而非父目录)
+        // JAVA_HOME itself (a home directory, not its parent)
         var javaHome = Environment.GetEnvironmentVariable("JAVA_HOME");
         if (!string.IsNullOrWhiteSpace(javaHome) && File.Exists(Path.Combine(javaHome, "bin", "java.exe")))
             results.Add(javaHome);
@@ -108,13 +108,13 @@ public static class JavaScan
         AddRootsFrom(Path.Combine(userProfile, ".jdks"));
         AddRootsFrom(Path.Combine(userProfile, "scoop", "apps", "java", "current", ".."));
 
-        // SL 自家的 java 目录(阶段三自动下载的 temurin-<major> 就装在这里)
+        // SL own java directory (where the temurin-<major> downloaded automatically in stage 3 lives)
         AddRootsFrom(Path.Combine(Boot.Runtime.Root, "java"));
 
         return results.Distinct(StringComparer.OrdinalIgnoreCase);
     }
 
-    /// <summary>解析 JDK 自带的 release 文本:JAVA_VERSION="21.0.4" / IMPLEMENTOR="..." / OS_ARCH="x64"。</summary>
+    /// <summary>Parse the JDK bundled release text: JAVA_VERSION="21.0.4" / IMPLEMENTOR="..." / OS_ARCH="x64".</summary>
     private static JavaInstall? ParseReleaseFile(string releaseFile)
     {
         try

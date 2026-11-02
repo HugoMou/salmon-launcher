@@ -1,18 +1,18 @@
-﻿; Salmon Launcher (SL) — installer script for Inno Setup 6
+﻿; SalmonLauncher (SL) — installer script for Inno Setup 6
 ; Copyright (C) 2026 Hugo Mou
 ; SPDX-License-Identifier: GPL-3.0-or-later
 ;
 ; Build: run dotnet publish to produce the self-contained output in artifacts\publish,
-; then run ISCC.exe /DAppVersion=1.0.2 installer\SL.iss
+; then run ISCC.exe /DAppVersion=1.0.3 installer\SL.iss
 ; or simply run installer\build-installer.ps1.
 
-#define AppName "Salmon Launcher"
+#define AppName "SalmonLauncher"
 #define AppExe "SL.exe"
 #define AppPublisher "Hugo Mou"
 #define AppUrl "https://github.com/HugoMou/salmon-launcher"
 
 #ifndef AppVersion
-  #define AppVersion "1.0.2"
+  #define AppVersion "1.0.3"
 #endif
 
 #define BuildDir "..\artifacts\publish"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- 主题壁纸(铺满窗口,标题栏下也可见) -->
+        <!-- Theme wallpaper (fills the window, visible under the title bar too) -->
         <Grid x:Name="WallpaperLayer"
               Grid.RowSpan="2"
               Visibility="Collapsed"
@@ -41,19 +41,19 @@
             <Border x:Name="WallpaperScrim" />
         </Grid>
 
-        <!-- 标题栏拖拽区(ExtendsContentIntoTitleBar) -->
+        <!-- Title bar drag area (ExtendsContentIntoTitleBar) -->
         <Grid x:Name="AppTitleBar" Height="48" Background="Transparent">
             <StackPanel Orientation="Horizontal"
                         Margin="14,0,0,0"
                         Spacing="9"
                         VerticalAlignment="Center">
-                <!-- 应用 Logo(项目内置素材 Assets\Logo.png) -->
+                <!-- App logo (bundled asset Assets\Logo.png) -->
                 <Image Source="ms-appx:///Assets/Logo.png"
                        Width="26"
                        Height="26"
                        Stretch="Uniform"
                        VerticalAlignment="Center" />
-                <TextBlock Text="Salmon Launcher"
+                <TextBlock Text="SalmonLauncher"
                            VerticalAlignment="Center"
                            Foreground="{ThemeResource Brush.Fg}"
                            FontWeight="SemiBold"
@@ -86,7 +86,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!-- 提示层(页面标题由标题栏与页面自身承担,这里只放 toast) -->
+                    <!-- Notification layer (the page title is handled by the title bar and the page itself; only toasts live here) -->
                     <StackPanel Margin="36,14,36,0" Spacing="10">
                         <ItemsControl x:Name="NotifyHost">
                             <ItemsControl.ItemContainerStyle>
@@ -110,7 +110,7 @@
                         </ItemsControl>
                     </StackPanel>
 
-                    <!-- 页面宿主 -->
+                    <!-- Page host -->
                     <Border x:Name="PageHost" Grid.Row="1" Background="Transparent">
                         <Frame x:Name="NavFrame" />
                     </Border>
@@ -118,7 +118,7 @@
             </NavigationView.Content>
         </NavigationView>
 
-        <!-- 欢迎页:首次进入或清除数据后的四步初始化,完成前盖住内容区 -->
+        <!-- Welcome page: four-step setup on first launch or after clearing data; covers the content area until complete -->
         <controls:OnboardingView x:Name="Onboarding" Grid.RowSpan="2" Visibility="Collapsed" />
     </Grid>
 </Window>

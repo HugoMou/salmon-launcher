@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -27,7 +27,7 @@ using SL.Core.Launch;
 
 namespace SL.App.Pages;
 
-/// <summary>加载器条目。</summary>
+/// <summary>Loader entry.</summary>
 public sealed class LoaderRow
 {
     public LoaderRow(string name, string tag, string detail, string glyph, bool available, Action choose)
@@ -48,7 +48,7 @@ public sealed class LoaderRow
     public RelayCommand ChooseCommand { get; }
 }
 
-/// <summary>加载器选择页:原版直接进入安装概览;Fabric / Quilt 可一键生成加载器实例。</summary>
+/// <summary>Loader selection page: vanilla goes straight to the install overview; Fabric / Quilt can create a loader instance in one click.</summary>
 public sealed partial class LoaderListPage : Page
 {
     private readonly DispatcherQueue _ui = DispatcherQueue.GetForCurrentThread();
@@ -96,7 +96,7 @@ public sealed partial class LoaderListPage : Page
         AppServices.Nav.Navigate("dl.install");
     }
 
-    /// <summary>Fabric / Quilt / Forge / NeoForge:生成实例元数据并提交加载器库下载。</summary>
+    /// <summary>Fabric / Quilt / Forge / NeoForge: generate instance metadata and submit loader library downloads.</summary>
     private async void InstallLoaderAsync(string loader)
     {
         if (_busy)

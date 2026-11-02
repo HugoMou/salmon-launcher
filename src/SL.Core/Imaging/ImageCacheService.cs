@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -16,14 +16,14 @@
 namespace SL.Core.Imaging;
 
 /// <summary>
-/// 图片缓存服务:为 UI 的 MyImage 等控件提供「本地缓存优先、网络回源」的取图能力。
-/// 网络下载属于数据获取,统一收敛在业务/数据层,UI 控件不直接发请求。
+/// Image cache service: gives UI controls such as MyImage a "local cache first, network fallback" image source.
+/// Network downloads count as data access and stay in the business/data layer; UI controls never issue requests themselves.
 /// </summary>
 public interface IImageCacheService
 {
     /// <summary>
-    /// 按 URL 取图:命中本地缓存直接返回;否则发起 HTTP 获取并写入缓存。
-    /// 失败时抛出带中文说明的异常,由控件决定展示回退图。
+    /// Fetch an image by URL: return it straight from the local cache on a hit, otherwise download it over HTTP and cache it.
+    /// On failure it throws an exception with a Chinese explanation; the control decides which fallback image to show.
     /// </summary>
     Task<byte[]> GetOrFetchAsync(string url);
 }

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,17 +18,17 @@ using System.Text.Json;
 
 namespace SL.Core.Net;
 
-/// <summary>用户手动添加的中继服务器。</summary>
-/// <param name="Name">显示名</param>
-/// <param name="Host">地址(IP 或域名)</param>
-/// <param name="Port">端口</param>
+/// <summary>A relay server added manually by the user.</summary>
+/// <param name="Name">Display name</param>
+/// <param name="Host">Address (IP or domain name)</param>
+/// <param name="Port">Port</param>
 public sealed record RelayEndpoint(string Name, string Host, int Port)
 {
     public string Key => $"{Host}:{Port}";
     public string Display => $"{Name} · {Host}:{Port}";
 }
 
-/// <summary>中继服务器收藏夹:保存在数据目录 relays.json,供「添加中继服务器」复用。</summary>
+/// <summary>Relay server favorites: stored as relays.json in the data directory and reused by "Add relay server".</summary>
 public static class RelayBook
 {
     private static string FilePath => Path.Combine(Boot.Runtime.Root, "relays.json");
@@ -73,7 +73,7 @@ public static class RelayBook
         }
         catch (Exception)
         {
-            // 收藏夹损坏不影响联机主流程
+            // a corrupted favorites file does not affect the main multiplayer flow
         }
     }
 }
