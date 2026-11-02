@@ -2,9 +2,9 @@
 ; Copyright (C) 2026 Hugo Mou
 ; SPDX-License-Identifier: GPL-3.0-or-later
 ;
-; 构建方式:先用 dotnet publish 生成自包含产物到 artifacts\publish,
-; 再执行 ISCC.exe /DAppVersion=1.0.2 installer\SL.iss
-; 或直接运行 installer\build-installer.ps1。
+; Build: run dotnet publish to produce the self-contained output in artifacts\publish,
+; then run ISCC.exe /DAppVersion=1.0.2 installer\SL.iss
+; or simply run installer\build-installer.ps1.
 
 #define AppName "Salmon Launcher"
 #define AppExe "SL.exe"
@@ -50,7 +50,7 @@ MinVersion=10.0.19041
 LicenseFile=..\LICENSE
 CloseApplications=yes
 
-; 四语言安装向导界面;语言文件位于 Inno Setup 6 的 Languages\ 子目录。
+; Four-language setup wizard; .isl files live in the Inno Setup 6 Languages folder.
 [Languages]
 Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 Name: "chinesetraditional"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
@@ -71,5 +71,5 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; IconFilename: "{a
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
-; 用户数据(实例、存档、日志、Java)位于 %APPDATA%\SalmonLauncher,
-; 卸载时保留,避免误删游戏内容。
+; User data (instances, saves, logs, Java) lives in %APPDATA%\SalmonLauncher and is
+; kept on uninstall so game content is never deleted by accident.
