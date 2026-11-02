@@ -3,7 +3,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 ;
 ; 构建方式:先用 dotnet publish 生成自包含产物到 artifacts\publish,
-; 再执行 ISCC.exe /DAppVersion=1.0.0 installer\SL.iss
+; 再执行 ISCC.exe /DAppVersion=1.0.1 installer\SL.iss
 ; 或直接运行 installer\build-installer.ps1。
 
 #define AppName "Salmon Launcher"
@@ -12,7 +12,7 @@
 #define AppUrl "https://github.com/HugoMou/salmon-launcher"
 
 #ifndef AppVersion
-  #define AppVersion "1.0.0"
+  #define AppVersion "1.0.1"
 #endif
 
 #define BuildDir "..\artifacts\publish"
@@ -50,7 +50,10 @@ MinVersion=10.0.19041
 LicenseFile=..\LICENSE
 CloseApplications=yes
 
+; 四语言安装向导界面;语言文件位于 Inno Setup 6 的 Languages\ 子目录。
 [Languages]
+Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "chinesetraditional"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 

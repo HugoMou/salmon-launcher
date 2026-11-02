@@ -31,3 +31,6 @@ dist/
 # ---------- 其他 ----------
 Thumbs.db
 Desktop.ini
+
+# OPencode 会话备份（历史导入）
+minecraft-java.json
