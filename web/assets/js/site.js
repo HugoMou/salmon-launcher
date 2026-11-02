@@ -9,6 +9,43 @@
   var DICT = window.SL_I18N || {};
   var nodes = [];
 
+  /* ---------- theme ---------- */
+  var THEME_KEY = "sl-theme";
+
+  function applyTheme(theme) {
+    var next = theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+
+    document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", String(next === "light"));
+    });
+
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (e) {
+      /* storage may be unavailable */
+    }
+  }
+
+  function initTheme() {
+    var saved = null;
+    try {
+      saved = localStorage.getItem(THEME_KEY);
+    } catch (e) {
+      saved = null;
+    }
+
+    applyTheme(saved === "light" ? "light" : "dark");
+
+    document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        applyTheme(
+          document.documentElement.dataset.theme === "light" ? "dark" : "light"
+        );
+      });
+    });
+  }
+
   /* ---------- language ---------- */
   function collect() {
     nodes = [];
@@ -339,6 +376,7 @@
   }
 
   function boot() {
+    initTheme();
     initLang();
     initMenu();
     initReveal();
