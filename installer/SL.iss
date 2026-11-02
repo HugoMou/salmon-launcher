@@ -9,7 +9,7 @@
 #define AppName "SalmonLauncher"
 #define AppExe "SL.exe"
 #define AppPublisher "Hugo Mou"
-#define AppUrl "https://github.com/HugoMou/salmon-launcher"
+#define AppUrl "https://github.com/HugoMou/salmonlauncher"
 
 #ifndef AppVersion
   #define AppVersion "1.0.3"

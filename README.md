@@ -38,7 +38,7 @@ A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and *
 | Installer (recommended) | `SL-Setup-1.0.3-win64.exe` | Standard Windows setup wizard with **Simplified Chinese / Traditional Chinese / English / Japanese** UI; adds a Start menu shortcut and an uninstall entry; can install for the current user without administrator rights |
 | Portable | `SL-1.0.3-portable-win64.zip` | Unzip and run; writes nothing to the registry; handy on a USB drive |
 
-Both packages bundle the complete .NET 10 and Windows App SDK runtimes, so **no separate runtime installation is needed**. Download: [GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases).
+Both packages bundle the complete .NET 10 and Windows App SDK runtimes, so **no separate runtime installation is needed**. Download: [GitHub Releases](https://github.com/HugoMou/salmonlauncher/releases).
 
 The installer is unsigned, so Windows SmartScreen may show "More info → Run anyway" on first launch. Uninstalling keeps instances and saves under `%APPDATA%\SalmonLauncher`.
 
