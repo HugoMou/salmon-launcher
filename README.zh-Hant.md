@@ -1,6 +1,6 @@
 # Salmon Launcher (SL)
 
-[简体中文](README.md) | **繁體中文** | [English](README.en.md) | [日本語](README.ja.md)
+[简体中文](README.zh-CN.md) | **繁體中文** | [English](README.md) | [日本語](README.ja.md)
 
 一個以 **WinUI 3 / Windows App SDK** 與 **.NET 10** 打造的 Minecraft Java 版啟動器。安裝、啟動、實例與模組、連線、皮膚預覽、崩潰診斷與主題切換全部整合在一個雙欄介面裡。
 

@@ -1,6 +1,6 @@
 # Salmon Launcher (SL)
 
-[简体中文](README.md) | [繁體中文](README.zh-Hant.md) | [English](README.en.md) | **日本語**
+[简体中文](README.zh-CN.md) | [繁體中文](README.zh-Hant.md) | [English](README.md) | **日本語**
 
 **WinUI 3 / Windows App SDK** と **.NET 10** で作られた Minecraft Java Edition ランチャーです。インストール、起動、バージョン管理と Mod、マルチプレイ、スキン表示、クラッシュ診断、テーマ切り替えを 1 つの 2 ペイン画面にまとめています。
 
