@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-zh-title="文档 — SalmonLauncher">Documentation — SalmonLauncher</title>
+<meta name="description" data-zh-content="SalmonLauncher 使用文档：首次启动、账户、Java、实例与模组、联机、下载源、数据目录与故障排查。" content="SalmonLauncher documentation: first launch, accounts, Java, instances and mods, multiplayer, download sources, data folder and troubleshooting.">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="assets/img/favicon.ico">
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="canonical" href="https://sl.hugomou.com/docs.html">
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/img/logo.png" alt="SalmonLauncher logo">
+      <span class="brand-name">SalmonLauncher</span>
+      <span class="brand-slash" data-zh="启动器官网">Launcher site</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="features.html" data-zh="功能">Features</a>
+      <a href="download.html" data-zh="下载">Download</a>
+      <a href="docs.html" aria-current="page" data-zh="文档">Docs</a>
+      <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      <a href="about.html" data-zh="关于">About</a>
+    </nav>
+    <div class="nav-tools">
+      <div class="lang" role="group" aria-label="Language">
+        <button data-set-lang="en" aria-pressed="true">EN</button>
+        <button data-set-lang="zh" aria-pressed="false">中</button>
+      </div>
+      <a class="btn btn-primary btn-sm" href="download.html" data-zh="下载 1.0.3">Get 1.0.3</a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html" data-zh="功能">Features</a>
+    <a href="download.html" data-zh="下载">Download</a>
+    <a href="docs.html" data-zh="文档">Docs</a>
+    <a href="changelog.html" data-zh="更新日志">Changelog</a>
+    <a href="about.html" data-zh="关于">About</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap phead">
+    <div>
+      <div class="eyebrow" data-zh="文档 · v1.0.3">Documentation · v1.0.3</div>
+      <h1 data-zh="从第一次打开，到第一次崩溃。">From first launch to first crash.</h1>
+      <p class="lede" data-zh="这份文档按使用顺序排列：先启动，再登录，然后是 Java、实例、模组、联机、下载源与数据目录。最后一节是常见问题。">This page follows the order you will actually need: launch, sign in, then Java, instances, mods, multiplayer, download sources and the data folder. Troubleshooting sits at the end.</p>
+    </div>
+    <div class="phead-aside">
+      <div><b>SL</b> / DOCS</div>
+      <div>8 SECTIONS</div>
+      <div>UPDATED 2026-11</div>
+    </div>
+  </section>
+
+  <div class="wrap doc-layout">
+    <nav class="doc-nav" aria-label="Documentation sections">
+      <span class="mono" data-zh="目录">Contents</span>
+      <a href="#first-launch" data-zh="01 首次启动">01 First launch</a>
+      <a href="#accounts" data-zh="02 账户">02 Accounts</a>
+      <a href="#java" data-zh="03 Java">03 Java</a>
+      <a href="#instances" data-zh="04 实例">04 Instances</a>
+      <a href="#mods" data-zh="05 模组与内容">05 Mods &amp; content</a>
+      <a href="#multiplayer" data-zh="06 联机">06 Multiplayer</a>
+      <a href="#sources" data-zh="07 下载源">07 Download sources</a>
+      <a href="#data" data-zh="08 数据目录">08 Data folder</a>
+      <a href="#faq" data-zh="09 常见问题">09 Troubleshooting</a>
+    </nav>
+
+    <div class="doc-body">
+      <section id="first-launch">
+        <h2><span class="n">01</span><span data-zh="首次启动">First launch</span></h2>
+        <p data-zh="首次打开后会进入引导流程：选择界面语言与主题、确认账户名称，然后选择一个版本开始安装。没有安装过 Java 也没关系，启动器会在需要时下载。">The first run opens an onboarding flow: choose the interface language and theme, confirm an account name, then pick a version to install. Not having Java installed is fine — the launcher downloads it when needed.</p>
+        <ol class="steps">
+          <li data-zh="打开应用，选择语言与明暗主题。两项都可以在设置页随时更改。">Open the app and choose a language and light/dark theme. Both can be changed later in settings.</li>
+          <li data-zh="确认离线账户名（3–16 个字符，可随时更换）。">Confirm the offline account name (3–16 characters, changeable at any time).</li>
+          <li data-zh="进入下载页，选择一个正式版或快照，点击安装。">Go to the download area, pick a release or snapshot, and install.</li>
+          <li data-zh="安装完成后回到启动页，选择实例并点击启动。">Return to the launch page, select the instance and hit launch.</li>
+        </ol>
+        <div class="note plain">
+          <b data-zh="首次安装的体积：">First install size:</b>
+          <span data-zh="库、资源与 natives 会写到共享目录，重复安装另一个版本时只会补齐缺失文件。版本文件本身不大，主要体积来自资源对象。">Libraries, assets and natives go into a shared folder, so installing another version only tops up what is missing. The version file itself is small; most of the size is asset objects.</span>
+        </div>
+      </section>
+
+      <section id="accounts">
+        <h2><span class="n">02</span><span data-zh="账户">Accounts</span></h2>
+        <p data-zh="启动器支持微软正版账户与不限数量的离线账户。正版登录入口会弹出三种方式，任选其一。">The launcher supports Microsoft accounts and unlimited offline accounts. The sign-in entry offers three methods; pick whichever works in your environment.</p>
+        <h3 data-zh="微软账户的三种登录方式">Three ways to sign in with Microsoft</h3>
+        <ul class="list">
+          <li data-zh="内置浏览器授权：在应用内打开微软登录页，完成后自动回跳。">Embedded browser: the Microsoft page opens inside the app and returns automatically.</li>
+          <li data-zh="设备码登录：应用给出一个代码，你在任意设备的浏览器里输入并确认。">Device code: the app shows a code; enter and confirm it in any browser.</li>
+          <li data-zh="系统浏览器登录：自动打开默认浏览器并复制授权链接，完成后把回跳链接粘回应用。">System browser: opens the default browser and copies the authorisation link; paste the callback link back into the app when done.</li>
+        </ul>
+        <p data-zh="登录成功后会话写入本地文件。启动时会自动续签；续签失败会退回离线身份并给出提示，不会直接阻断启动。">A successful sign-in stores the session locally. It refreshes automatically at launch; if refresh fails, the app falls back to an offline identity with a notice instead of blocking the launch.</p>
+        <h3 data-zh="离线账户">Offline accounts</h3>
+        <p data-zh="离线账户只使用名称，UUID 按离线规则生成（与离线服务器一致）。适合本地测试或离线整合包。">Offline accounts use only a name; the UUID follows the offline rule used by offline servers. They suit local testing and offline packs.</p>
+      </section>
+
+      <section id="java">
+        <h2><span class="n">03</span><span data-zh="Java">Java</span></h2>
+        <p data-zh="启动器会先扫描本机 Java，再决定是否下载。扫描范围包括 JAVA_HOME、Program Files\Java、Eclipse Adoptium、~\.jdks、LocalAppData\Programs，以及启动器自己的 java 目录。">The launcher scans for local Java before downloading anything. The scan covers JAVA_HOME, Program Files\Java, Eclipse Adoptium, ~\.jdks, LocalAppData\Programs, and the launcher's own java folder.</p>
+        <ul class="list">
+          <li data-zh="版本要求不足时，自动下载对应的 Eclipse Temurin 主版本。">If no matching major version exists, the corresponding Eclipse Temurin major is downloaded.</li>
+          <li data-zh="下载优先走 TUNA 镜像，失败则回退 Adoptium / GitHub，并校验 SHA-256。">Downloads prefer the TUNA mirror, fall back to Adoptium or GitHub, and verify SHA-256.</li>
+          <li data-zh="解压后去掉顶层目录，落到 %APPDATA%\SalmonLauncher\java\temurin-&lt;major&gt;。">After extraction the top-level folder is stripped, landing in %APPDATA%\SalmonLauncher\java\temurin-&lt;major&gt;.</li>
+          <li data-zh="启动成功后会后台重扫 Java 环境，下一次选择更快。">After a successful launch the environment is rescanned in the background, making the next pick faster.</li>
+        </ul>
+        <div class="note">
+          <b data-zh="多人游戏里的 Java 版本错误：">Java version mismatch:</b>
+          <span data-zh="新版 Minecraft 需要更高主版本的 Java。不要手动指向旧 JDK；让启动器下载对应版本，或者安装正确的 Temurin 主版本后重启应用。">Newer Minecraft versions need a newer Java major. Do not point the launcher at an old JDK; let it fetch the right one, or install the correct Temurin major and restart the app.</span>
+        </div>
+      </section>
+
+      <section id="instances">
+        <h2><span class="n">04</span><span data-zh="实例">Instances</span></h2>
+        <p data-zh="每个实例是一组独立目录，版本、模组、存档、日志互不干扰。复制整个实例目录就能迁移，删掉目录就是彻底移除。">Each instance is an independent tree: versions, mods, worlds and logs do not interfere. Copy the whole folder to migrate; delete the folder to remove it completely.</p>
+        <div class="code">
+          <div class="code-head">
+            <span data-zh="实例目录结构">Instance folder layout</span>
+            <button class="copy-inline" data-copy="code-tree">COPY</button>
+          </div>
+          <pre id="code-tree">%APPDATA%\SalmonLauncher\
+├─ libraries\          <span class="c">shared</span>
+├─ assets\             <span class="c">indexes · objects · virtual</span>
+├─ java\               <span class="c">temurin-17 · temurin-25</span>
+├─ cache\meta\         <span class="c">version_manifest_v2.json</span>
+└─ instances\&lt;id&gt;\
+   ├─ meta\  versions\  natives\
+   ├─ mods\  resourcepacks\  shaderpacks\
+   ├─ saves\  logs\  crash-reports\</pre>
+        </div>
+        <p data-zh="实例设置包括内存上限、窗口尺寸与额外 JVM 参数。这些设置只影响当前实例，不会污染其他版本。">Instance settings cover memory limit, window size and extra JVM arguments. They apply only to that instance and never leak into another version.</p>
+      </section>
+
+      <section id="mods">
+        <h2><span class="n">05</span><span data-zh="模组与内容">Mods &amp; content</span></h2>
+        <p data-zh="模组启停不移动文件，只把扩展名在 .jar 与 .jar.disabled 之间切换。列表里的名称与版本优先读取 fabric.mod.json、mods.toml 或 mcmod.info，读不到才回退文件名。">Toggling a mod never moves the file; the extension switches between .jar and .jar.disabled. Names and versions come from fabric.mod.json, mods.toml or mcmod.info, falling back to the filename only when those are missing.</p>
+        <h3 data-zh="安装文件夹对应关系">Where content lands</h3>
+        <ul class="list">
+          <li data-zh="模组 → instances\&lt;id&gt;\mods">Mods → instances\&lt;id&gt;\mods</li>
+          <li data-zh="光影 → instances\&lt;id&gt;\shaderpacks">Shaders → instances\&lt;id&gt;\shaderpacks</li>
+          <li data-zh="资源包 → instances\&lt;id&gt;\resourcepacks">Resource packs → instances\&lt;id&gt;\resourcepacks</li>
+        </ul>
+        <p data-zh="Modrinth 搜索页会先显示目标实例与目录，确认后才会下载。本地模组也可以直接导入，原文件保留不动。">The Modrinth view shows the target instance and folder before downloading. Local mods can also be imported directly, with the original file left untouched.</p>
+      </section>
+
+      <section id="multiplayer">
+        <h2><span class="n">06</span><span data-zh="联机">Multiplayer</span></h2>
+        <p data-zh="VoxLink 提供三种方式：自建房间、局域网扫描、手动中继。房间邀请码以 SLROOM 开头，端口由系统挑选，避免撞上常见端口。">VoxLink offers three routes: host a room, scan the LAN, or point at a relay manually. Room invite codes start with SLROOM, and the port is chosen by the system to avoid common conflicts.</p>
+        <ol class="steps">
+          <li data-zh="建房：选择“自建房间”，应用生成邀请码并开始监听。">Host: choose “Host a room”; the app generates an invite code and starts listening.</li>
+          <li data-zh="加入：对方在同一台机器或同一局域网内输入邀请码。">Join: the other player enters the invite code on the same machine or the same LAN.</li>
+          <li data-zh="局域网扫描：选择“扫描”，列出当前网段可加入的游戏。">LAN scan: choose “Scan” to list joinable games on the current subnet.</li>
+          <li data-zh="手动中继：已有中继地址时直接填写，跳过建房。">Manual relay: if you already run a relay, enter its address and skip hosting.</li>
+        </ol>
+        <div class="note">
+          <b data-zh="当前版本的边界：">Scope in this release:</b>
+          <span data-zh="1.0.3 的信令仍是本地回环（loopback），适合同机与同内网。跨公网联机需要自建中继服务器，公网中继尚未内置。">Signalling in 1.0.3 is still loopback, which covers the same machine and the same LAN. Playing across the internet needs your own relay server; a public relay is not bundled yet.</span>
+        </div>
+      </section>
+
+      <section id="sources">
+        <h2><span class="n">07</span><span data-zh="下载源">Download sources</span></h2>
+        <p data-zh="所有下载都经过白名单校验，并做终验：">Every download passes a source allow-list and a final check:</p>
+        <ul class="list">
+          <li data-zh="官方：piston-meta.mojang.com、libraries.minecraft.net、resources.download.minecraft.net">Official: piston-meta.mojang.com, libraries.minecraft.net, resources.download.minecraft.net</li>
+          <li data-zh="国内镜像：bmclapi2.bangbang93.com（可在设置中开启镜像优先）">China mirror: bmclapi2.bangbang93.com (mirror-first is a setting)</li>
+          <li data-zh="Java：api.adoptium.net、TUNA 镜像、GitHub Releases">Java: api.adoptium.net, TUNA mirror, GitHub Releases</li>
+          <li data-zh="Modrinth：官方 API 与国内镜像">Modrinth: official API and a China mirror</li>
+        </ul>
+        <p data-zh="主源重试失败会切换到镜像；断点续传遇到服务器无视 Range 时整文件重写；最后按清单里的 SHA-1 或 SHA-256 校验，不匹配就删除并重新下载。">Primary retries fall back to a mirror; resume handles servers that ignore Range by rewriting the whole file; the final SHA-1 or SHA-256 check deletes and re-downloads on a mismatch.</p>
+        <div class="code">
+          <div class="code-head">
+            <span data-zh="手工检查缓存清单">Inspect the cached manifest</span>
+            <button class="copy-inline" data-copy="code-cache">COPY</button>
+          </div>
+          <pre id="code-cache"><span class="c"># PowerShell</span>
+$root = "$env:APPDATA\SalmonLauncher"
+Get-ChildItem "$root\cache\meta"
+(Get-Content "$root\cache\meta\version_manifest_v2.json" -Raw).Length</pre>
+        </div>
+      </section>
+
+      <section id="data">
+        <h2><span class="n">08</span><span data-zh="数据目录">Data folder</span></h2>
+        <p data-zh="设置、账户、日志、实例与存档都留在这台机器上：">Settings, accounts, logs, instances and worlds all stay on this machine:</p>
+        <div class="code">
+          <div class="code-head">
+            <span data-zh="打开数据目录">Open the data folder</span>
+            <button class="copy-inline" data-copy="code-open">COPY</button>
+          </div>
+          <pre id="code-open">explorer "$env:APPDATA\SalmonLauncher"</pre>
+        </div>
+        <p data-zh="设置页底部的“清除全部数据”会先让你勾选额外要清除的项目，随后进入 10 秒冷静期；倒计时结束再确认一次才会执行，完成后应用自动退出。">“Clear all data” at the bottom of settings first asks which extra items to remove, then starts a 10-second cooling-off countdown. Only after that second confirmation does it run, and the app exits when done.</p>
+        <div class="note green">
+          <b data-zh="备份建议：">Backup tip:</b>
+          <span data-zh="迁移到另一台电脑时，直接复制整个 %APPDATA%\SalmonLauncher 目录即可，包括实例与存档。">To move to another PC, copy the whole %APPDATA%\SalmonLauncher folder, instances and worlds included.</span>
+        </div>
+      </section>
+
+      <section id="faq">
+        <h2><span class="n">09</span><span data-zh="常见问题">Troubleshooting</span></h2>
+        <p data-zh="先从日志开始。实例日志在 instances\&lt;id&gt;\logs\latest.log，崩溃报告在 crash-reports。">Start with the log. The instance log is at instances\&lt;id&gt;\logs\latest.log, and crash reports are in crash-reports.</p>
+        <div class="faq">
+          <details>
+            <summary data-zh="Windows 提示“未知发布者”，是不是文件有问题？">Windows says “Unknown publisher”. Is the file bad?</summary>
+            <p data-zh="不是。安装包使用自签名证书签名，未导入该证书的机器会显示未知发布者。用页面上的 SHA-256 校验文件即可确认完整性。">No. The installer is self-signed, so machines without the certificate see an unknown publisher. Compare the SHA-256 on this site to confirm integrity.</p>
+          </details>
+          <details>
+            <summary data-zh="启动卡在某一步不动">Launching seems stuck on one step</summary>
+            <p data-zh="打开任务中心查看当前阶段。如果是资源补齐，说明正在下载缺失对象；如果是 Java，可能在等待下载完成。网络受限时可以到设置里开启镜像优先。">Open the task centre to see the current stage. Assets means missing objects are downloading; Java means a download may be in flight. On a restricted network, turn on mirror-first in settings.</p>
+          </details>
+          <details>
+            <summary data-zh="游戏闪退，日志里有 OutOfMemoryError">The game exits with OutOfMemoryError</summary>
+            <p data-zh="在实例的启动设置里提高内存上限（例如 4096 MB 以上），同时确认系统本身还有足够空闲内存。整合包越大，需要的堆越多。">Raise the memory limit in the instance's launch settings (for example above 4096 MB), and check that the system itself has free memory. Bigger packs need bigger heaps.</p>
+          </details>
+          <details>
+            <summary data-zh="模组装上但游戏里没有">A mod is installed but absent in game</summary>
+            <p data-zh="确认三件事：模组与游戏版本匹配、加载器类型匹配（Fabric 的模组不能放进 Forge 实例）、文件没有被改成 .jar.disabled。">Check three things: the mod matches the game version, it matches the loader (a Fabric mod will not run in a Forge instance), and the file is not renamed to .jar.disabled.</p>
+          </details>
+          <details>
+            <summary data-zh="联机加入失败">Joining a room fails</summary>
+            <p data-zh="1.0.3 的中继是本地回环，只有同机或同内网可用。跨公网需要一个可访问的中继地址。确认双方版本一致，并检查防火墙是否放行应用。">The 1.0.3 relay is loopback, so it only works on the same machine or LAN. Across the internet you need a reachable relay address. Make sure both sides run the same version and that the firewall allows the app.</p>
+          </details>
+          <details>
+            <summary data-zh="日志文件打不开，提示被占用">The log cannot be opened because it is in use</summary>
+            <p data-zh="游戏运行时日志被 log4j 持有。启动器用共享读写方式读取，所以应用内查看不会冲突；用其他编辑器中打开时请选择允许共享读取的工具。">The game holds the log open through log4j. The launcher reads it with shared access, so its viewer is fine; other editors must allow shared reads.</p>
+          </details>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html">
+          <img src="assets/img/logo.png" alt="">
+          <span class="brand-name">SalmonLauncher</span>
+        </a>
+        <p data-zh="一个开源的 Minecraft Java 版启动器：安装、启动、模组、联机、诊断，全部本地完成。">An open-source Minecraft: Java Edition launcher. Install, launch, mod, play together and diagnose — all locally.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="产品">Product</h4>
+        <a href="features.html" data-zh="功能">Features</a>
+        <a href="download.html" data-zh="下载">Download</a>
+        <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="资源">Resources</h4>
+        <a href="docs.html" data-zh="文档">Documentation</a>
+        <a href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="所有版本">All releases</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="法律">Legal</h4>
+        <a href="about.html" data-zh="关于与许可">About &amp; licence</a>
+        <a href="about.html#disclaimer" data-zh="免责声明">Disclaimer</a>
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span data-year>2026</span> Hugo Mou · SalmonLauncher</span>
+      <span data-zh="非 Mojang Studios 或 Microsoft 官方产品。Minecraft 为 Mojang Studios 商标。">Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang Studios.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>

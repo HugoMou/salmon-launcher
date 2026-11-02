@@ -40,7 +40,7 @@
 
 两个文件都包含完整的 .NET 10 与 Windows App SDK 运行时，**无需单独安装任何运行库**。下载地址：[GitHub Releases](https://github.com/HugoMou/salmonlauncher/releases)。
 
-安装包为未签名版本，首次运行时 Windows SmartScreen 可能提示「更多信息 → 仍要运行」。卸载程序会保留 `%APPDATA%\SalmonLauncher` 下的实例与存档。
+安装包与卸载程序使用自签名证书（CN=SalmonLauncher, O=Hugo Mou），由构建脚本在本地生成。未导入该证书的电脑仍可能提示「未知发布者」，这是自签名的正常现象，不代表文件被篡改——请改为核对 SHA-256。卸载程序会保留 `%APPDATA%\SalmonLauncher` 下的实例与存档。
 
 ## 构建
 
