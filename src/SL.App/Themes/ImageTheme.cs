@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,13 +18,13 @@ using Windows.Storage.Streams;
 
 namespace SL.App.Themes;
 
-/// <summary>从一张壁纸里提取出的主题(配色 + 强调色 + 壁纸路径)。</summary>
+/// <summary>A theme extracted from a wallpaper (palette + accent + wallpaper path).</summary>
 public sealed record ImageThemeResult(string DominantHex, ThemePalette Palette, AccentChoice Accent);
 
-/// <summary>从图片取色并生成主题:主色决定强调色,平均色决定底色倾向。</summary>
+/// <summary>Sample colors from an image and generate a theme: the dominant color determines the accent, the average color biases the background.</summary>
 public static class ImageTheme
 {
-    /// <summary>读取图片像素(BGRA8)。</summary>
+    /// <summary>Read image pixels (BGRA8).</summary>
     public static async Task<(int Width, int Height, byte[] Pixels)?> ReadPixelsAsync(string path, int maxEdge = 320)
     {
         try
@@ -67,7 +67,7 @@ public static class ImageTheme
         }
     }
 
-    /// <summary>平均色(用于判断整体明暗)。</summary>
+    /// <summary>Average color (used to judge overall lightness).</summary>
     public static (byte R, byte G, byte B) Average(byte[] bgra)
     {
         long r = 0, g = 0, b = 0, n = 0;
@@ -85,7 +85,7 @@ public static class ImageTheme
         return ((byte)(r / n), (byte)(g / n), (byte)(b / n));
     }
 
-    /// <summary>主色:按 16 级量化统计,选"出现多且足够鲜艳"的颜色。</summary>
+    /// <summary>Dominant color: quantized into 16 levels, picking the color that appears often and is vivid enough.</summary>
     public static (byte R, byte G, byte B) Dominant(byte[] bgra)
     {
         var buckets = new Dictionary<int, (int Count, long R, long G, long B)>();
@@ -126,7 +126,7 @@ public static class ImageTheme
             var sat = max == 0 ? 0 : (max - min) / (double)max;
             var lum = (max + min) / 510.0;
 
-            // 出现频率为主,适度偏好鲜艳、亮度居中的颜色
+            // Weight frequency first, with a mild preference for vivid colors of medium lightness
             var score = Math.Log(entry.Count + 1) * (0.35 + sat * 1.4) * (1 - Math.Abs(lum - 0.55) * 1.6);
             if (score > bestScore)
             {
@@ -137,7 +137,7 @@ public static class ImageTheme
         return best;
     }
 
-    /// <summary>由图片生成主题(配色推导复用方块主题的 HSL 逻辑)。</summary>
+    /// <summary>Generate a theme from an image (color derivation reuses the HSL logic from block themes).</summary>
     public static async Task<ImageThemeResult?> BuildAsync(string id, string name, string imagePath, string hint)
     {
         var pixels = await ReadPixelsAsync(imagePath);
@@ -147,7 +147,7 @@ public static class ImageTheme
         var (r, g, b) = Dominant(pixels.Value.Pixels);
         var (ar, ag, ab) = Average(pixels.Value.Pixels);
 
-        // 主色占 70%,平均色占 30%,避免极端鲜艳的画面把界面带偏
+        // 70% dominant color and 30% average color, so an extremely vivid image does not skew the UI
         var mr = (byte)((r * 0.7) + (ar * 0.3));
         var mg = (byte)((g * 0.7) + (ag * 0.3));
         var mb = (byte)((b * 0.7) + (ab * 0.3));

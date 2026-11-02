@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,7 +20,7 @@ using SL.App.Localization;
 
 namespace SL.App.Dialogs;
 
-/// <summary>提示口味(信息/成功/警告/错误/询问)。</summary>
+/// <summary>Message flavor (info/success/warning/error/question).</summary>
 public enum MsgMark
 {
     Info,
@@ -31,19 +31,19 @@ public enum MsgMark
 }
 
 /// <summary>
-/// 模态对话框服务(WinUI 3 ContentDialog):
-/// - 同一 XamlRoot 同时只能有一个 ContentDialog,内部用信号量排队;
-/// - API 与旧版(WPF 自绘层)保持一致,便于页面平移。
+/// Modal dialog service (WinUI 3 ContentDialog):
+/// - Only one ContentDialog may exist per XamlRoot at a time; requests are queued internally with a semaphore;
+/// - The API matches the legacy version (WPF custom-drawn layer) so pages can be ported easily.
 /// </summary>
 public sealed class DialogService
 {
     private XamlRoot? _root;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    /// <summary>由 MainWindow 注入根 XamlRoot。</summary>
+    /// <summary>Injected with the root XamlRoot by MainWindow.</summary>
     public void Attach(XamlRoot root) => _root = root;
 
-    // ============================== 常用对话框 ==============================
+    // ============================== Common dialogs ==============================
 
     public async Task<bool> ConfirmAsync(string title, string message, MsgMark mark = MsgMark.Question,
         string? okLabel = null, string? cancelLabel = null)
@@ -110,12 +110,12 @@ public sealed class DialogService
         return result == ContentDialogResult.Primary ? list.SelectedIndex : null;
     }
 
-    // ============================== 构建与调度 ==============================
+    // ============================== Construction and dispatch ==============================
 
-    /// <summary>根 XamlRoot(MainWindow 注入;自绘对话框复用)。</summary>
+    /// <summary>Root XamlRoot (injected by MainWindow; reused by custom-drawn dialogs).</summary>
     public XamlRoot? Root => _root;
 
-    /// <summary>展示自定义 ContentDialog(与内置对话框共用排队,保证同根单例)。</summary>
+    /// <summary>Show a custom ContentDialog (shares the queue with built-in dialogs, guaranteeing a single instance per root).</summary>
     public async Task<ContentDialogResult> ShowCustomAsync(ContentDialog dialog)
     {
         dialog.XamlRoot = dialog.XamlRoot ?? _root
@@ -176,7 +176,7 @@ public sealed class DialogService
         return dialog;
     }
 
-    /// <summary>同一时刻只展示一个对话框;后续请求排队依次弹出。</summary>
+    /// <summary>Only one dialog is shown at a time; later requests are queued and shown in order.</summary>
     private async Task<ContentDialogResult> ShowAsync(ContentDialog dialog)
     {
         await _gate.WaitAsync().ConfigureAwait(true);

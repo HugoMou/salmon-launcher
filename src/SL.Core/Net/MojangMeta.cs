@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,9 +21,9 @@ using System.Text.Json;
 namespace SL.Core.Net;
 
 /// <summary>
-/// Mojang 官方元数据接入(阶段二):
-/// - version_manifest_v2:版本清单(带缓存,30 分钟新鲜度,离线时回退旧缓存);
-/// - 版本 JSON:解析 client / libraries / assetIndex,并有 windows 平台 rules 过滤。
+/// Mojang official metadata access (stage 2):
+/// - version_manifest_v2: version manifest (cached, 30-minute freshness, falls back to the stale cache when offline);
+/// - version JSON: parse client / libraries / assetIndex, with Windows platform rules filtering.
 /// </summary>
 public static class MojangMeta
 {
@@ -35,7 +35,7 @@ public static class MojangMeta
         Timeout = TimeSpan.FromSeconds(30),
     };
 
-    // ============================== 模型 ==============================
+    // ============================== Models ==============================
 
     public sealed record VersionEntry(string Id, string Type, string Url, string? Sha1, DateTimeOffset ReleaseTime)
     {
@@ -62,14 +62,14 @@ public static class MojangMeta
         public required IReadOnlyList<LibraryArtifact> Libraries { get; init; }
         public string MainClass { get; init; } = "";
         public string Type { get; init; } = "release";
-        /// <summary>javaVersion.majorVersion(缺失视为 8)。</summary>
+        /// <summary>javaVersion.majorVersion (treated as 8 when absent).</summary>
         public int JavaMajor { get; init; } = 8;
         public long LibraryBytes => Libraries.Sum(l => l.Size);
     }
 
-    // ============================== 版本清单 ==============================
+    // ============================== Version manifest ==============================
 
-    /// <summary>取版本清单:缓存优先后网络;网络失败回退过期缓存;两者皆无 → 抛出。</summary>
+    /// <summary>Get the version manifest: cache first, then network; fall back to the stale cache when the network fails; throw when neither exists.</summary>
     public static async Task<IReadOnlyList<VersionEntry>> GetVersionsAsync(bool forceRefresh, CancellationToken cancellation)
     {
         var cacheFile = Path.Combine(Core.Boot.Runtime.MetaDir, "version_manifest_v2.json");
@@ -77,7 +77,7 @@ public static class MojangMeta
         var fresh = File.Exists(stampFile)
                     && DateTimeOffset.UtcNow - File.GetLastWriteTimeUtc(stampFile) < Freshness;
 
-        // 读缓存路径(新鲜缓存始终可用;非强制刷新时旧缓存也可用)
+        // read the cached path (a fresh cache is always usable; a stale one is usable unless a forced refresh is requested)
         if (File.Exists(cacheFile) && (fresh || !forceRefresh))
         {
             try
@@ -86,14 +86,14 @@ public static class MojangMeta
             }
             catch
             {
-                // 缓存损坏 → 走网络
+                // cache corrupted → go to the network
             }
         }
 
         try
         {
             var json = await FetchAsync(ManifestUrl, cancellation).ConfigureAwait(false);
-            ParseManifest(json); // 预检,坏响应不落缓存
+            ParseManifest(json); // pre-validate so a bad response is not cached
             Directory.CreateDirectory(Core.Boot.Runtime.MetaDir);
             await File.WriteAllTextAsync(cacheFile, json, cancellation).ConfigureAwait(false);
             File.WriteAllText(stampFile, DateTimeOffset.UtcNow.ToString("O"));
@@ -101,7 +101,7 @@ public static class MojangMeta
         }
         catch (Exception)
         {
-            // 网络失败:有过期缓存就降级使用
+            // network failed: degrade to the stale cache when one exists
             if (File.Exists(cacheFile))
                 return ParseManifest(await File.ReadAllTextAsync(cacheFile, cancellation).ConfigureAwait(false));
             throw;
@@ -124,16 +124,16 @@ public static class MojangMeta
         return versions;
     }
 
-    // ============================== 版本详情 ==============================
+    // ============================== Version details ==============================
 
-    /// <summary>下载并解析版本 JSON(client / libraries / assetIndex,按 Windows 平台过滤)。</summary>
+    /// <summary>Download and parse the version JSON (client / libraries / assetIndex, filtered by Windows platform).</summary>
     public static async Task<VersionDetail?> GetVersionAsync(string versionUrl, CancellationToken cancellation)
     {
         var json = await FetchAsync(versionUrl, cancellation).ConfigureAwait(false);
         return ParseVersionJson(json);
     }
 
-    /// <summary>解析版本 JSON 文本(启动流水线直接吃 instances/<id>/meta/<id>.json)。</summary>
+    /// <summary>Parse version JSON text (the launch pipeline consumes instances/<id>/meta/<id>.json directly).</summary>
     public static VersionDetail ParseVersionJson(string json)
     {
         using var doc = JsonDocument.Parse(json);
@@ -166,7 +166,7 @@ public static class MojangMeta
             if (downloads.TryGetProperty("client_mappings", out var mappings)
                 && mappings.ValueKind == JsonValueKind.Object)
             {
-                // 客户端映射表(混淆表)阶段三启动流程才需要,这里忽略
+                // the client mappings (obfuscation table) are only needed by the stage-3 launch flow, so they are ignored here
             }
         }
 
@@ -200,8 +200,8 @@ public static class MojangMeta
 
             var name = lib.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
 
-            // 2026 新格式:natives 直接编码在坐标里(…:natives-windows)。
-            // 其他平台的 natives 变体(…-natives-linux/macos/…)在本机完全不适用 → 跳过。
+            // 2026 format: natives are encoded directly in the coordinate (…:natives-windows).
+            // natives variants for other platforms (…-natives-linux/macos/…) are entirely unusable on this machine → skip.
             if (IsForeignNativeName(name))
                 continue;
             var cppNative = IsWindowsNativeName(name);
@@ -218,7 +218,7 @@ public static class MojangMeta
                             a.Url, a.Size, a.Sha1, IsNative: cppNative));
                 }
 
-                // 旧格式(有 classifiers 时):Windows natives 单独拉取(阶段三启动准备时解压)
+                // legacy format (when classifiers are present): fetch Windows natives separately (extracted during stage-3 launch preparation)
                 if (dl.TryGetProperty("classifiers", out var classifiers)
                     && classifiers.ValueKind == JsonValueKind.Object
                     && classifiers.TryGetProperty("natives-windows", out var natives)
@@ -236,11 +236,11 @@ public static class MojangMeta
         return result;
     }
 
-    /// <summary>2026 新格式:Windows natives 以坐标后缀 natives-windows 表示(x64 主线)。</summary>
+    /// <summary>2026 format: Windows natives are expressed by the natives-windows coordinate suffix (x64 mainline).</summary>
     private static bool IsWindowsNativeName(string name)
         => name.EndsWith("natives-windows", StringComparison.Ordinal);
 
-    /// <summary>其他平台(含 Windows ARM64)的 natives 变体 → x64 主线不可用。</summary>
+    /// <summary>natives variants for other platforms (including Windows ARM64) → unusable on the x64 mainline.</summary>
     private static bool IsForeignNativeName(string name)
         => name.Contains("natives-linux", StringComparison.Ordinal)
            || name.Contains("natives-macos", StringComparison.Ordinal)
@@ -249,7 +249,7 @@ public static class MojangMeta
            || name.Contains("natives-solaris", StringComparison.Ordinal)
            || name.EndsWith("natives-windows-arm64", StringComparison.Ordinal);
 
-    /// <summary>Mojang library rules 的 Windows 平台判定:rules 为空 → 允许;否则按逐条 allow/deny 半径收敛。</summary>
+    /// <summary>Windows platform decision for Mojang library rules: empty rules → allowed; otherwise converge per allow/deny rule.</summary>
     private static bool EvaluateRules(JsonElement lib)
     {
         if (!lib.TryGetProperty("rules", out var rules) || rules.ValueKind != JsonValueKind.Array)
@@ -260,7 +260,7 @@ public static class MojangMeta
         {
             var action = rule.TryGetProperty("action", out var a) && a.GetString() == "deny" ? "deny" : "allow";
 
-            // 当前仅支持无 feature 的 os 规则;含 feature 的规则视为不适用(不收敛)
+            // only featureless os rules are supported for now; rules containing features are treated as not applicable (no convergence)
             bool applies = true;
             if (rule.TryGetProperty("os", out var os) && os.ValueKind == JsonValueKind.Object)
             {
@@ -270,7 +270,7 @@ public static class MojangMeta
                     applies &= arch.GetString() is null or "" or "x64";
             }
             if (rule.TryGetProperty("features", out _))
-                applies = false; // TLA/特殊客户端特性:阶段三按需启用
+                applies = false; // TLA/special client features: enabled on demand in stage 3
 
             if (applies)
                 allowed = action == "allow";
@@ -278,7 +278,7 @@ public static class MojangMeta
         return allowed;
     }
 
-    /// <summary>被解析库相对路径的兜底推导:group/artifact/version/name.jar。</summary>
+    /// <summary>Fallback derivation of a parsed library relative path: group/artifact/version/name.jar.</summary>
     private static string DerivePath(string name)
     {
         var parts = name.Split(':');

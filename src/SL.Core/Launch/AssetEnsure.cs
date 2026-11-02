@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,9 +21,9 @@ using System.Text.Json;
 namespace SL.Core.Launch;
 
 /// <summary>
-/// 资源对象补齐:读取 assets/indexes/<id>.json,把缺失的 objects
-/// (assets/objects/<hash 前两位>/<hash>)按 8 并发补齐,SHA-1 随手复核。
-/// 后台发生,不进任务中心(由 Pres 聚合为一条汇总)。
+/// Asset object backfill: read assets/indexes/<id>.json and fill in the missing objects
+/// (assets/objects/<first two chars of the hash>/<hash>) with 8-way concurrency, verifying SHA-1 on the fly.
+/// Runs in the background, outside the task center (Pres aggregates it into one summary).
 /// </summary>
 public static class AssetEnsure
 {
@@ -47,10 +47,10 @@ public static class AssetEnsure
 
     public sealed record AssetProgress(int Done, int Total, long Bytes);
 
-    /// <summary>补齐进度(节流由订阅方自行处理)。</summary>
+    /// <summary>Backfill progress (throttling is left to the subscriber).</summary>
     public static event Action<AssetProgress>? Progress;
 
-    /// <summary>返回缺失数;全部就绪返回 0。资产索引文件缺失/损坏 → 抛出。</summary>
+    /// <summary>Returns the number of missing objects; 0 when everything is ready. A missing/corrupt asset index throws.</summary>
     public static async Task<int> EnsureAsync(string indexFile, string assetsRoot, CancellationToken cancellation)
     {
         var (objects, missingRaw) = await Task.Run(() =>
@@ -76,7 +76,7 @@ public static class AssetEnsure
                     if (!File.Exists(target))
                         missing.Add(item);
                     else if (size >= 0 && new FileInfo(target).Length != size)
-                        missing.Add(item); // 大小不符 → 重下
+                        missing.Add(item); // size mismatch → download again
                 }
             }
             return (list, missing);
@@ -102,7 +102,7 @@ public static class AssetEnsure
             }
         }
 
-        // 8 路切片并发
+        // 8-way chunked concurrency
         const int lanes = 8;
         var tasks = new List<Task>();
         var chunks = missingRaw.Select((o, i) => (o, idx: i))
@@ -110,7 +110,7 @@ public static class AssetEnsure
         tasks.AddRange(chunks.Select(worker));
         await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        // 失败一次镜像重试(顺序)
+        // retry once on the mirror after a failure (sequential)
         foreach (var obj in failed)
         {
             cancellation.ThrowIfCancellationRequested();
@@ -148,7 +148,7 @@ public static class AssetEnsure
             if (obj.Size >= 0 && bytes.Length != obj.Size)
                 return false;
 
-            // SHA-1 复核(资产对象名即哈希)
+            // SHA-1 re-check (the asset object name is its hash)
             using var sha = System.Security.Cryptography.SHA1.Create();
             var actual = Convert.ToHexString(sha.ComputeHash(bytes)).ToLowerInvariant();
             if (!string.Equals(actual, obj.Hash, StringComparison.OrdinalIgnoreCase))

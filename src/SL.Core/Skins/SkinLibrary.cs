@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,14 +18,14 @@ using System.Net.Http;
 
 namespace SL.Core.Skins;
 
-/// <summary>一个已保存的皮肤。</summary>
-/// <param name="OwnerId">所属账户 Id(msa:&lt;uuid&gt; / offline:&lt;名字&gt;)</param>
-/// <param name="FileName">文件名(含扩展名)</param>
-/// <param name="Path">完整路径</param>
-/// <param name="Name">显示名(去扩展名)</param>
-/// <param name="Width">像素宽(64 / 128)</param>
-/// <param name="Height">像素高(64 为现代皮肤,32 为旧版)</param>
-/// <param name="SavedAt">保存时间</param>
+/// <summary>A saved skin.</summary>
+/// <param name="OwnerId">Owning account Id (msa:&lt;uuid&gt; / offline:&lt;name&gt;)</param>
+/// <param name="FileName">File name (including the extension)</param>
+/// <param name="Path">Full path</param>
+/// <param name="Name">Display name (extension removed)</param>
+/// <param name="Width">Pixel width (64 / 128)</param>
+/// <param name="Height">Pixel height (64 for modern skins, 32 for legacy)</param>
+/// <param name="SavedAt">Save time</param>
 public sealed record SkinItem(string OwnerId, string FileName, string Path, string Name,
     int Width, int Height, DateTimeOffset SavedAt)
 {
@@ -36,8 +36,8 @@ public sealed record SkinItem(string OwnerId, string FileName, string Path, stri
 }
 
 /// <summary>
-/// 皮肤仓库:按账户分目录保存皮肤文件(数据目录 skins/&lt;ownerId&gt;/),
-/// 支持从本地导入与按 URL 下载;文件即事实,便于用户自行管理。
+/// Skin repository: skin files are stored per account directory (data directory skins/&lt;ownerId&gt;/),
+/// with local import and URL download; files are the source of truth, so users can manage them directly.
 /// </summary>
 public static class SkinLibrary
 {
@@ -64,7 +64,7 @@ public static class SkinLibrary
         return list.OrderByDescending(s => s.SavedAt).ToList();
     }
 
-    /// <summary>从本地文件导入(复制;同名自动追加序号)。返回落盘文件名。</summary>
+    /// <summary>Import from a local file (copy; a duplicate name gets a sequence number appended). Returns the file name written.</summary>
     public static string Import(string ownerId, string sourcePath)
     {
         if (!File.Exists(sourcePath))
@@ -86,7 +86,7 @@ public static class SkinLibrary
         return Path.GetFileName(target);
     }
 
-    /// <summary>按 URL 下载皮肤(仅 http/https),返回落盘文件名。</summary>
+    /// <summary>Download a skin by URL (http/https only); returns the file name written.</summary>
     public static async Task<string> DownloadAsync(string ownerId, string url, string? name,
         CancellationToken cancellation = default)
     {
@@ -121,7 +121,7 @@ public static class SkinLibrary
             File.Delete(path);
     }
 
-    /// <summary>读 PNG 头部 IHDR 取宽高(不依赖图像解码)。</summary>
+    /// <summary>Read width/height from the PNG IHDR header (does not rely on image decoding).</summary>
     private static (int Width, int Height) ReadPngSize(string path)
     {
         try
@@ -130,7 +130,7 @@ public static class SkinLibrary
             var header = new byte[26];
             if (stream.Read(header, 0, header.Length) < header.Length)
                 return (0, 0);
-            // IHDR 数据在 16..24,大端序
+            // IHDR data sits at 16..24, big-endian
             var width = (header[16] << 24) | (header[17] << 16) | (header[18] << 8) | header[19];
             var height = (header[20] << 24) | (header[21] << 16) | (header[22] << 8) | header[23];
             return (width, height);

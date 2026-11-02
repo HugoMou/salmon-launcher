@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -19,13 +19,13 @@ using System.Security.Cryptography;
 namespace SL.Core.Transfers;
 
 /// <summary>
-/// 下载引擎:「任务抽象 + 有界并发调度 + 多源回退 + 重试退避 + 快照事件」。
+/// Download engine: "task abstraction + bounded concurrent scheduling + multi-source fallback + retry backoff + snapshot events".
 ///
-/// - 有界并发:Pump() 在并发上限内按优先级(高→低)从队列取任务启动;
-/// - 多源回退:主源按 MaxAttemptsPerSource 重试并指数退避,耗尽后切换镜像源;
-///   镜像顺序按历史成功率动态调整(成功 +1 / 失败 -1);
-/// - 暂停/取消:CTS 传导进 transport;暂停保留进度,恢复/重试从断点续传;
-/// - 事件即快照:引擎只发不可变 TransferSnapshot,UI 线程零文件 IO。
+/// - Bounded concurrency: Pump() starts tasks from the queue by priority (high→low) within the concurrency limit;
+/// - Multi-source fallback: the primary source retries MaxAttemptsPerSource times with exponential backoff, then switches to a mirror;
+///   mirror order adapts to historical success rates (+1 on success / -1 on failure);
+/// - Pause/cancel: the CTS flows into transport; pause keeps progress, resume/retry continues from the resume point;
+/// - Events are snapshots: the engine only emits immutable TransferSnapshot, so the UI thread does zero file IO.
 /// </summary>
 public sealed class TransferEngine : ITransferService
 {
@@ -73,7 +73,7 @@ public sealed class TransferEngine : ITransferService
         }
     }
 
-    // ============================== 提交 ==============================
+    // ============================== Submit ==============================
 
     public TransferTask Submit(TransferSpec spec)
     {
@@ -91,7 +91,7 @@ public sealed class TransferEngine : ITransferService
         return task;
     }
 
-    // ============================== 控制:暂停/恢复/取消/重试 ==============================
+    // ============================== Control: pause/resume/cancel/retry ==============================
 
     public void Pause(string id)
     {
@@ -110,14 +110,14 @@ public sealed class TransferEngine : ITransferService
                     break;
 
                 case TransferState.Downloading or TransferState.Verifying:
-                    // 标记暂停后取消当前尝试;worker 收尾(FinishInterruption)置为 Paused 并保留进度
+                    // mark paused, then cancel the current attempt; the worker cleanup (FinishInterruption) sets Paused and keeps progress
                     task.PauseRequested = true;
                     if (_cts.TryGetValue(task.Id, out var workerCts))
                         workerCts.Cancel();
-                    return; // 事件由 worker 收尾发出
+                    return; // the event is emitted by the worker cleanup
 
                 default:
-                    return; // 终态任务不可暂停
+                    return; // a terminal task cannot be paused
             }
         }
 
@@ -160,11 +160,11 @@ public sealed class TransferEngine : ITransferService
                     break;
 
                 case TransferState.Downloading or TransferState.Verifying:
-                    // 明确为「取消」:清掉暂停标记再取消尝试
+                    // explicitly a cancel: clear the pause marker before cancelling the attempt
                     task.PauseRequested = false;
                     if (_cts.TryGetValue(task.Id, out var workerCts))
                         workerCts.Cancel();
-                    return; // 事件由 worker 收尾发出
+                    return; // the event is emitted by the worker cleanup
 
                 default:
                     return;
@@ -228,9 +228,9 @@ public sealed class TransferEngine : ITransferService
         RaiseStructure();
     }
 
-    // ============================== 调度 ==============================
+    // ============================== Scheduling ==============================
 
-    /// <summary>调度心跳:可从任意线程安全调用</summary>
+    /// <summary>Scheduling heartbeat: safe to call from any thread</summary>
     private void Pump()
     {
         var starts = new List<TransferTask>();
@@ -256,7 +256,7 @@ public sealed class TransferEngine : ITransferService
             RunWorker(task);
     }
 
-    /// <summary>任务取得并发槽并建立 CTS(锁内调用)</summary>
+    /// <summary>A task has taken a concurrency slot and a CTS (called while the lock is held)</summary>
     private void Begin(TransferTask task)
     {
         task.State = TransferState.Downloading;
@@ -281,9 +281,9 @@ public sealed class TransferEngine : ITransferService
             return _tasks.Where(t => t.State == TransferState.Paused).Select(t => t.Id).ToList();
     }
 
-    // ============================== Worker 生命周期 ==============================
+    // ============================== Worker lifetime ==============================
 
-    /// <summary>async void 仅由引擎内部启动,调用方保证 try/catch 兜底。</summary>
+    /// <summary>async void is only started internally by the engine; callers guarantee a try/catch backstop.</summary>
     private async void RunWorker(TransferTask task)
     {
         try
@@ -292,7 +292,7 @@ public sealed class TransferEngine : ITransferService
         }
         catch (OperationCanceledException)
         {
-            FinishInterruption(task); // 保险:极少数路径漏处理的取消
+            FinishInterruption(task); // safety net: a cancellation missed on a rare path
         }
         catch (Exception ex)
         {
@@ -315,7 +315,7 @@ public sealed class TransferEngine : ITransferService
         {
             lock (_gate)
             {
-                task.BytesReceived = 0; // 换来源后从头开始
+                task.BytesReceived = 0; // restart from zero after switching sources
                 task.CurrentSource = source.Url;
             }
 
@@ -323,12 +323,12 @@ public sealed class TransferEngine : ITransferService
             {
                 var cts = TryGetCts(task.Id);
                 if (cts is null)
-                    return; // 任务已被取消并完成收尾
+                    return; // the task was already cancelled and has been finalized
 
                 long resume;
                 lock (_gate)
                 {
-                    resume = attempt == 1 ? 0 : task.BytesReceived; // 同源重试保留断点
+                    resume = attempt == 1 ? 0 : task.BytesReceived; // same-source retry keeps the resume point
                     task.Attempt = attempt;
                     task.State = TransferState.Downloading;
                     task.Error = null;
@@ -363,7 +363,7 @@ public sealed class TransferEngine : ITransferService
 
                 if (result.Success)
                 {
-                    // 阶段二:Http 任务带期望 SHA-1 时,先进入校验阶段再判定完成
+                    // stage 2: for Http tasks with an expected SHA-1, enter the verification stage before marking completion
                     var verifyError = await VerifySha1Async(task, cts.Token).ConfigureAwait(false);
                     if (verifyError is null)
                     {
@@ -371,7 +371,7 @@ public sealed class TransferEngine : ITransferService
                         return;
                     }
 
-                    // 校验不过 → 删除损坏前缀,按当次尝试失败继续(同源重试 → 镜像)
+                    // verification failed → delete the corrupt prefix and continue as a failure of this attempt (same-source retry → mirror)
                     TryDeleteDest(task.Spec.DestPath);
                     lock (_gate)
                         task.BytesReceived = 0;
@@ -385,7 +385,7 @@ public sealed class TransferEngine : ITransferService
                 }
                 Logging.AppLog.Warn("Transfer", $"{task.Spec.DisplayName} 失败({source.Url}): {task.Error}");
 
-                // 同源指数退避重试
+                // same-source exponential backoff retry
                 if (attempt < _options.MaxAttemptsPerSource)
                 {
                     var backoff = _options.RetryBaseDelayMs * (1 << (attempt - 1));
@@ -404,7 +404,7 @@ public sealed class TransferEngine : ITransferService
                 }
             }
 
-            // 该来源重试耗尽 → 下一个镜像(foreach 顶部会把 BytesReceived 清零)
+            // this source is out of attempts → next mirror (the top of the foreach resets BytesReceived)
         }
 
         var mirrorCount = Math.Max(0, sources.Count - 1);
@@ -413,9 +413,9 @@ public sealed class TransferEngine : ITransferService
             : "下载源失败。请检查网络后重试。");
     }
 
-    // ============================== SHA-1 终验(阶段二) ==============================
+    // ============================== Final SHA-1 check (stage 2) ==============================
 
-    /// <summary>Http + 带 ExpectedSha1 的任务:流式计算文件 SHA-1 并比对。null = 无需校验或校验通过。</summary>
+    /// <summary>Http tasks with ExpectedSha1: compute the file SHA-1 on the fly and compare. null = no check needed or the check passed.</summary>
     private async Task<string?> VerifySha1Async(TransferTask task, CancellationToken token)
     {
         var expected = task.Spec.ExpectedSha1;
@@ -463,7 +463,7 @@ public sealed class TransferEngine : ITransferService
     private static string ShortSha(string sha)
         => sha.Length <= 12 ? sha : sha[..8] + "…";
 
-    /// <summary>删除损坏的落盘文件(尽力而为,失败不阻塞重试)。</summary>
+    /// <summary>Delete the corrupt on-disk file (best effort; a failure does not block the retry).</summary>
     private static void TryDeleteDest(string? dest)
     {
         if (string.IsNullOrEmpty(dest) || !File.Exists(dest))
@@ -474,7 +474,7 @@ public sealed class TransferEngine : ITransferService
         }
         catch (IOException)
         {
-            // 文件被占用等场景:忽略,下轮 PrepareLocalPrefix 会按前缀续传并由校验兜底
+            // file in use, etc.: ignore; the next PrepareLocalPrefix resumes from the prefix and verification covers the rest
         }
         catch (UnauthorizedAccessException)
         {
@@ -507,7 +507,7 @@ public sealed class TransferEngine : ITransferService
         RaiseStructure();
     }
 
-    /// <summary>worker 被取消后的收尾:按 PauseRequested 区分暂停与取消。</summary>
+    /// <summary>Cleanup after a worker is cancelled: tell pause and cancel apart via PauseRequested.</summary>
     private void FinishInterruption(TransferTask task)
     {
         lock (_gate)
@@ -518,7 +518,7 @@ public sealed class TransferEngine : ITransferService
 
             if (wasPause)
             {
-                task.State = TransferState.Paused; // 保留 BytesReceived,恢复时续传
+                task.State = TransferState.Paused; // keep BytesReceived so the resume continues
             }
             else
             {
@@ -532,7 +532,7 @@ public sealed class TransferEngine : ITransferService
         RaiseStructure();
     }
 
-    // ============================== 进度与事件 ==============================
+    // ============================== Progress and events ==============================
 
     private void OnProgress(TransferTask task, long absolute)
     {
@@ -544,7 +544,7 @@ public sealed class TransferEngine : ITransferService
             {
                 if (absolute < last.Bytes)
                 {
-                    // 进度回退(换来源):重置采样基准
+                    // progress went backwards (source switch): reset the sampling baseline
                     _progressLast[task.Id] = (absolute, now);
                 }
                 else
@@ -555,7 +555,7 @@ public sealed class TransferEngine : ITransferService
                         var rate = (absolute - last.Bytes) * 1000.0 / Math.Max(1, dt);
                         task.SpeedBytesPerSecond = task.SpeedBytesPerSecond <= 0
                             ? rate
-                            : task.SpeedBytesPerSecond * 0.65 + rate * 0.35; // EMA 平滑
+                            : task.SpeedBytesPerSecond * 0.65 + rate * 0.35; // EMA smoothing
                         _progressLast[task.Id] = (absolute, now);
                     }
                 }
@@ -612,7 +612,7 @@ public sealed class TransferEngine : ITransferService
                task.SpeedBytesPerSecond, task.Attempt, task.Spec.Sources.Count, task.CurrentSource,
                task.Error, task.Spec.Priority, task.Spec.Hidden);
 
-    // ============================== 多源与传输 ==============================
+    // ============================== Multi-source and transport ==============================
 
     private void NoteSource(string url, bool ok)
     {

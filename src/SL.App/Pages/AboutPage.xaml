@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@
                        Style="{ThemeResource TitleLargeTextBlockStyle}"
                        Foreground="{ThemeResource Brush.Fg}" />
 
-            <!-- 品牌卡 -->
+            <!-- Brand card -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -45,7 +45,7 @@
                                    Stretch="Uniform" />
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="3">
-                            <TextBlock Text="Salmon Launcher"
+                            <TextBlock Text="SalmonLauncher"
                                        FontSize="21"
                                        FontWeight="Bold"
                                        Foreground="{ThemeResource Brush.Fg}" />
@@ -84,7 +84,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 运行信息 -->
+            <!-- Runtime info -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -123,7 +123,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 系统要求 -->
+            <!-- System requirements -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -140,7 +140,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 数据与隐私 -->
+            <!-- Data and privacy -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -155,7 +155,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 安装与卸载 -->
+            <!-- Install and uninstall -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -169,7 +169,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 能力一览 -->
+            <!-- Capabilities at a glance -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -197,7 +197,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 反馈与问题报告 -->
+            <!-- Feedback and issue reporting -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -211,7 +211,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 致谢 -->
+            <!-- Credits -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -227,12 +227,12 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="Salmon Launcher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。"
+            <TextBlock Text="SalmonLauncher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。"
                        FontSize="11.5"
                        TextWrapping="Wrap"
                        Foreground="{ThemeResource Brush.FgFaint}"
                        Margin="0,4,0,0" />
-            <TextBlock Text="Copyright (C) 2026 Hugo Mou · Salmon Launcher 以 GNU GPL v3 或更新版本许可发布;源代码与许可证全文见项目仓库。"
+            <TextBlock Text="Copyright (C) 2026 Hugo Mou · SalmonLauncher 以 GNU GPL v3 或更新版本许可发布;源代码与许可证全文见项目仓库。"
                        FontSize="11.5"
                        TextWrapping="Wrap"
                        Foreground="{ThemeResource Brush.FgFaint}" />

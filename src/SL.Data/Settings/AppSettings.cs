@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -17,56 +17,56 @@ namespace SL.Data.Settings;
 
 using SL.Data.Storage;
 
-/// <summary>全局设置的数据载体(与业务层的配置模型保持独立,方便字段演进)。</summary>
+/// <summary>Data carrier for global settings (kept independent from the business-layer config model so fields can evolve).</summary>
 public class AppSettings
 {
     /// <summary>"dark" | "light" | "system"</summary>
     public string ThemeMode { get; set; } = "system";
 
-    /// <summary>配色方案：salmon / ink / sand / slate</summary>
+    /// <summary>Color palette: salmon / ink / sand / slate</summary>
     public string ThemePalette { get; set; } = "salmon";
 
-    /// <summary>强调色：coral / ocean / forest / violet / amber</summary>
+    /// <summary>Accent color: coral / ocean / forest / violet / amber</summary>
     public string AccentColor { get; set; } = "coral";
 
-    /// <summary>下载并发数上限</summary>
+    /// <summary>Maximum download concurrency</summary>
     public int TransferConcurrency { get; set; } = 6;
 
-    /// <summary>阶段五:离线账户名(游戏内玩家名)</summary>
+    /// <summary>Phase 5: offline account name (in-game player name)</summary>
     public string AccountName { get; set; } = "Rio";
 
-    /// <summary>账户类型:"offline"(离线)/ "msa"(微软正版)。</summary>
+    /// <summary>Account type: "offline" / "msa" (Microsoft account).</summary>
     public string AccountType { get; set; } = "offline";
 
-    /// <summary>游戏内存分配(MB)</summary>
+    /// <summary>Game memory allocation (MB)</summary>
     public int MemoryMb { get; set; } = 4096;
 
-    /// <summary>附加 JVM 参数(空格分隔,插在主类之前)</summary>
+    /// <summary>Extra JVM arguments (space-separated, inserted before the main class)</summary>
     public string JvmExtraArgs { get; set; } = "";
 
-    /// <summary>游戏窗口宽度(像素)</summary>
+    /// <summary>Game window width (pixels)</summary>
     public int GameWidth { get; set; } = 854;
 
-    /// <summary>游戏窗口高度(像素)</summary>
+    /// <summary>Game window height (pixels)</summary>
     public int GameHeight { get; set; } = 480;
 
-    /// <summary>下载源:"auto"(官方主源+镜像回退) / "bmclapi"(镜像优先)</summary>
+    /// <summary>Download source: "auto" (official primary source + mirror fallback) / "bmclapi" (mirror preferred)</summary>
     public string DownloadSource { get; set; } = "auto";
 
-    /// <summary>Modrinth 走国内镜像(检索与文件下载)</summary>
+    /// <summary>Use the domestic mirror for Modrinth (search and file downloads)</summary>
     public bool ModrinthMirror { get; set; } = true;
 
-    /// <summary>是否已阅读并同意用户协议</summary>
+    /// <summary>Whether the user agreement has been read and accepted</summary>
     public bool TermsAccepted { get; set; }
 
-    /// <summary>界面语言:"auto"(跟随系统)或 zh-Hans / zh-Hant / en / ja</summary>
+    /// <summary>UI language: "auto" (follow the system) or zh-Hans / zh-Hant / en / ja</summary>
     public string Language { get; set; } = "auto";
 
-    /// <summary>欢迎页(首次启动初始化)是否已完成;清除数据后回到 false 重新引导</summary>
+    /// <summary>Whether onboarding (first-run setup) has completed; reset to false after clearing data to run the guide again</summary>
     public bool OnboardingCompleted { get; set; }
 }
 
-/// <summary>设置文件的读写入口(原子落盘)。</summary>
+/// <summary>Read/write entry point for the settings file (atomic persistence).</summary>
 public sealed class AppSettingsStore
 {
     private readonly string _path;

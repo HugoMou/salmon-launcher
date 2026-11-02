@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@ using SL.App.Localization;
 
 namespace SL.App.Pages;
 
-/// <summary>可诊断文件行。</summary>
+/// <summary>Diagnosable file row.</summary>
 public sealed class CrashRow
 {
     public CrashRow(string path, DateTimeOffset time)
@@ -37,7 +37,7 @@ public sealed class CrashRow
     public string Detail { get; }
 }
 
-/// <summary>崩溃诊断页视图模型:扫描实例崩溃报告与日志,按规则表给出结论。</summary>
+/// <summary>Crash diagnostics view model: scans instance crash reports and logs, then concludes by rule table.</summary>
 public sealed class CrashDiagVM : VmBase, IRefreshable
 {
     private CrashRow? _selectedFile;

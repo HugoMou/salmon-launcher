@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -27,7 +27,7 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- 分段控件:横向排列的圆角选项,选中态用强调色文字 + 卡片底色 -->
+            <!-- Segmented control: horizontally arranged rounded options; the selected state uses accent-colored text + card background -->
             <Style x:Key="Style.Segment" TargetType="RadioButton">
                 <Setter Property="MinWidth" Value="0" />
                 <Setter Property="MinHeight" Value="0" />
@@ -84,7 +84,7 @@
                 </Setter>
             </Style>
 
-            <!-- 分段控件的容器底板 -->
+            <!-- Container backing for the segmented control -->
             <Style x:Key="Style.SegmentHost" TargetType="Border">
                 <Setter Property="Background" Value="{ThemeResource Brush.PageBg}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
@@ -94,14 +94,14 @@
                 <Setter Property="HorizontalAlignment" Value="Left" />
             </Style>
 
-            <!-- 文本链接按钮 -->
+            <!-- Text link button -->
             <Style x:Key="Style.Link" TargetType="HyperlinkButton">
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="FontSize" Value="12.5" />
                 <Setter Property="Foreground" Value="{ThemeResource Brush.Accent}" />
             </Style>
 
-            <!-- 协议正文段落 -->
+            <!-- Terms body paragraphs -->
             <Style x:Key="Style.TermsBody" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="12.5" />
                 <Setter Property="LineHeight" Value="21" />
@@ -109,7 +109,7 @@
                 <Setter Property="Foreground" Value="{ThemeResource Brush.FgDim}" />
             </Style>
 
-            <!-- 页面主标题:比系统 TitleLarge 小一号,避免高分屏下过大 -->
+            <!-- Page main title: one size smaller than the system TitleLarge to avoid being too large on high-DPI screens -->
             <Style x:Key="TitleLargeTextBlockStyle" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="24" />
                 <Setter Property="FontWeight" Value="SemiBold" />

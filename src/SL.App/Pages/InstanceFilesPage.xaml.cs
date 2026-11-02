@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -28,7 +28,7 @@ using SL.App.Notify;
 
 namespace SL.App.Pages;
 
-/// <summary>实例内文件行(资源包 / 光影 / 存档共用)。</summary>
+/// <summary>File row inside an instance (shared by resource packs / shaders / worlds).</summary>
 public sealed class InstanceFileRow
 {
     public InstanceFileRow(string name, string detail, string glyph, string actionText, string path)
@@ -49,7 +49,7 @@ public sealed class InstanceFileRow
         => ActionText.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
 }
 
-/// <summary>实例文件页:资源包 / 光影 / 存档三种视图共用,分类由路由 key 决定。</summary>
+/// <summary>Instance files page: shared by the resource pack / shader / world views; the category is determined by the route key.</summary>
 public sealed partial class InstanceFilesPage : Page
 {
     private readonly ObservableCollection<InstancePick> _picks = [];

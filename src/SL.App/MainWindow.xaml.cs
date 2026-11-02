@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -36,7 +36,7 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
 
-        Title = "Salmon Launcher";
+        Title = "SalmonLauncher";
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
         SystemBackdrop = new MicaBackdrop();
@@ -72,9 +72,9 @@ public sealed partial class MainWindow : Window
         ApplyTheme();
     }
 
-    // ---------------------------------------------------------- 窗口图标
+    // ---------------------------------------------------------- Window icon
 
-    /// <summary>任务栏 / Alt+Tab 图标:项目内置的 Assets\Logo.ico(含 16–256 多尺寸)。</summary>
+    /// <summary>Taskbar / Alt+Tab icon: bundled Assets\Logo.ico (with multiple sizes from 16 to 256).</summary>
     private void SetWindowIcon()
     {
         try
@@ -89,7 +89,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    // ---------------------------------------------------------- 首次启动协议
+    // ---------------------------------------------------------- First-launch agreement
 
     private async Task EnsureTermsAsync()
     {
@@ -98,7 +98,7 @@ public sealed partial class MainWindow : Window
 
         var agreed = await AppServices.Dialogs.ConfirmAsync(
             Loc.T("用户协议与免责声明"),
-            Loc.T("Salmon Launcher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。")
+            Loc.T("SalmonLauncher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。")
             + "\n\n"
             + Loc.T("本软件不含任何统计、埋点或广告组件,不会收集你的设备信息、游戏行为或个人信息。仅在排查问题时,你主动分享的日志文件会被读取。")
             + "\n\n"
@@ -117,7 +117,7 @@ public sealed partial class MainWindow : Window
         AppServices.Notify.Publish(NotifyKind.Success, Loc.T("同意并继续"));
     }
 
-    // ---------------------------------------------------------- 导航菜单
+    // ---------------------------------------------------------- Navigation menu
 
     private void BuildMenu()
     {
@@ -143,7 +143,7 @@ public sealed partial class MainWindow : Window
             AppServices.Nav.Navigate(key);
     }
 
-    /// <summary>导航变化 → 同步面包屑与 NavigationView 选中态。</summary>
+    /// <summary>Navigation changed -> sync the breadcrumb title and NavigationView selection.</summary>
     private void SyncShell()
     {
         var key = AppServices.Nav.CurrentKey;
@@ -170,7 +170,7 @@ public sealed partial class MainWindow : Window
         return null;
     }
 
-    // ---------------------------------------------------------- 语言
+    // ---------------------------------------------------------- Language
 
     private void OnLanguageChanged()
     {
@@ -180,7 +180,7 @@ public sealed partial class MainWindow : Window
         AppServices.Nav.ReloadCurrent();
     }
 
-    // ---------------------------------------------------------- 主题与壁纸
+    // ---------------------------------------------------------- Theme and wallpaper
 
     private void ApplyTheme()
     {
@@ -218,14 +218,14 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    /// <summary>顶部提示区与页面区共用一层底色,避免壁纸在标题下露出色带。</summary>
+    /// <summary>The top notification area and page area share one background layer to keep the wallpaper from showing a color band under the title.</summary>
     private void SetContentBackground(Brush? brush)
     {
         ContentRoot.Background = brush;
         PageHost.Background = brush;
     }
 
-    /// <summary>从当前主题字典取画刷。</summary>
+    /// <summary>Get a brush from the current theme dictionary.</summary>
     private static Brush? ThemedBrush(string key)
     {
         var resources = Application.Current.Resources;

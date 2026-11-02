@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -25,7 +25,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- 第 0 行刻意留空:标题栏(窗口拖拽区)保持可见可用 -->
+            <!-- Row 0 is intentionally left empty so the title bar (window drag area) stays visible and usable -->
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -39,21 +39,21 @@
                             HorizontalAlignment="Center"
                             Spacing="18">
 
-                    <!-- 头部 -->
+                    <!-- Header -->
                     <StackPanel Orientation="Horizontal" Spacing="11" HorizontalAlignment="Center">
                         <Image Source="ms-appx:///Assets/Logo.png"
                                Width="32"
                                Height="32"
                                Stretch="Uniform"
                                VerticalAlignment="Center" />
-                        <TextBlock Text="欢迎使用 Salmon Launcher"
+                        <TextBlock Text="欢迎使用 SalmonLauncher"
                                    FontSize="17"
                                    FontWeight="SemiBold"
                                    Foreground="{ThemeResource Brush.Fg}"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- 步骤指示:四个圆点(完成后打勾) + 下方进度条 -->
+                    <!-- Step indicator: four dots (ticked when finished) + progress bar below -->
                     <StackPanel Spacing="9">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -116,7 +116,7 @@
                                    HorizontalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- 步骤内容 -->
+                    <!-- Step content -->
                     <Border Background="{ThemeResource Brush.Card}"
                             BorderBrush="{ThemeResource Brush.Border}"
                             BorderThickness="1"
@@ -124,7 +124,7 @@
                             Padding="26,22">
                         <Grid x:Name="Panels" MinHeight="300">
 
-                            <!-- 第 1 页:选择语言 -->
+                            <!-- Page 1: Choose language -->
                             <StackPanel x:Name="PanelLang" Spacing="16">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="选择语言"
@@ -139,7 +139,7 @@
                                 <StackPanel x:Name="LangList" Spacing="8" />
                             </StackPanel>
 
-                            <!-- 第 2 页:同意条款 -->
+                            <!-- Page 2: Accept the terms -->
                             <StackPanel x:Name="PanelTerms" Spacing="12" Visibility="Collapsed">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="用户协议与免责声明"
@@ -158,7 +158,7 @@
                                               CornerRadius="10">
                                     <StackPanel Spacing="10" Padding="15,12">
                                         <TextBlock Style="{StaticResource Style.TermsBody}"
-                                                   Text="Salmon Launcher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。" />
+                                                   Text="SalmonLauncher 为第三方免费工具,与 Mojang Studios、Microsoft 无隶属或授权关系;Minecraft 是 Mojang Studios 的商标。" />
                                         <TextBlock Style="{StaticResource Style.TermsBody}"
                                                    Text="本软件不含任何统计、埋点或广告组件,不会收集你的设备信息、游戏行为或个人信息。仅在排查问题时,你主动分享的日志文件会被读取。" />
                                         <TextBlock x:Name="TermsVersionLine"
@@ -172,7 +172,7 @@
                                           Unchecked="OnTermsToggled" />
                             </StackPanel>
 
-                            <!-- 第 3 页:登录正版或创建离线账户 -->
+                            <!-- Page 3: Sign in with a premium account or create an offline account -->
                             <StackPanel x:Name="PanelAccount" Spacing="14" Visibility="Collapsed">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="登录账户"
@@ -224,7 +224,7 @@
                                            Visibility="Collapsed" />
                             </StackPanel>
 
-                            <!-- 第 4 页:选择主题(主题工坊 · 可跳过) -->
+                            <!-- Page 4: Choose a theme (Theme Workshop · skippable) -->
                             <StackPanel x:Name="PanelTheme" Spacing="14" Visibility="Collapsed">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="选择主题"
@@ -319,7 +319,7 @@
                                            Foreground="{ThemeResource Brush.FgFaint}" />
                             </StackPanel>
 
-                            <!-- 完成页 -->
+                            <!-- Completion page -->
                             <StackPanel x:Name="PanelDone"
                                         Spacing="14"
                                         Visibility="Collapsed"
@@ -332,7 +332,7 @@
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
                                 </Border>
-                                <TextBlock Text="恭喜你完成所有设置了,你现在可以使用 Salmon Launcher 了"
+                                <TextBlock Text="恭喜你完成所有设置了,你现在可以使用 SalmonLauncher 了"
                                            FontSize="19"
                                            FontWeight="SemiBold"
                                            Foreground="{ThemeResource Brush.Fg}"
@@ -350,7 +350,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- 底部导航 -->
+                    <!-- Bottom navigation -->
                     <Grid>
                         <Button x:Name="BackBtn"
                                 Content="上一步"

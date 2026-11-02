@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -80,7 +80,7 @@
                 </Border>
             </Border>
 
-            <!-- 模式一:本机当中心服务器 -->
+            <!-- Mode 1: this machine as the central server -->
             <Border x:Name="HostPanel"
                     Grid.Row="2"
                     Background="{ThemeResource Brush.Card}"
@@ -156,7 +156,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 模式二:局域网 -->
+            <!-- Mode 2: LAN -->
             <Border x:Name="LanPanel"
                     Grid.Row="2"
                     Visibility="Collapsed"
@@ -214,7 +214,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 模式三:添加中继服务器 -->
+            <!-- Mode 3: add relay server -->
             <Border x:Name="ManualPanel"
                     Grid.Row="2"
                     Visibility="Collapsed"
@@ -297,7 +297,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 运行日志 -->
+            <!-- Runtime log -->
             <Border Grid.Row="3"
                     Height="230"
                     Background="{ThemeResource Brush.Card}"

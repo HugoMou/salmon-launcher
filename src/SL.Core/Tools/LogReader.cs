@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -17,8 +17,8 @@ using System.IO;
 
 namespace SL.Core.Tools;
 
-/// <summary>阶段六:应用日志 / 实例日志读取(按行尾部读取,含按级别与关键词过滤)。</summary>
-/// <param name="Lines">读取的行(自顶向下)</param>
+/// <summary>Stage 6: app log / instance log reading (tail read line by line, with filtering by level and keyword).</summary>
+/// <param name="Lines">Lines read (top to bottom)</param>
 public sealed record LogTail(string File, IReadOnlyList<string> Lines)
 {
     public int WarnCount => Lines.Count(l => l.Contains("[WARN]", StringComparison.Ordinal));
@@ -27,7 +27,7 @@ public sealed record LogTail(string File, IReadOnlyList<string> Lines)
 
 public static class LogReader
 {
-    /// <summary>最近的启动器自身日志文件(app-YYYYMMDD.log,新→旧)。</summary>
+    /// <summary>Most recent launcher log file (app-YYYYMMDD.log, newest → oldest).</summary>
     public static IReadOnlyList<string> LauncherLogs()
     {
         var dir = Boot.Runtime.LogDir;
@@ -38,7 +38,7 @@ public static class LogReader
             .ToList();
     }
 
-    /// <summary>尾部读取 lines 行;keyword 空则不过滤。</summary>
+    /// <summary>Tail-read the last <c>lines</c> lines; no filtering when keyword is empty.</summary>
     public static LogTail? ReadTail(string file, int lines, string keyword = "")
     {
         if (!File.Exists(file))
@@ -47,7 +47,7 @@ public static class LogReader
         string[] all;
         try
         {
-            // FileShare.ReadWrite:游戏进程可能正以追加模式写同一文件,不能因读取阻塞它
+            // FileShare.ReadWrite: the game process may be appending to the same file, so reading must not block it
             using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(stream);
             var buffer = new List<string>();
@@ -67,7 +67,7 @@ public static class LogReader
         return new LogTail(file, slice);
     }
 
-    /// <summary>实例运行日志(instances/<id>/logs/latest.log)。</summary>
+    /// <summary>Instance runtime log (instances/<id>/logs/latest.log).</summary>
     public static string? LatestInstanceLog(string instanceId)
     {
         var p = Path.Combine(Boot.Runtime.InstancesDir, instanceId, "logs", "latest.log");

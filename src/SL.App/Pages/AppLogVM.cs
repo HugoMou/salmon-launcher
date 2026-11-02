@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -23,7 +23,7 @@ using SL.App.Localization;
 
 namespace SL.App.Pages;
 
-/// <summary>日志文件行。</summary>
+/// <summary>Log file row.</summary>
 public sealed class LogFileRow
 {
     public LogFileRow(string path)
@@ -36,7 +36,7 @@ public sealed class LogFileRow
     public string Display { get; }
 }
 
-/// <summary>应用日志页视图模型:文件选择、关键词过滤与尾部读取。</summary>
+/// <summary>App log page view model: file selection, keyword filtering, and tail reading.</summary>
 public sealed class AppLogVM : VmBase, IRefreshable
 {
     private const int TailLines = 2000;

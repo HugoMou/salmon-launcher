@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -19,14 +19,14 @@ using Microsoft.UI.Xaml.Media;
 
 namespace SL.App.Localization;
 
-/// <summary>可选语言。</summary>
+/// <summary>Selectable language.</summary>
 public sealed record LanguageOption(string Code, string Name);
 
 /// <summary>
-/// 轻量本地化层:
-/// - 默认跟随系统语言(auto),也可在设置里固定为某种语言;
-/// - 以「简体中文原文」为键做映射,无需给每个控件起资源键;
-/// - 切换语言时整树就地替换文本(含再次切回原文),页面不需要重建。
+/// Lightweight localization layer:
+/// - Follows the system language by default (auto), but can be pinned to a specific language in settings;
+/// - Maps using the Simplified Chinese source text as the key, so no resource key is needed per control;
+/// - Switching languages replaces text in place across the whole tree (including switching back to the source text), without rebuilding pages.
 /// </summary>
 public static partial class Loc
 {
@@ -42,19 +42,19 @@ public static partial class Loc
         new("ja", "日本語"),
     ];
 
-    /// <summary>设置里的语言项(auto 或具体语言)。</summary>
+    /// <summary>Language setting (auto or a concrete language).</summary>
     public static string Setting { get; private set; } = AutoCode;
 
-    /// <summary>实际生效的语言。</summary>
+    /// <summary>The language actually in effect.</summary>
     public static string Current { get; private set; } = SourceLang;
 
-    /// <summary>语言变化通知(用于刷新标题栏、导航与菜单)。</summary>
+    /// <summary>Language change notification (used to refresh the title bar, navigation, and menu).</summary>
     public static event Action? Changed;
 
     public static string DisplayName(string code)
         => Languages.FirstOrDefault(l => l.Code == code)?.Name ?? code;
 
-    /// <summary>初始化(启动时调用一次)。</summary>
+    /// <summary>Initialize (called once at startup).</summary>
     public static void Initialize(string? setting)
     {
         Setting = NormalizeSetting(setting);
@@ -66,14 +66,14 @@ public static partial class Loc
             : Languages.Any(l => l.Code == setting) ? setting!
             : AutoCode;
 
-    /// <summary>把设置项解析成实际语言。</summary>
+    /// <summary>Resolve the setting into the effective language.</summary>
     public static string Resolve(string? setting)
     {
         var code = NormalizeSetting(setting);
         return code == AutoCode ? DetectSystem() : code;
     }
 
-    /// <summary>系统首选语言 → 支持的语言;不支持时回退英文。</summary>
+    /// <summary>System preferred languages -> supported language; falls back to English when unsupported.</summary>
     public static string DetectSystem()
     {
         try
@@ -123,7 +123,7 @@ public static partial class Loc
         _ => null,
     };
 
-    /// <summary>翻译一个简体中文原文(字典里没有则原样返回)。</summary>
+    /// <summary>Translate a Simplified Chinese source string (returns it unchanged if absent from the dictionary).</summary>
     public static string T(string source)
     {
         if (Current == SourceLang || string.IsNullOrEmpty(source))
@@ -134,9 +134,9 @@ public static partial class Loc
         return map is not null && map.TryGetValue(source, out var text) ? text : source;
     }
 
-    // ---------------------------------------------------------------- 视觉树就地替换
+    // ---------------------------------------------------------------- In-place visual tree replacement
 
-    /// <summary>对一棵已加载的可视树应用当前语言。</summary>
+    /// <summary>Apply the current language to a loaded visual tree.</summary>
     public static void ApplyTo(DependencyObject? root)
     {
         if (root is null)
@@ -144,7 +144,7 @@ public static partial class Loc
         Walk(root, Convert);
     }
 
-    /// <summary>切换语言并就地更新整棵树(不重建页面)。</summary>
+    /// <summary>Switch language and update the whole tree in place (without rebuilding pages).</summary>
     public static void SwitchTo(string setting, DependencyObject? root)
     {
         var old = Current;
@@ -250,7 +250,7 @@ public static partial class Loc
             Walk(VisualTreeHelper.GetChild(node, i), convert);
     }
 
-    /// <summary>当前语言的文案是否已翻译(供自检)。</summary>
+    /// <summary>Whether the current language's text is translated (for self-checks).</summary>
     public static int TranslatedCount => Current switch
     {
         "en" => En.Count,

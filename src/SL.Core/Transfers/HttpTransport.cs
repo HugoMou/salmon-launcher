@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,13 +21,13 @@ using System.Net.Http.Headers;
 namespace SL.Core.Transfers;
 
 /// <summary>
-/// 阶段二的真实 HTTP 传输:直接落盘 + Range 断点续传 + 完整性护栏。
+/// Stage 2 real HTTP transport: direct-to-disk writes + Range resume + integrity guards.
 ///
-/// - 断点续传:优先复用引擎给定的 ResumeBytes;引擎从 0 重新起算时,参考本地已有前缀文件
-///   (暂停 / 恢复、跨进程重启的续传都由此统一兜住);
-/// - 服务器不支持 Range(返回 200 而非 206)时自动退化为整文件重写;
-/// - 写完做长度守卫(与 Content-Length / Spec.BytesTotal 比对),SHA-1 终验由引擎统一执行;
-/// - 字节级精确:禁用自动解压,避免 gzip 改写实际字节数破坏续传与校验。
+/// - Resume: prefer the ResumeBytes given by the engine; when the engine restarts from 0, consult the local prefix file
+///   (pause/resume and cross-process resume are all covered uniformly here);
+/// - When the server does not support Range (returns 200 instead of 206), degrade to rewriting the whole file;
+/// - Apply a length guard after writing (compare with Content-Length / Spec.BytesTotal); the final SHA-1 check is run by the engine;
+/// - Byte-exact: automatic decompression is disabled so gzip cannot rewrite the real byte count and break resume/verification.
 /// </summary>
 public sealed class HttpTransport : ITransport
 {
@@ -59,8 +59,8 @@ public sealed class HttpTransport : ITransport
         if (!string.IsNullOrEmpty(dir))
             Directory.CreateDirectory(dir);
 
-        // 本地已有可用文件(重复安装 / 上次已完成)且大小吻合(或带 SHA-1 可校验):
-        // 不再发请求,直接交给引擎做终验;否则会带超大 Range 触发服务器 416。
+        // a usable local file already exists (reinstall / previous completion) and the size matches (or SHA-1 is available for verification):
+        // send no request and hand it to the engine for final verification; otherwise an oversized Range would trigger a 416 from the server.
         var expectedTotal = context.Task.Spec.BytesTotal;
         if (File.Exists(dest) && new FileInfo(dest).Length > 0)
         {
@@ -85,14 +85,14 @@ public sealed class HttpTransport : ITransport
         using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellation)
             .ConfigureAwait(false);
 
-        // Range 越界:本地前缀比服务器文件还大,删掉重下
+        // Range out of bounds: the local prefix is larger than the server file, so delete it and re-download
         if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
         {
             StartOver(dest);
             return TransportResult.Fail($"HTTP 416 断点失效,已清空本地缓存重试");
         }
 
-        // 服务器无视 Range 返回完整 200 → 前缀失效,整文件重写
+        // the server ignores Range and returns a full 200 → the prefix is invalid, rewrite the whole file
         if (response.StatusCode == HttpStatusCode.OK)
             startBytes = 0;
         else if (response.StatusCode != HttpStatusCode.PartialContent
@@ -137,7 +137,7 @@ public sealed class HttpTransport : ITransport
         }
         catch (OperationCanceledException)
         {
-            throw; // 引擎统一收尾(暂停保留断点 / 取消保留断点)
+            throw; // the engine wraps up uniformly (pause keeps the resume point / cancel keeps it too)
         }
 
         var finalLength = new FileInfo(dest).Length;
@@ -157,11 +157,11 @@ public sealed class HttpTransport : ITransport
         }
         catch (IOException)
         {
-            // 删不掉就交给下一轮覆盖写
+            // if it cannot be deleted, leave it to the next round to overwrite
         }
     }
 
-    /// <summary>读取本地前缀:返回续传起点;返回 -1 表示本地状态无法自洽(已清理,从头来)。</summary>
+    /// <summary>Read the local prefix: returns the resume start offset; -1 means the local state is inconsistent (cleaned up, start from scratch).</summary>
     private static long PrepareLocalPrefix(TransferContext context, string dest)
     {
         if (!File.Exists(dest))
@@ -171,9 +171,9 @@ public sealed class HttpTransport : ITransport
         var expectedTotal = context.Task.Spec.BytesTotal;
 
         if (expectedTotal <= 0 || prefixLength <= expectedTotal)
-            return prefixLength; // 部分前缀:Range 续传(引擎 BytesReceived 由 Progress 回报矫正)
+            return prefixLength; // partial prefix: Range resume (BytesReceived is corrected by the Progress reports of the engine)
 
-        // 前缀比期望值还大 → 来源不可信,删除重来
+        // prefix larger than expected → the source is untrustworthy, delete it and start over
         context.Progress(0);
         try
         {

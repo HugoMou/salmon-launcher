@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@ using Windows.UI;
 
 namespace SL.App.Themes;
 
-/// <summary>一张壁纸场景卡:缩略图 + 从画面里取到的主色。</summary>
+/// <summary>A wallpaper scene card: thumbnail + dominant color sampled from the image.</summary>
 public sealed class WallpaperCard : INotifyPropertyChanged
 {
     private ImageSource? _thumb;
@@ -62,7 +62,7 @@ public sealed class WallpaperCard : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>供辅助功能与调试显示场景名,而不是类型名。</summary>
+    /// <summary>Show the scene name instead of the type name for accessibility and debugging.</summary>
     public override string ToString() => Name;
 
     private void Set<T>(ref T field, T value, [CallerMemberName] string? name = null)

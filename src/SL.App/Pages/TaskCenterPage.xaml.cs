@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -19,7 +19,7 @@ using SL.App.Infrastructure;
 
 namespace SL.App.Pages;
 
-/// <summary>任务中心页:直接绑定组合根中的 TaskCenterVM(引擎事件已接入)。</summary>
+/// <summary>Task center page: binds directly to the TaskCenterVM in the composition root (engine events are wired up).</summary>
 public sealed partial class TaskCenterPage : Page
 {
     public TaskCenterPage()

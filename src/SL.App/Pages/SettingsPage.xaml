@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -34,7 +34,7 @@
                        Foreground="{ThemeResource Brush.FgDim}"
                        Margin="0,-12,0,4" />
 
-            <!-- 账户 -->
+            <!-- Account -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -143,7 +143,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 外观 -->
+            <!-- Appearance -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -166,7 +166,7 @@
                                    Foreground="{ThemeResource Brush.FgFaint}" />
                     </Grid>
 
-                    <!-- 深浅色:分段控件 -->
+                    <!-- Light / dark: segmented control -->
                     <Grid ColumnSpacing="18">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="88" />
@@ -194,7 +194,7 @@
                         </Border>
                     </Grid>
 
-                    <!-- 配色方案:可换肤卡片 -->
+                    <!-- Color schemes: skinnable cards -->
                     <StackPanel Spacing="10">
                         <TextBlock Text="配色方案" Foreground="{ThemeResource Brush.FgDim}" />
                         <GridView x:Name="PaletteGrid"
@@ -238,7 +238,7 @@
                         </GridView>
                     </StackPanel>
 
-                    <!-- 强调色 -->
+                    <!-- Accent color -->
                     <StackPanel Spacing="10">
                         <TextBlock Text="强调色" Foreground="{ThemeResource Brush.FgDim}" />
                         <ItemsControl x:Name="AccentList">
@@ -282,7 +282,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 下载 -->
+            <!-- Downloads -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -334,7 +334,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 语言 -->
+            <!-- Language -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -367,7 +367,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 协议 -->
+            <!-- Policies -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -391,7 +391,7 @@
                 </Grid>
             </Border>
 
-            <!-- 清除全部数据 -->
+            <!-- Clear all data -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Danger}"
                     BorderThickness="1"

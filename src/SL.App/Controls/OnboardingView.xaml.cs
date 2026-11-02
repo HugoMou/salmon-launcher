@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -25,9 +25,9 @@ using SL.Core.Logging;
 namespace SL.App.Controls;
 
 /// <summary>
-/// 欢迎页:首次进入软件或清除数据后的四步初始化(语言 → 条款 → 账户 → 主题)+ 完成页。
-/// 作为覆盖层铺在主窗口内容之上;每完成一页,顶部圆点打勾,下方进度条前进一格。
-/// 主题页可跳过;点击「开始使用」落盘 OnboardingCompleted 并触发 Completed。
+/// Welcome page: four-step setup on first launch or after clearing data (language → terms → account → theme), plus a completion page.
+/// Sits above the main window content as an overlay; each finished page ticks its dot at the top and advances the progress bar below.
+/// The theme page is optional; clicking "Get Started" persists OnboardingCompleted and raises Completed.
 /// </summary>
 public sealed partial class OnboardingView : UserControl
 {
@@ -46,10 +46,10 @@ public sealed partial class OnboardingView : UserControl
     private bool _wallpapersLoaded;
     private int _step;
 
-    /// <summary>已完成的页数:打勾圆点与进度条的依据(只增不减,回退不取消打勾)。</summary>
+    /// <summary>Number of pages reached: basis for the ticked dots and progress bar (only increases, so going back never unticks).</summary>
     private int _reached;
 
-    /// <summary>四步全部完成并点击「开始使用」时触发。</summary>
+    /// <summary>Raised when all four steps are done and "Get Started" is clicked.</summary>
     public event Action? Completed;
 
     public OnboardingView()
@@ -64,8 +64,8 @@ public sealed partial class OnboardingView : UserControl
         _labels = [DotLabel0, DotLabel1, DotLabel2, DotLabel3];
 
         _loading = true;
-        //DataContext 设在整个面板上:两个操作按钮是 AccountRoot 的兄弟节点,
-        // 只挂在头像行上会让 Command 绑定拿不到 VM
+        // DataContext is set on the whole panel: the two action buttons are siblings of AccountRoot,
+        // so hanging it on the avatar row alone would leave the Command bindings without a VM
         PanelAccount.DataContext = _account;
         BuildLanguageList();
         if (AppServices.Settings.Current.TermsAccepted)
@@ -80,7 +80,7 @@ public sealed partial class OnboardingView : UserControl
         AppServices.Settings.Changed += OnSettingsChanged;
     }
 
-    // ---------------------------------------------------------- 第 1 页:语言
+    // ---------------------------------------------------------- Page 1: Language
 
     private void BuildLanguageList()
     {
@@ -129,13 +129,13 @@ public sealed partial class OnboardingView : UserControl
         Loc.SwitchTo(code, App.Window.Content as DependencyObject);
     }
 
-    // ---------------------------------------------------------- 第 2 页:条款
+    // ---------------------------------------------------------- Page 2: Terms
 
     private void OnTermsToggled(object sender, RoutedEventArgs e) => RefreshGate();
 
-    // ---------------------------------------------------------- 第 4 页:主题(主题工坊)
+    // ---------------------------------------------------------- Page 4: Theme (Theme Workshop)
 
-    /// <summary>与主题工坊同一套设置:内置场景 + 选择图片,配色自动从画面里取。</summary>
+    /// <summary>Same settings as the Theme Workshop: built-in scenes plus image picking, with colors sampled from the artwork.</summary>
     private void LoadThemeStep()
     {
         foreach (var scene in WallpaperFactory.Scenes)
@@ -147,7 +147,7 @@ public sealed partial class OnboardingView : UserControl
 
     private void RefreshThemeStatus() => ThemeStatusText.Text = ThemeApplier.CurrentSummary();
 
-    /// <summary>第一次进入主题页时才生成缩略图,避免拖慢首屏。</summary>
+    /// <summary>Thumbnails are generated only when the theme page is first entered, to keep the initial screen fast.</summary>
     private async Task EnsureWallpapersAsync()
     {
         if (_wallpapersLoaded)
@@ -177,7 +177,7 @@ public sealed partial class OnboardingView : UserControl
         RefreshThemeStatus();
     }
 
-    // ---------------------------------------------------------- 步骤流转
+    // ---------------------------------------------------------- Step flow
 
     private void OnNext(object sender, RoutedEventArgs e)
     {
@@ -224,7 +224,7 @@ public sealed partial class OnboardingView : UserControl
         RefreshGate();
     }
 
-    /// <summary>按页推进:完成的圆点打勾,进度条与「已完成 X/4」同步。</summary>
+    /// <summary>Advance page by page: completed dots get a tick, and the progress bar stays in sync with "Completed X/4".</summary>
     private void RefreshProgress()
     {
         for (var i = 0; i < StepCount; i++)
@@ -243,7 +243,7 @@ public sealed partial class OnboardingView : UserControl
         ProgressText.Text = $"{Loc.T("已完成")} {_reached}/{StepCount}";
     }
 
-    /// <summary>每页的「下一步」准入:条款需勾选,账户页需已有账户,其余随时可过。</summary>
+    /// <summary>Per-page "Next" gate: terms must be accepted, the account page needs an existing account, everything else always passes.</summary>
     private void RefreshGate()
     {
         var ok = _step switch
@@ -265,7 +265,7 @@ public sealed partial class OnboardingView : UserControl
         RefreshProgress();
         if (_wallpapers.Count > 0)
         {
-            // 场景名是翻译后的文本,语言切换后需重新绑定一次
+            // Scene names are translated text, so rebind once after a language switch
             ThemeSceneGrid.ItemsSource = null;
             ThemeSceneGrid.ItemsSource = _wallpapers;
         }

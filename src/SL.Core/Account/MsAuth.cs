@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -21,7 +21,7 @@ using System.Text.Json;
 
 namespace SL.Core.Account;
 
-/// <summary>已登录的微软/正版会话(持久化到 accounts\msa.json)。</summary>
+/// <summary>Signed-in Microsoft/premium session (persisted to accounts\msa.json).</summary>
 public sealed record MsSession
 {
     public string MicrosoftAccessToken { get; init; } = "";
@@ -29,7 +29,7 @@ public sealed record MsSession
     public string MinecraftAccessToken { get; init; } = "";
     public string Uuid { get; init; } = "";
     public string Name { get; init; } = "";
-    /// <summary>minecraftservices 令牌过期时刻(UTC)。</summary>
+    /// <summary>Expiry time of the minecraftservices token (UTC).</summary>
     public DateTimeOffset MinecraftExpiresAt { get; init; }
     public DateTimeOffset SavedAt { get; init; } = DateTimeOffset.Now;
 
@@ -40,8 +40,8 @@ public sealed record MsSession
 public sealed class MsAuthException(string message) : Exception(message);
 
 /// <summary>
-/// 阶段八:微软正版登录。用微软一方 Xbox 公共 client id(与官方启动器一致)+ 设备码流程,
-/// 链路:MS OAuth → Xbox Live(RPS) → XSTS → minecraftservices → profile。全部真实 HTTP。
+/// Stage 8: Microsoft premium sign-in. Uses Microsoft first-party Xbox public client id (the same one the official launcher uses) plus the device code flow,
+/// chain: MS OAuth → Xbox Live (RPS) → XSTS → minecraftservices → profile. Everything is real HTTP.
 /// </summary>
 public static class MsAuth
 {
@@ -59,14 +59,14 @@ public static class MsAuth
         };
         var client = new HttpClient(handler)
         {
-            Timeout = Timeout.InfiniteTimeSpan, // 轮询由调用方控制
+            Timeout = Timeout.InfiniteTimeSpan, // Polling is controlled by the caller
         };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("SalmonLauncher/0.3 (Salmon Launcher Launcher)");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("SalmonLauncher/0.3 (SalmonLauncher Launcher)");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
         return client;
     }
 
-    /// <summary>交互式授权请求(官方启动器同款:PKCE + oauth20_desktop.srf 回跳)。</summary>
+    /// <summary>Interactive authorization request (same as the official launcher: PKCE + oauth20_desktop.srf redirect).</summary>
     public sealed record AuthorizationRequest(string Url, string Verifier);
 
     public static AuthorizationRequest BeginInteractive()
@@ -85,7 +85,7 @@ public static class MsAuth
         return new AuthorizationRequest(url, verifier);
     }
 
-    /// <summary>用授权码完成令牌交换,并续跑全链路(XBL → XSTS → minecraft → profile)。</summary>
+    /// <summary>Exchange the authorization code for tokens, then continue the whole chain (XBL → XSTS → minecraft → profile).</summary>
     public static async Task<MsSession> CompleteInteractiveAsync(string code, string verifier, Action<string>? step = null, CancellationToken ct = default)
     {
         step?.Invoke("正在交换访问令牌…");
@@ -115,8 +115,8 @@ public static class MsAuth
     }
 
     /// <summary>
-    /// 从浏览器回跳地址中提取授权码;也接受用户直接粘贴的 code。
-    /// 回跳形如 https://login.live.com/oauth20_desktop.srf?code=...&amp;state=...
+    /// Extract the authorization code from the browser redirect URL; also accepts a code the user pasted directly.
+    /// The redirect looks like https://login.live.com/oauth20_desktop.srf?code=...&amp;state=...
     /// </summary>
     public static string ExtractAuthorizationCode(string input)
     {
@@ -129,7 +129,7 @@ public static class MsAuth
         {
             if (text.Contains("://", StringComparison.Ordinal))
                 throw new MsAuthException("该链接缺少查询参数;请复制登录完成后地址栏里的完整链接。");
-            return text; // 直接粘贴 code
+            return text; // code pasted directly
         }
 
         var query = text[(q + 1)..];
@@ -167,9 +167,9 @@ public static class MsAuth
     private static string Base64Url(byte[] data)
         => Convert.ToBase64String(data).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 
-    // ------------------------------------------------------------ 设备码 + 轮询 (主通道:PCL 式大字设备码,无需复制回跳 URL)
+    // ------------------------------------------------------------ Device code + polling (main path: PCL-style large device code, no need to copy the redirect URL)
 
-    /// <summary>设备码起步:返回 userCode/deviceCode/verificationUri;用户在 verificationUri 输入 userCode 完成授权后,由 LoginAsync 轮询收尾。</summary>
+    /// <summary>Start the device code flow: returns userCode/deviceCode/verificationUri; once the user enters userCode at verificationUri and authorizes, LoginAsync polls to finish.</summary>
     public static async Task<(string UserCode, string DeviceCode, string VerificationUri, int IntervalSeconds)> StartAsync(CancellationToken ct)
     {
         using var req = new HttpRequestMessage(HttpMethod.Post,
@@ -192,7 +192,7 @@ public static class MsAuth
 
     private enum PollState { Pending, Denied, Done }
 
-    /// <summary>轮询一次令牌。</summary>
+    /// <summary>Poll for a token once.</summary>
     private static async Task<(PollState State, string? Access, string? Refresh)> PollOnceAsync(
         string deviceCode, CancellationToken ct)
     {
@@ -218,13 +218,13 @@ public static class MsAuth
             root.TryGetProperty("refresh_token", out var rt) ? rt.GetString() : null);
     }
 
-    // ------------------------------------------------------------ 全链路
+    // ------------------------------------------------------------ Full chain
 
     /// <summary>
-    /// 完整登录:在 interval 节奏下轮询设备码直到授权完成(maxSeconds 上限),
-    /// 过了微软这关再串 Xbox Live → XSTS → minecraftservices → profile。
+    /// Full sign-in: poll the device code at the interval rhythm until authorization completes (bounded by maxSeconds),
+    /// then, past the Microsoft stage, run Xbox Live → XSTS → minecraftservices → profile in sequence.
     /// </summary>
-    /// <param name="step">每一步的状态回调(展示用)。</param>
+    /// <param name="step">Status callback for each step (for display).</param>
     public static async Task<MsSession> LoginAsync(string deviceCode, int intervalSeconds, int maxSeconds,
         Action<string>? step = null, CancellationToken ct = default)
     {
@@ -243,7 +243,7 @@ public static class MsAuth
             }
             catch (Exception)
             {
-                state = PollState.Pending; // 轮询期网络抖动不中断等待,持续重试直到截止
+                state = PollState.Pending; // Network hiccups while polling do not abort the wait; keep retrying until the deadline
             }
             if (state == PollState.Done)
                 break;
@@ -257,7 +257,7 @@ public static class MsAuth
         return await FinishAsync(msAccess, msRefresh, step, ct).ConfigureAwait(false);
     }
 
-    /// <summary>持有微软令牌后的公共链路(XBL → XSTS → minecraftservices → profile → 会话)。</summary>
+    /// <summary>Shared chain once a Microsoft token is held (XBL → XSTS → minecraftservices → profile → session).</summary>
     private static async Task<MsSession> FinishAsync(
         string msAccess, string msRefresh, Action<string>? step, CancellationToken ct)
     {
@@ -284,9 +284,9 @@ public static class MsAuth
         };
     }
 
-    private const int MinecraftTokenLifetimeSeconds = 86400 * 3; // minecraftservices 有效期约 3 天,保守记满
+    private const int MinecraftTokenLifetimeSeconds = 86400 * 3; // minecraftservices tokens last about 3 days; record the full value conservatively
 
-    /// <summary>会话保活:未过期直接返回;过期则用 refresh_token 走一轮新链。</summary>
+    /// <summary>Session keep-alive: return as-is when not expired; otherwise run a fresh chain with refresh_token.</summary>
     public static async Task<MsSession> EnsureFreshAsync(MsSession session, Action<string>? step = null, CancellationToken ct = default)
     {
         while (!session.MinecraftValid)
@@ -298,7 +298,7 @@ public static class MsAuth
 
     private static async Task<MsSession> RefreshChainAsync(MsSession session, Action<string>? step, CancellationToken ct)
     {
-        // 1) MSA refresh_token 换新微软令牌
+        // 1) Exchange the MSA refresh_token for a new Microsoft token
         step?.Invoke("正在续签微软令牌…");
         string msAccess, msRefresh;
         try
@@ -323,11 +323,11 @@ public static class MsAuth
         }
         catch (MsAuthException) { throw; }
 
-        // 2) 复用公共链路续签(内部重新走 XBL → profile)
+        // 2) Reuse the shared chain to renew (internally reruns XBL → profile)
         return await FinishAsync(msAccess, msRefresh, step, ct).ConfigureAwait(false);
     }
 
-    // ------------------------------------------------------------ 各站
+    // ------------------------------------------------------------ Each hop
 
     private static async Task<(string XboxToken, string UserHash)> XblUserTokenAsync(string msAccess, CancellationToken ct)
     {
@@ -410,9 +410,9 @@ public static class MsAuth
             root.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "");
     }
 
-    // ------------------------------------------------------------ 会话存储
+    // ------------------------------------------------------------ Session storage
 
-    /// <summary>msa.json 读写(accounts 目录;原子写)。</summary>
+    /// <summary>msa.json read/write (accounts directory; atomic write).</summary>
     public static MsSession? LoadSession()
     {
         var path = SessionPath();
@@ -444,9 +444,9 @@ public static class MsAuth
 
     public static string SessionPath() => Path.Combine(Boot.Runtime.Root, "accounts", "msa.json");
 
-    // ------------------------------------------------------------ 基础设施
+    // ------------------------------------------------------------ Infrastructure
 
-    /// <summary>安全取字符串字段;缺失或为空时抛出带上下文的友好异常,避免原始 KeyNotFoundException 漏到 UI。</summary>
+    /// <summary>Read a string field safely; when missing or empty, throw a friendly exception with context so a raw KeyNotFoundException never reaches the UI.</summary>
     private static string Prop(JsonElement el, string name, string context)
     {
         if (el.ValueKind == JsonValueKind.Object && el.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String)

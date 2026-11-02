@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@ using SL.App.Notify;
 
 namespace SL.App.Pages;
 
-/// <summary>实例列表行(概览页下拉用)。</summary>
+/// <summary>Instance list row (used by the overview page drop-down).</summary>
 public sealed class InstancePick
 {
     public InstancePick(InstanceInfo info)
@@ -45,7 +45,7 @@ public sealed class InstancePick
     public override string ToString() => Id;
 }
 
-/// <summary>实例概览页:实例信息、计数与快捷操作。</summary>
+/// <summary>Instance overview page: instance info, counts, and quick actions.</summary>
 public sealed partial class InstanceOverviewPage : Page
 {
     private readonly ObservableCollection<InstancePick> _picks = [];

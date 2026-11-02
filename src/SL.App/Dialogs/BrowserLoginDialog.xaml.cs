@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -26,8 +26,8 @@ using SL.Core.Logging;
 namespace SL.App.Dialogs;
 
 /// <summary>
-/// 内置浏览器正版登录:WebView2 直接打开微软授权页(PKCE),登录完成后回跳到
-/// oauth20_desktop.srf 的瞬间就地截获授权码并续跑全链路,全程无需复制粘贴。
+/// Built-in browser premium login: WebView2 opens the Microsoft authorization page (PKCE); the moment
+/// login redirects to oauth20_desktop.srf, the authorization code is captured in place and the whole flow continues, with no copy-paste.
 /// </summary>
 public sealed partial class BrowserLoginDialog : ContentDialog
 {
@@ -54,7 +54,7 @@ public sealed partial class BrowserLoginDialog : ContentDialog
         };
     }
 
-    /// <summary>按窗口大小给出内容尺寸:登录页需要比对话框模板默认上限更大的可用区域。</summary>
+    /// <summary>Size the content to the window: the login page needs more room than the dialog template default allows.</summary>
     private void FitToHost()
     {
         if (XamlRoot is not { } root)

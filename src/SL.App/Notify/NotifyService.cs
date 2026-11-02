@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -27,7 +27,7 @@ public enum NotifyKind
     Error,
 }
 
-/// <summary>单条提示(显示中),映射到 InfoBar 展示。</summary>
+/// <summary>A single toast (currently on screen), mapped to an InfoBar.</summary>
 public sealed class Toast : Infrastructure.VmBase
 {
     public string Id { get; } = Guid.NewGuid().ToString("N");
@@ -67,7 +67,7 @@ public sealed class Toast : Infrastructure.VmBase
         }
     }
 
-    /// <summary>用户点击 InfoBar 关闭按钮时触发,服务据此出队并显示下一条。</summary>
+    /// <summary>Raised when the user clicks the InfoBar close button; the service dequeues it and shows the next one.</summary>
     public event Action? Closed;
 
     internal Toast(NotifyKind kind, string text)
@@ -79,10 +79,10 @@ public sealed class Toast : Infrastructure.VmBase
 }
 
 /// <summary>
-/// 提示层服务:非模态 InfoBar 通知。
-/// - 队列逐条显示(同屏 ≤ MaxVisible);
-/// - 同类型(Kind+文本相同)重复提示自动合并为一条并累加计数;
-/// - 线程安全:非 UI 线程调用 Publish 会自动转发到 UI 线程。
+/// Toast layer service: non-modal InfoBar notifications.
+/// - Shows the queue one at a time (at most MaxVisible on screen);
+/// - Repeated notifications of the same kind (same Kind + text) merge into one with an incremented count;
+/// - Thread-safe: a Publish call from a non-UI thread is forwarded to the UI thread automatically.
 /// </summary>
 public sealed class NotifyService
 {
@@ -91,10 +91,10 @@ public sealed class NotifyService
     private readonly Dictionary<string, Toast> _visibleByKey = [];
     private readonly Dictionary<string, DispatcherQueueTimer> _timers = [];
 
-    /// <summary>同时可见的最大条数(逐条显示,默认 1,可调大允许堆叠)</summary>
+    /// <summary>Maximum number of toasts visible at once (shown one by one, default 1; raise it to allow stacking)</summary>
     public int MaxVisible { get; set; } = 1;
 
-    /// <summary>单条提示停留时长</summary>
+    /// <summary>How long a single toast stays on screen</summary>
     public TimeSpan Lifetime { get; set; } = TimeSpan.FromMilliseconds(4200);
 
     public ObservableCollection<Toast> Items { get; } = [];
@@ -115,7 +115,7 @@ public sealed class NotifyService
     {
         var key = $"{kind}|{text}";
 
-        // 1) 已在显示:合并(计数 +1 并重置存活时间)
+        // 1) Already visible: merge (count +1 and restart the lifetime)
         if (_visibleByKey.TryGetValue(key, out var shown))
         {
             shown.Count++;
@@ -123,14 +123,14 @@ public sealed class NotifyService
             return;
         }
 
-        // 2) 在队列中等待:合并
+        // 2) Waiting in the queue: merge
         if (_pending.FirstOrDefault(t => t.MergeKey == key) is Toast queued)
         {
             queued.Count++;
             return;
         }
 
-        // 3) 新建:可见槽位够则立即显示,否则排队
+        // 3) New: show immediately if a visible slot is free, otherwise enqueue
         var toast = new Toast(kind, text);
         if (Items.Count < MaxVisible && _pending.Count == 0)
             Show(toast);

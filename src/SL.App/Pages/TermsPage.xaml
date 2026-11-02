@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -49,7 +49,7 @@
                            Text="最近更新 2026 年 10 月 · 使用本软件即表示你已阅读并接受以下全部条款。" />
             </Grid>
 
-            <!-- 要点速览 -->
+            <!-- Key points at a glance -->
             <Border Background="{ThemeResource Brush.Card}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -68,7 +68,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- 同意状态 -->
+            <!-- Consent status -->
             <Border Background="{ThemeResource Brush.AccentSoft}"
                     BorderBrush="{ThemeResource Brush.Border}"
                     BorderThickness="1"
@@ -109,7 +109,7 @@
                     <StackPanel Spacing="6">
                         <TextBlock Text="一、总则与适用范围" FontWeight="SemiBold" Foreground="{ThemeResource Brush.Fg}" />
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
-                                   Text="1. Salmon Launcher(以下简称「本软件」)是一款用于管理、安装与启动 Minecraft 的第三方桌面工具。本协议是你与本软件作者之间关于使用本软件的约定。若你不同意其中任何条款,请停止使用并删除本软件。" />
+                                   Text="1. SalmonLauncher(以下简称「本软件」)是一款用于管理、安装与启动 Minecraft 的第三方桌面工具。本协议是你与本软件作者之间关于使用本软件的约定。若你不同意其中任何条款,请停止使用并删除本软件。" />
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
                                    Text="2. 本协议适用于启动器本体及其提供的全部功能,包括版本安装、实例管理、内容下载、账户管理、联机、主题与崩溃诊断。游戏本体不在本协议范围内,其使用须遵守 Mojang Studios 的最终用户许可协议。" />
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
@@ -195,7 +195,7 @@
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
                                    Text="4. 再分发时须保留版权声明与许可声明,并向接收者提供完整对应的源代码;许可证全文见项目根目录的 LICENSE 文件与 https://www.gnu.org/licenses/gpl-3.0.html。" />
                         <TextBlock Style="{ThemeResource Style.TermsBody}"
-                                   Text="5. Copyright (C) 2026 Hugo Mou. Salmon Launcher 及其源代码的版权归作者所有,保留所有权利。" />
+                                   Text="5. Copyright (C) 2026 Hugo Mou. SalmonLauncher 及其源代码的版权归作者所有,保留所有权利。" />
                     </StackPanel>
 
                     <StackPanel Spacing="6">

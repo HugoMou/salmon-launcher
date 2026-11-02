@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -20,9 +20,9 @@ using System.Text.Json.Serialization;
 namespace SL.Data.Storage;
 
 /// <summary>
-/// 原子化 JSON 文件读写:写入时先落临时文件,成功后整体替换目标文件。
-/// 这样启动器在任何时刻崩溃,目录里要么是旧配置、要么是完整新配置,
-/// 不会出现写了一半的损坏文件。
+/// Atomic JSON file read/write: write to a temporary file first, then replace the target file as a whole on success.
+/// This way, whenever the launcher crashes, the directory holds either the old config or the complete new config,
+/// never a half-written corrupted file.
 /// </summary>
 public static class AtomicJsonFile
 {
@@ -33,7 +33,7 @@ public static class AtomicJsonFile
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
-    /// <summary>读取配置;文件缺失或损坏时返回默认实例(throwNotFound=false 行为由调用方决定是否提示)。</summary>
+    /// <summary>Reads the config; returns a default instance when the file is missing or corrupted (the throwNotFound=false behavior; callers decide whether to notify the user).</summary>
     public static T Load<T>(string path) where T : new()
     {
         try
@@ -47,7 +47,7 @@ public static class AtomicJsonFile
         }
         catch (Exception)
         {
-            // 配置损坏:回退默认值。调用方如需告知用户,可先探测文件存在性。
+            // Corrupted config: fall back to defaults. Callers that want to inform the user can probe for the file first.
             return new T();
         }
     }
@@ -64,7 +64,7 @@ public static class AtomicJsonFile
             JsonSerializer.Serialize(stream, value, Options);
         }
 
-        // File.Move 原子替换(Windows 上 overwrite:true 走 ReplaceFile 语义)
+        // File.Move atomic replace (overwrite:true uses ReplaceFile semantics on Windows)
         File.Move(tmp, path, overwrite: true);
     }
 }

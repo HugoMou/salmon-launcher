@@ -1,4 +1,4 @@
-﻿// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -17,34 +17,34 @@ namespace SL.Core.Transfers;
 
 public interface ITransferService
 {
-    /// <summary>引擎参数(并发数等,可运行时调整)</summary>
+    /// <summary>Engine parameters (concurrency, etc.; adjustable at runtime)</summary>
     TransferOptions Options { get; }
 
-    /// <summary>提交任务并立即返回任务对象(含 Id)</summary>
+    /// <summary>Submit a task and return the task object immediately (including its Id)</summary>
     TransferTask Submit(TransferSpec spec);
 
     void Pause(string id);
     void Resume(string id);
     void Cancel(string id);
 
-    /// <summary>重试:Failed / Cancelled 任务重新入队(进度归零)</summary>
+    /// <summary>Retry: re-queue Failed / Cancelled tasks (progress reset to zero)</summary>
     void Retry(string id);
 
     void PauseAll();
     void ResumeAll();
 
-    /// <summary>清除所有终态任务(完成/失败/取消)</summary>
+    /// <summary>Clear all terminal tasks (completed/failed/cancelled)</summary>
     void ClearFinished();
 
-    /// <summary>当前全部任务的快照(UI 初始化时使用)</summary>
+    /// <summary>Snapshot of all current tasks (used when the UI initializes)</summary>
     IReadOnlyList<TransferSnapshot> Snapshots { get; }
 
-    /// <summary>单个任务的进度/状态更新(UI 需自行切换到 UI 线程)</summary>
+    /// <summary>Progress/state update of a single task (the UI must switch to the UI thread itself)</summary>
     event Action<TransferSnapshot>? Updated;
 
-    /// <summary>任务集合结构变化(新增/移除),UI 需重建列表</summary>
+    /// <summary>Task collection structure changed (added/removed); the UI must rebuild its list</summary>
     event Action? StructureChanged;
 
-    /// <summary>是否有正在执行或排队中的任务</summary>
+    /// <summary>Whether any task is running or queued</summary>
     bool HasActive { get; }
 }

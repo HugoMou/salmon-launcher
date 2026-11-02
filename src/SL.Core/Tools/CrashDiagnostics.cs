@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -18,14 +18,14 @@ using System.Text;
 
 namespace SL.Core.Tools;
 
-/// <summary>阶段六:崩溃诊断(规则表式签名匹配,读取磁盘事实)。</summary>
-/// <param name="Findings">诊断结论与建议(与签名顺序一致)</param>
-/// <param name="Excerpt">报告正文摘录(前若干行)</param>
+/// <summary>Stage 6: crash diagnostics (rule-table signature matching against disk facts).</summary>
+/// <param name="Findings">Diagnosis and suggestions (in the same order as the signatures)</param>
+/// <param name="Excerpt">Excerpt of the report body (first few lines)</param>
 public sealed record CrashDiagResult(string File, IReadOnlyList<string> Findings, string Excerpt);
 
 public static class CrashDiagnostics
 {
-    /// <summary>扫描 instances/*\crash-reports 与 instances/*/logs/latest.log,返回可诊断文件(新→旧)。</summary>
+    /// <summary>Scan instances/*\crash-reports and instances/*/logs/latest.log; return diagnosable files (newest → oldest).</summary>
     public static IReadOnlyList<(string Path, DateTimeOffset Time)> ListReadable(CancellationToken cancellation = default)
     {
         var root = Boot.Runtime.InstancesDir;
@@ -54,7 +54,7 @@ public static class CrashDiagnostics
         return list.OrderByDescending(x => x.Item2).ToList();
     }
 
-    /// <summary>分析单个报告(只读文本;含规则表诊断)。</summary>
+    /// <summary>Analyze a single report (read-only text; includes rule-table diagnosis).</summary>
     public static CrashDiagResult Analyze(string file)
     {
         var findings = new List<string>();
@@ -74,7 +74,7 @@ public static class CrashDiagnostics
                 findings.Add(rule.Suggestion);
         }
 
-        // 摘录:报告前 60 行(含崩溃描述),日志则取尾 60 行
+        // excerpt: the first 60 lines of a report (including the crash description); for logs, the last 60 lines
         var excerpt = file.EndsWith("latest.log", StringComparison.OrdinalIgnoreCase)
             ? TakeTail(text, 60)
             : TakeHead(text, 60);

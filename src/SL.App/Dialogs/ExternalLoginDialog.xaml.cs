@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -25,8 +25,8 @@ using Windows.System;
 namespace SL.App.Dialogs;
 
 /// <summary>
-/// 外部浏览器登录:直接唤起系统默认浏览器打开微软授权页,登录完成后
-/// 让用户把回跳链接粘回来换取会话(适用于内置浏览器不可用的环境)。
+/// External browser login: launches the system default browser to open the Microsoft authorization page; after
+/// login, the user pastes the redirect link back to exchange for a session (for environments where the built-in browser is unavailable).
 /// </summary>
 public sealed partial class ExternalLoginDialog : ContentDialog
 {
@@ -44,7 +44,7 @@ public sealed partial class ExternalLoginDialog : ContentDialog
         PrimaryButtonClick += OnPrimary;
     }
 
-    /// <summary>用户填写的回跳链接(仅在点了「完成登录」时有值)。</summary>
+    /// <summary>Redirect link entered by the user (only set when "Complete login" is clicked).</summary>
     public string? CallbackUrl { get; private set; }
 
     private async Task OpenBrowserAsync()

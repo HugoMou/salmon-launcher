@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@ using SL.App.Localization;
 
 namespace SL.App.Pages;
 
-/// <summary>全局偏好页:内存/窗口/JVM 参数/下载源与数据目录、Java 环境。</summary>
+/// <summary>Global preferences page: memory / window / JVM arguments / download source and data directory, Java environment.</summary>
 public sealed partial class GlobalSettingsPage : Page
 {
     private bool _loading;

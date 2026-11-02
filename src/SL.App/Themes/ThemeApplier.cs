@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -25,12 +25,12 @@ using Windows.UI;
 namespace SL.App.Themes;
 
 /// <summary>
-/// 壁纸主题的应用逻辑:内置场景直接取色,本地图片先复制进壁纸库再取色;
-/// 生成配色与强调色后注册并落盘。主题工坊与欢迎页共用这一套流程。
+/// Wallpaper theme application logic: built-in scenes are sampled directly; local images are first copied into the wallpaper library, then sampled;
+/// generated palettes and accents are registered and persisted. The theme workshop and welcome page share this flow.
 /// </summary>
 public static class ThemeApplier
 {
-    /// <summary>生成缩略图与主色,供场景卡展示;失败时把主色标记为「—」。</summary>
+    /// <summary>Generate a thumbnail and dominant color for the scene card; on failure, mark the dominant color as "-".</summary>
     public static async Task PrepareAsync(WallpaperCard card)
     {
         try
@@ -54,7 +54,7 @@ public static class ThemeApplier
         }
     }
 
-    /// <summary>套用一张内置场景:壁纸与整套配色一起换掉。</summary>
+    /// <summary>Apply a built-in scene: replace both the wallpaper and the whole palette.</summary>
     public static async Task<bool> ApplySceneAsync(WallpaperCard card)
     {
         if (!card.Ready || card.Path is null)
@@ -67,7 +67,7 @@ public static class ThemeApplier
             .ConfigureAwait(true);
     }
 
-    /// <summary>选择本地图片并套用为主题;用户取消或失败时返回 false。</summary>
+    /// <summary>Pick a local image and apply it as the theme; returns false if the user cancels or it fails.</summary>
     public static async Task<bool> PickAndApplyAsync()
     {
         try
@@ -95,14 +95,14 @@ public static class ThemeApplier
         }
     }
 
-    /// <summary>清除壁纸,回到默认配色。</summary>
+    /// <summary>Clear the wallpaper and return to the default palette.</summary>
     public static void ClearWallpaper()
     {
         AppServices.Settings.Update(c => c.Palette = "salmon");
         AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已清除壁纸,恢复默认配色"));
     }
 
-    /// <summary>恢复默认配色与强调色。</summary>
+    /// <summary>Restore the default palette and accent.</summary>
     public static void ResetPalette()
     {
         AppServices.Settings.Update(c =>
@@ -113,7 +113,7 @@ public static class ThemeApplier
         AppServices.Notify.Publish(NotifyKind.Info, Loc.T("已恢复默认配色"));
     }
 
-    /// <summary>当前壁纸与配色的简述,用于状态行。</summary>
+    /// <summary>Brief description of the current wallpaper and palette, used for the status line.</summary>
     public static string CurrentSummary()
     {
         var wallpaper = ThemeManager.BackgroundImage;

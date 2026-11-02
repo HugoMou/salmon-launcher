@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Salmon Launcher (SL) — a Minecraft Java edition launcher
+  SalmonLauncher (SL) — a Minecraft Java edition launcher
   Copyright (C) 2026 Hugo Mou
 
   This program is free software: you can redistribute it and/or modify it under
@@ -29,7 +29,7 @@
             <ColumnDefinition Width="*" MinWidth="440" />
         </Grid.ColumnDefinitions>
 
-        <!-- 侧边栏:用户列表 -->
+        <!-- Sidebar: user list -->
         <Border Background="{ThemeResource Brush.Card}"
                 BorderBrush="{ThemeResource Brush.Border}"
                 BorderThickness="1"
@@ -90,7 +90,7 @@
             </Grid>
         </Border>
 
-        <!-- 右侧:皮肤列表 + 3D 预览 -->
+        <!-- Right side: skin list + 3D preview -->
         <Grid Grid.Column="1" RowSpacing="14">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

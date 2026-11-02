@@ -1,10 +1,10 @@
-# Salmon Launcher (SL)
+# SalmonLauncher (SL)
 
-[简体中文](README.zh-CN.md) | [繁體中文](README.zh-Hant.md) | [English](README.md) | **日本語**
+[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-Hant.md) | **日本語**
 
 **WinUI 3 / Windows App SDK** と **.NET 10** で作られた Minecraft Java Edition ランチャーです。インストール、起動、バージョン管理と Mod、マルチプレイ、スキン表示、クラッシュ診断、テーマ切り替えを 1 つの 2 ペイン画面にまとめています。
 
-- バージョン: 1.0.2
+- バージョン: 1.0.3
 - 対応 OS: Windows 10 (2004 以降) / Windows 11、x64 のみ
 - ライセンス: GNU General Public License v3.0 以降(GPL-3.0-or-later)
 
@@ -31,12 +31,12 @@
 
 ## ダウンロードとインストール
 
-**最新リリース: v1.0.2**
+**最新リリース: v1.0.3**
 
 | 形式 | ファイル | 説明 |
 | --- | --- | --- |
-| インストーラー(推奨) | `SL-Setup-1.0.2-win64.exe` | **简体中文 / 繁體中文 / English / 日本語** の 4 言語 UI を備えた標準の Windows セットアップウィザード。スタートメニューのショートカットとアンインストール項目を作成し、管理者権限なしで現在のユーザーにのみインストールすることもできます |
-| ポータブル版 | `SL-1.0.2-portable-win64.zip` | 解凍してすぐ使えます。レジストリに書き込まないため、USB メモリなどに入れて持ち運べます |
+| インストーラー(推奨) | `SL-Setup-1.0.3-win64.exe` | **简体中文 / 繁體中文 / English / 日本語** の 4 言語 UI を備えた標準の Windows セットアップウィザード。スタートメニューのショートカットとアンインストール項目を作成し、管理者権限なしで現在のユーザーにのみインストールすることもできます |
+| ポータブル版 | `SL-1.0.3-portable-win64.zip` | 解凍してすぐ使えます。レジストリに書き込まないため、USB メモリなどに入れて持ち運べます |
 
 どちらも .NET 10 と Windows App SDK のランタイムを同梱しており、**別途ランタイムをインストールする必要はありません**。ダウンロード: [GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
 
@@ -61,7 +61,7 @@ src\SL.App\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\SL.exe
 ### インストーラーとポータブル版の作成
 
 ```powershell
-.\installer\build-installer.ps1 -Version 1.0.2
+.\installer\build-installer.ps1 -Version 1.0.3
 ```
 
 このスクリプトは `dotnet publish`(Release、自己完結)を実行し、Inno Setup で `installer\SL.iss` をコンパイルして、`dist\` に `SL-Setup-<バージョン>-win64.exe` と `SL-<バージョン>-portable-win64.zip` を生成します。[Inno Setup 6](https://jrsoftware.org/isinfo.php) が必要です。
@@ -102,7 +102,7 @@ UI は **简体中文**、**繁體中文**、**English**、**日本語** の 4 �
 ## 著作権とライセンス
 
 ```
-Salmon Launcher (SL)
+SalmonLauncher (SL)
 Copyright (C) 2026 Hugo Mou
 
 本プロジェクトは GNU General Public License 第 3 版(またはそれ以降)で

@@ -1,4 +1,4 @@
-// Salmon Launcher (SL) — a Minecraft Java edition launcher
+// SalmonLauncher (SL) — a Minecraft Java edition launcher
 // Copyright (C) 2026 Hugo Mou
 //
 // This program is free software: you can redistribute it and/or modify it under
@@ -27,7 +27,7 @@ using SL.App.Localization;
 
 namespace SL.App.Pages;
 
-/// <summary>Modrinth 项目卡片行。</summary>
+/// <summary>Modrinth project card row.</summary>
 public sealed class RepoRow
 {
     public RepoRow(Modrinth.ProjectHit hit, RepoVM owner)
@@ -48,7 +48,7 @@ public sealed class RepoRow
     public string Categories => string.Join(" · ", Hit.Categories);
 }
 
-/// <summary>仓库页视图模型:模组 / 光影 / 资源包三类共用,检索与安装均走真实网络。</summary>
+/// <summary>Repository view model: shared by mods / shaders / resource packs; search and install both use the real network.</summary>
 public sealed class RepoVM : VmBase, IRefreshable
 {
     private readonly DispatcherQueue _ui = DispatcherQueue.GetForCurrentThread();
@@ -110,7 +110,7 @@ public sealed class RepoVM : VmBase, IRefreshable
         _ => "resourcepacks",
     };
 
-    /// <summary>路由 key 决定分类:dl.pack / dl.shaders / dl.packs。</summary>
+    /// <summary>The route key determines the category: dl.pack / dl.shaders / dl.packs.</summary>
     public void Configure(string routeKey)
     {
         _category = routeKey switch
@@ -146,7 +146,7 @@ public sealed class RepoVM : VmBase, IRefreshable
         }
     }
 
-    /// <summary>实例 id → (游戏版本, 加载器)。加载器实例按 {版本}-{加载器} 命名。</summary>
+    /// <summary>Instance id → (game version, loader). Loader instances are named {version}-{loader}.</summary>
     private static (string Version, string Loader) SplitInstance(string instanceId)
     {
         if (instanceId.Length == 0)
@@ -157,7 +157,7 @@ public sealed class RepoVM : VmBase, IRefreshable
             if (instanceId.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
                 return (instanceId[..^suffix.Length], loader);
         }
-        // 原版实例没有加载器:默认按 Fabric 找模组(否则检索不到可装内容)
+        // Vanilla instances have no loader: default to Fabric when looking for mods (otherwise no installable content is found)
         return (instanceId, "fabric");
     }
 
