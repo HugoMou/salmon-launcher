@@ -2015,7 +2015,32 @@ main {
 }
 
 /* ---------- responsive ---------- */
+/* six nav items: tighten spacing, collapse to burger earlier */
+@media (max-width: 1140px) {
+  .nav-in {
+    gap: 18px;
+  }
+  .nav-links a {
+    padding: 8px;
+  }
+  .nav-tools {
+    gap: 10px;
+    padding-left: 12px;
+  }
+  .lang button {
+    padding: 6px 7px;
+  }
+}
 @media (max-width: 1080px) {
+  .nav-links {
+    display: none;
+  }
+  .burger {
+    display: flex;
+  }
+  .nav-tools {
+    margin-left: auto;
+  }
   .hero {
     grid-template-columns: 1fr;
     gap: 44px;
