@@ -40,7 +40,7 @@
 
 どちらも .NET 10 と Windows App SDK のランタイムを同梱しており、**別途ランタイムをインストールする必要はありません**。ダウンロード: [GitHub Releases](https://github.com/HugoMou/salmonlauncher/releases)。
 
-インストーラーは未署名のため、初回起動時に Windows SmartScreen が「詳細情報 → 実行」を求める場合があります。アンインストールしても `%APPDATA%\SalmonLauncher` のインスタンスとセーブデータは保持されます。
+インストーラーとアンインストーラーは自己署名証明書（CN=SalmonLauncher, O=Hugo Mou）で署名されており、ビルドスクリプトがローカルで生成します。証明書をインポートしていない PC では SmartScreen が「不明な発行元」と表示することがありますが、自己署名では想定内の動作であり、ファイルの改ざんを意味しません。代わりに SHA-256 を照合してください。アンインストールしても `%APPDATA%\SalmonLauncher` のインスタンスとセーブデータは保持されます。
 
 ## ビルド
 

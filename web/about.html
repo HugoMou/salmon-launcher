@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-zh-title="关于与许可 — SalmonLauncher">About &amp; licence — SalmonLauncher</title>
+<meta name="description" data-zh-content="关于 SalmonLauncher：项目原则、技术构成、GPL-3.0 许可、免责声明与致谢。" content="About SalmonLauncher: project principles, technical shape, the GPL-3.0 licence, disclaimer and credits.">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="assets/img/favicon.ico">
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="canonical" href="https://sl.hugomou.com/about.html">
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/img/logo.png" alt="SalmonLauncher logo">
+      <span class="brand-name">SalmonLauncher</span>
+      <span class="brand-slash" data-zh="启动器官网">Launcher site</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="features.html" data-zh="功能">Features</a>
+      <a href="download.html" data-zh="下载">Download</a>
+      <a href="docs.html" data-zh="文档">Docs</a>
+      <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      <a href="about.html" aria-current="page" data-zh="关于">About</a>
+    </nav>
+    <div class="nav-tools">
+      <div class="lang" role="group" aria-label="Language">
+        <button data-set-lang="en" aria-pressed="true">EN</button>
+        <button data-set-lang="zh" aria-pressed="false">中</button>
+      </div>
+      <a class="btn btn-primary btn-sm" href="download.html" data-zh="下载 1.0.3">Get 1.0.3</a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html" data-zh="功能">Features</a>
+    <a href="download.html" data-zh="下载">Download</a>
+    <a href="docs.html" data-zh="文档">Docs</a>
+    <a href="changelog.html" data-zh="更新日志">Changelog</a>
+    <a href="about.html" data-zh="关于">About</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap phead">
+    <div>
+      <div class="eyebrow" data-zh="关于 · 许可 · 免责">About · licence · disclaimer</div>
+      <h1 data-zh="一个被人读得懂的启动器。">A launcher you can read.</h1>
+      <p class="lede" data-zh="SalmonLauncher 是单人维护的开源项目。目标不是做最多功能的启动器，而是把“下载、启动、出错、修复”这条链路摊开给你看。">SalmonLauncher is an open-source project maintained by one person. The aim is not to have the most features, but to lay the chain of download, launch, fail and fix in front of you.</p>
+    </div>
+    <div class="phead-aside">
+      <div><b>SL</b> / ABOUT</div>
+      <div>GPL-3.0-OR-LATER</div>
+      <div>EST. 2026</div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="two-col reveal" style="padding-top:52px">
+      <div class="prose">
+        <h2 style="font-size:28px;margin-bottom:18px" data-zh="为什么还有一个启动器">Why another launcher</h2>
+        <p data-zh="现有工具往往分成两类：一类足够轻，但出错时只说“启动失败”；另一类功能齐全，却把下载、模组、联机拆成互不相认的几个页面，出了问题只能靠猜。">Existing tools tend to split in two: ones light enough to run anywhere but which say only “launch failed”, and ones with every feature, split across pages that do not know about each other, leaving you to guess when something breaks.</p>
+        <p data-zh-html="这个项目选择第三条：<strong>所有环节共享同一份状态</strong>，并且每一步都能被看见。下载有校验记录，启动有阶段状态，崩溃有签名匹配，模组启停只是改名。">This project takes a third route: <strong>every stage shares the same state</strong>, and every step is visible. Downloads carry verification records, launches report stage by stage, crashes are signature-matched, and mod toggling is just a rename.</p>
+        <p data-zh="它使用 WinUI 3 与 Windows App SDK 构建，界面是双栏主从导航加页面栈；底层分为数据层、业务层、表示层，依赖只允许单向流动。">It is built with WinUI 3 and the Windows App SDK, with a two-pane master–detail navigation and a page stack. Underneath, data, business and presentation layers depend only one way.</p>
+        <div class="stat-grid" style="margin-top:28px">
+          <div class="stat"><b>3</b><span data-zh="分层">layers</span></div>
+          <div class="stat"><b>7</b><span data-zh="功能域">domains</span></div>
+          <div class="stat"><b>4</b><span data-zh="界面语言">languages</span></div>
+          <div class="stat"><b>2</b><span data-zh="明暗主题">themes</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="code" style="margin-top:0">
+          <div class="code-head">
+            <span data-zh="版本档案">Release identity</span>
+            <button class="copy-inline" data-copy="code-id">COPY</button>
+          </div>
+          <pre id="code-id"><span class="k">name</span>        SalmonLauncher (SL)
+<span class="k">version</span>     1.0.3
+<span class="k">platform</span>    Windows 10 2004+ / 11, x64
+<span class="k">toolkit</span>     WinUI 3 · Windows App SDK
+<span class="k">runtime</span>     .NET 10 (self-contained)
+<span class="k">licence</span>     GPL-3.0-or-later
+<span class="k">copyright</span>   (C) 2026 Hugo Mou
+<span class="k">source</span>      github.com/HugoMou/salmonlauncher</pre>
+        </div>
+        <div class="note plain" style="margin-top:18px">
+          <b data-zh="数据不出本机。">Data stays local.</b>
+          <span data-zh="设置、账户会话、日志、实例与存档都写在 %APPDATA%\SalmonLauncher，只有下载与元数据请求会访问网络。">Settings, account sessions, logs, instances and worlds are written under %APPDATA%\SalmonLauncher. Only downloads and metadata requests go to the network.</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="sec">
+      <div class="sec-head reveal">
+        <span class="sec-num">01 —</span>
+        <h2 data-zh="许可">Licence</h2>
+        <span class="sec-line"></span>
+        <span class="mono">GPL-3.0-OR-LATER</span>
+      </div>
+      <div class="two-col reveal">
+        <div class="prose">
+          <p data-zh="本项目以 GNU 通用公共许可证第 3 版或任何更新版本发布。你可以运行、研究、修改与再分发，包括收取费用，但必须保留版权与许可声明，并向接收者提供完整的对应源代码。">This project is released under the GNU General Public License, version 3 or any later version. You may run, study, modify and redistribute it, including for a fee, as long as you keep the copyright and licence notices and give recipients the complete corresponding source code.</p>
+          <p data-zh="完整许可证文本位于仓库根目录的 LICENSE 文件，也可在 GNU 官网阅读。">The full licence text is in the LICENSE file at the repository root and on the GNU website.</p>
+          <div class="btn-row" style="margin-top:22px">
+            <a class="btn btn-ghost btn-sm" href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener" data-zh="阅读 GPL-3.0">Read GPL-3.0</a>
+            <a class="btn btn-ghost btn-sm" href="https://github.com/HugoMou/salmonlauncher/blob/main/LICENSE" target="_blank" rel="noopener" data-zh="仓库 LICENSE">Repository LICENSE</a>
+          </div>
+        </div>
+        <div class="legal">
+          <b>SalmonLauncher (SL)</b><br>
+          Copyright (C) 2026 Hugo Mou<br><br>
+          <span data-zh="本程序是自由软件：你可以依据自由软件基金会发布的 GNU 通用公共许可证第 3 版或更新版本的条款重新分发和/或修改它。本程序分发时希望它有用，但不提供任何担保，甚至不提供适销性或特定用途适用性的默示担保。">This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="disclaimer">
+      <div class="sec-head reveal">
+        <span class="sec-num">02 —</span>
+        <h2 data-zh="免责声明">Disclaimer</h2>
+        <span class="sec-line"></span>
+        <span class="mono" data-zh="请阅读">Read this</span>
+      </div>
+      <div class="req-grid reveal">
+        <div class="req">
+          <h3 data-zh="与官方无关">No affiliation</h3>
+          <ul>
+            <li data-zh="这是免费的第三方工具，与 Mojang Studios 或 Microsoft 没有隶属或授权关系。">This is a free third-party tool with no affiliation or authorisation from Mojang Studios or Microsoft.</li>
+            <li data-zh="Minecraft 是 Mojang Studios 的商标。">Minecraft is a trademark of Mojang Studios.</li>
+            <li data-zh="应用不捆绑、不分发、不修改任何 Minecraft 游戏文件。">The app does not bundle, distribute or modify any Minecraft game files.</li>
+            <li data-zh="游戏文件来自官方源或公共镜像。">Game files come from official sources or public mirrors.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3 data-zh="使用风险">Use at your own risk</h3>
+          <ul>
+            <li data-zh="模组、光影与资源包来自 Modrinth 等公开平台，版权归各自作者。">Mods, shaders and resource packs come from public platforms such as Modrinth and remain their authors' property.</li>
+            <li data-zh="软件按“现状”提供，不附带任何明示或默示担保。">The software is provided “as is”, without any express or implied warranty.</li>
+            <li data-zh="重要操作前请备份存档与实例。">Back up worlds and instances before important operations.</li>
+            <li data-zh="使用本应用即表示你已阅读并接受应用内的使用条款与免责声明。">Using the app means you have read and accepted the Terms of Use and Disclaimer shown inside it.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head reveal">
+        <span class="sec-num">03 —</span>
+        <h2 data-zh="致谢">Credits</h2>
+        <span class="sec-line"></span>
+        <span class="mono" data-zh="站在别人肩上">Standing on shoulders</span>
+      </div>
+      <div class="doc-body" style="padding:0">
+        <p data-zh="没有这些公开服务，这个项目无法存在：">This project could not exist without these public services:</p>
+        <ul class="list">
+          <li data-zh="Mojang 版本清单与资源服务（piston-meta / libraries / resources）">Mojang's version manifest and resource services (piston-meta, libraries, resources)</li>
+          <li data-zh="BMCLAPI 提供的国内镜像">The China mirror provided by BMCLAPI</li>
+          <li data-zh="Eclipse Adoptium 与 TUNA 提供的 Java 运行时与镜像">Java runtimes and mirrors from Eclipse Adoptium and TUNA</li>
+          <li data-zh="Modrinth 提供的内容目录与 API">The content catalogue and API from Modrinth</li>
+          <li data-zh="Inno Setup 提供的安装包构建能力">Installer building from Inno Setup</li>
+          <li data-zh="所有报告问题、测试版本与提交翻译的人">Everyone who reported issues, tested builds and contributed translations</li>
+        </ul>
+        <div class="note green">
+          <b data-zh="联系与反馈：">Contact:</b>
+          <span data-zh="问题请提交到 GitHub Issues；安全问题请避免在公开 issue 中粘贴完整日志与个人信息。">Report bugs on GitHub Issues. For security matters, avoid pasting full logs or personal information into a public issue.</span>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost" href="https://github.com/HugoMou/salmonlauncher/issues" target="_blank" rel="noopener" data-zh="提交问题">Open an issue</a>
+          <a class="btn btn-ghost" href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener" data-zh="浏览源码">Browse the source</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band reveal">
+      <div>
+        <span class="mono" data-zh="开始使用">Get started</span>
+        <h2 data-zh="读完了，就装一个。">Done reading. Install it.</h2>
+        <p data-zh="Windows 10 2004+ / 11 · x64 · 免装运行时">Windows 10 2004+ / 11 · x64 · runtimes included</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href="download.html" data-zh="下载 1.0.3">Download 1.0.3</a>
+        <a class="btn btn-ghost btn-lg" href="docs.html" data-zh="阅读文档">Read the docs</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html">
+          <img src="assets/img/logo.png" alt="">
+          <span class="brand-name">SalmonLauncher</span>
+        </a>
+        <p data-zh="一个开源的 Minecraft Java 版启动器：安装、启动、模组、联机、诊断，全部本地完成。">An open-source Minecraft: Java Edition launcher. Install, launch, mod, play together and diagnose — all locally.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="产品">Product</h4>
+        <a href="features.html" data-zh="功能">Features</a>
+        <a href="download.html" data-zh="下载">Download</a>
+        <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="资源">Resources</h4>
+        <a href="docs.html" data-zh="文档">Documentation</a>
+        <a href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="所有版本">All releases</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="法律">Legal</h4>
+        <a href="about.html" data-zh="关于与许可">About &amp; licence</a>
+        <a href="about.html#disclaimer" data-zh="免责声明">Disclaimer</a>
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span data-year>2026</span> Hugo Mou · SalmonLauncher</span>
+      <span data-zh="非 Mojang Studios 或 Microsoft 官方产品。Minecraft 为 Mojang Studios 商标。">Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang Studios.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-zh-title="更新日志 — SalmonLauncher">Changelog — SalmonLauncher</title>
+<meta name="description" data-zh-content="SalmonLauncher 版本更新日志：1.0.3 与 1.0.2 的修复、签名与仓库变更。" content="SalmonLauncher release notes for 1.0.3 and 1.0.2: fixes, code signing and repository changes.">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="assets/img/favicon.ico">
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="canonical" href="https://sl.hugomou.com/changelog.html">
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/img/logo.png" alt="SalmonLauncher logo">
+      <span class="brand-name">SalmonLauncher</span>
+      <span class="brand-slash" data-zh="启动器官网">Launcher site</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="features.html" data-zh="功能">Features</a>
+      <a href="download.html" data-zh="下载">Download</a>
+      <a href="docs.html" data-zh="文档">Docs</a>
+      <a href="changelog.html" aria-current="page" data-zh="更新日志">Changelog</a>
+      <a href="about.html" data-zh="关于">About</a>
+    </nav>
+    <div class="nav-tools">
+      <div class="lang" role="group" aria-label="Language">
+        <button data-set-lang="en" aria-pressed="true">EN</button>
+        <button data-set-lang="zh" aria-pressed="false">中</button>
+      </div>
+      <a class="btn btn-primary btn-sm" href="download.html" data-zh="下载 1.0.3">Get 1.0.3</a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html" data-zh="功能">Features</a>
+    <a href="download.html" data-zh="下载">Download</a>
+    <a href="docs.html" data-zh="文档">Docs</a>
+    <a href="changelog.html" data-zh="更新日志">Changelog</a>
+    <a href="about.html" data-zh="关于">About</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap phead">
+    <div>
+      <div class="eyebrow" data-zh="更新日志">Release notes</div>
+      <h1 data-zh="每次改动都写下来。">Every change, written down.</h1>
+      <p class="lede" data-zh="这里只记录已经发布的版本。仓库标签与完整资源列表以 GitHub Releases 为准。">Only shipped versions are listed here. Tags and complete asset lists live on GitHub Releases.</p>
+    </div>
+    <div class="phead-aside">
+      <div><b>SL</b> / CHANGELOG</div>
+      <div>LATEST v1.0.3</div>
+    </div>
+  </section>
+
+  <div class="wrap-narrow">
+    <div class="log">
+      <article class="entry reveal">
+        <div class="entry-head">
+          <h2>v1.0.3</h2>
+          <span class="entry-tag" data-zh="最新">Latest</span>
+          <time datetime="2026-11-02">2026-11-02</time>
+        </div>
+        <p class="lede" data-zh="仓库统一英文命名，安装包与卸载程序加入代码签名。">English-first repository, unified naming, and code signing for the installer and uninstaller.</p>
+        <ul>
+          <li data-zh="GitHub 仓库更名为 salmonlauncher，旧地址自动 301 跳转，历史提交与 Release 全部保留。">The GitHub repository was renamed to salmonlauncher; the old address 301-redirects and all history and releases were kept.</li>
+          <li data-zh="安装包与卸载程序使用自签名证书（CN=SalmonLauncher, O=Hugo Mou）签名，构建脚本自动定位证书。">The installer and uninstaller are now signed with a self-signed certificate (CN=SalmonLauncher, O=Hugo Mou), located automatically by the build script.</li>
+          <li data-zh="四份 README 更新下载章节，系统要求统一为 Windows 10 2004（内部版本 19041）。">All four READMEs gained a download section, with the requirement unified at Windows 10 2004 (build 19041).</li>
+          <li data-zh="仓库可见内容、脚本注释与提交信息统一为英文，品牌名统一为无空格的 SalmonLauncher。">Repository-facing text, script comments and commit messages moved to English, with the brand unified as the space-free SalmonLauncher.</li>
+          <li data-zh="发布 SL-Setup-1.0.3-win64.exe 与 SL-1.0.3-portable-win64.zip。">Shipped SL-Setup-1.0.3-win64.exe and SL-1.0.3-portable-win64.zip.</li>
+        </ul>
+      </article>
+
+      <article class="entry reveal">
+        <div class="entry-head">
+          <h2>v1.0.2</h2>
+          <time datetime="2026-11-02">2026-11-02</time>
+        </div>
+        <p class="lede" data-zh="修复安装程序快捷方式图标不显示，并补齐安装向导的多语言。">Shortcut icon fix and a fully localised setup wizard.</p>
+        <ul>
+          <li data-zh="根因：可执行文件未嵌入图标，快捷方式也未显式指定图标路径。现已嵌入 Logo.ico 并在脚本中指定路径。">Root cause: the executable embedded no icon and the shortcut specified no icon path. Logo.ico is now embedded and referenced explicitly.</li>
+          <li data-zh="桌面与开始菜单快捷方式图标显示恢复正常。">Desktop and Start menu shortcuts now show the application icon.</li>
+          <li data-zh="安装向导支持简体中文、繁体中文、英文、日文四种语言。">The setup wizard now ships in Simplified Chinese, Traditional Chinese, English and Japanese.</li>
+          <li data-zh="四份 README 同步版本号，并新增安装包与便携版的下载说明。">The four READMEs were bumped and gained installer and portable download notes.</li>
+        </ul>
+      </article>
+
+      <article class="entry reveal">
+        <div class="entry-head">
+          <h2 data-zh="更早的标签">Earlier tags</h2>
+          <time>v1.0.1 · v1.0.0</time>
+        </div>
+        <p class="lede" data-zh="v1.0.1 与 v1.0.0 仍保留在仓库中，但没有发布说明。要查看当时的提交，请打开 GitHub 的标签列表。">v1.0.1 and v1.0.0 remain in the repository without published notes. Open the tag list on GitHub to inspect those commits.</p>
+        <p style="margin-top:14px">
+          <a class="link-arrow" href="https://github.com/HugoMou/salmonlauncher/tags" target="_blank" rel="noopener" data-zh="在 GitHub 查看标签 →">View tags on GitHub →</a>
+        </p>
+      </article>
+    </div>
+
+    <section class="cta-band reveal">
+      <div>
+        <span class="mono" data-zh="当前版本">Current release</span>
+        <h2 data-zh="1.0.3 已可下载。">1.0.3 is ready.</h2>
+        <p data-zh="安装包 59.5 MB，便携版 87 MB，均附 SHA-256。">59.5 MB installer, 87 MB portable, both with SHA-256.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href="download.html" data-zh="前往下载">Download</a>
+        <a class="btn btn-ghost btn-lg" href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="GitHub Releases">GitHub Releases</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html">
+          <img src="assets/img/logo.png" alt="">
+          <span class="brand-name">SalmonLauncher</span>
+        </a>
+        <p data-zh="一个开源的 Minecraft Java 版启动器：安装、启动、模组、联机、诊断，全部本地完成。">An open-source Minecraft: Java Edition launcher. Install, launch, mod, play together and diagnose — all locally.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="产品">Product</h4>
+        <a href="features.html" data-zh="功能">Features</a>
+        <a href="download.html" data-zh="下载">Download</a>
+        <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="资源">Resources</h4>
+        <a href="docs.html" data-zh="文档">Documentation</a>
+        <a href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="所有版本">All releases</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="法律">Legal</h4>
+        <a href="about.html" data-zh="关于与许可">About &amp; licence</a>
+        <a href="about.html#disclaimer" data-zh="免责声明">Disclaimer</a>
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span data-year>2026</span> Hugo Mou · SalmonLauncher</span>
+      <span data-zh="非 Mojang Studios 或 Microsoft 官方产品。Minecraft 为 Mojang Studios 商标。">Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang Studios.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>

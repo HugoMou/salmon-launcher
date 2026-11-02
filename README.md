@@ -40,7 +40,7 @@ A Minecraft Java Edition launcher built with **WinUI 3 / Windows App SDK** and *
 
 Both packages bundle the complete .NET 10 and Windows App SDK runtimes, so **no separate runtime installation is needed**. Download: [GitHub Releases](https://github.com/HugoMou/salmonlauncher/releases).
 
-The installer is unsigned, so Windows SmartScreen may show "More info → Run anyway" on first launch. Uninstalling keeps instances and saves under `%APPDATA%\SalmonLauncher`.
+The installer and uninstaller are signed with a self-signed certificate (CN=SalmonLauncher, O=Hugo Mou), generated locally by the build script. Machines that have not imported that certificate may still see "Unknown publisher" in SmartScreen; that is expected for self-signing and does not mean the file was altered — check the SHA-256 instead. Uninstalling keeps instances and saves under `%APPDATA%\SalmonLauncher`.
 
 ## Build
 

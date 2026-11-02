@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-zh-title="功能 — SalmonLauncher">Features — SalmonLauncher</title>
+<meta name="description" data-zh-content="SalmonLauncher 功能详解：版本安装、启动流水线、实例与模组、联机中继、Modrinth 内容、账户、外观与崩溃诊断。" content="What SalmonLauncher does: version installs, the launch pipeline, instances and mods, multiplayer relay, Modrinth content, accounts, appearance and crash diagnostics.">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="assets/img/favicon.ico">
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="canonical" href="https://sl.hugomou.com/features.html">
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="index.html">
+      <img src="assets/img/logo.png" alt="SalmonLauncher logo">
+      <span class="brand-name">SalmonLauncher</span>
+      <span class="brand-slash" data-zh="启动器官网">Launcher site</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="features.html" aria-current="page" data-zh="功能">Features</a>
+      <a href="download.html" data-zh="下载">Download</a>
+      <a href="docs.html" data-zh="文档">Docs</a>
+      <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      <a href="about.html" data-zh="关于">About</a>
+    </nav>
+    <div class="nav-tools">
+      <div class="lang" role="group" aria-label="Language">
+        <button data-set-lang="en" aria-pressed="true">EN</button>
+        <button data-set-lang="zh" aria-pressed="false">中</button>
+      </div>
+      <a class="btn btn-primary btn-sm" href="download.html" data-zh="下载 1.0.3">Get 1.0.3</a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu">
+    <a href="features.html" data-zh="功能">Features</a>
+    <a href="download.html" data-zh="下载">Download</a>
+    <a href="docs.html" data-zh="文档">Docs</a>
+    <a href="changelog.html" data-zh="更新日志">Changelog</a>
+    <a href="about.html" data-zh="关于">About</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap phead">
+    <div>
+      <div class="eyebrow" data-zh="功能清单">Capability sheet</div>
+      <h1 data-zh="所有东西都在同一个窗口里。">Everything in one window.</h1>
+      <p class="lede" data-zh="SalmonLauncher 把启动器该做的事情拆成七个区域，但它们共享同一份配置、同一个实例目录和同一套任务队列。下面是每个区域具体能做什么。">SalmonLauncher splits the job of a launcher into seven areas, but they share one config, one instance folder and one task queue. Here is exactly what each area does.</p>
+    </div>
+    <div class="phead-aside">
+      <div><b>SL</b> / FEATURES</div>
+      <div>v1.0.3</div>
+      <div>WIN 10 2004+</div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="feature reveal">
+      <div class="feature-copy">
+        <span class="mono">01 / INSTALL</span>
+        <h2 data-zh="版本安装：从清单到可运行目录">Install: manifest to runnable folder</h2>
+        <p data-zh="版本列表来自 Mojang 官方 version_manifest_v2.json：默认显示最新 40 个正式版与最新 12 个快照/历史版本。选中版本后，启动器按清单补齐库、资源与 natives，并自动定位或下载合适的 Java。">The version list comes from Mojang's official version_manifest_v2.json: the latest 40 releases plus the latest 12 snapshots and historical builds. Pick one and the launcher fills in libraries, assets and natives from the manifest, then finds or downloads a matching Java.</p>
+        <ul class="checks">
+          <li data-zh="Fabric / Quilt / Forge / NeoForge 加载器安装">Fabric, Quilt, Forge and NeoForge loader installs</li>
+          <li data-zh="主源失败自动切换 BMCLAPI 镜像">Automatic BMCLAPI mirror fallback when the primary source fails</li>
+          <li data-zh="断点续传与 SHA-1 终验，失败即重下">Resume plus SHA-1 verification; mismatches are downloaded again</li>
+          <li data-zh="2026 版 natives 规则：只取 windows-x64，剔除其他平台">2026 natives rules: windows-x64 only, other platforms pruned</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>install / 1.20.1</span><b>4 STEPS</b></div>
+          <div class="pipe">
+            <div class="pipe-row done"><span class="pipe-dot"></span><span>manifest · version json</span><span>OK</span></div>
+            <div class="pipe-row done"><span class="pipe-dot"></span><span>libraries · 58 files</span><span>OK</span></div>
+            <div class="pipe-row done"><span class="pipe-dot"></span><span>assets · index 12</span><span>OK</span></div>
+            <div class="pipe-row done"><span class="pipe-dot"></span><span>natives · lwjgl</span><span>OK</span></div>
+            <div class="pipe-row now"><span class="pipe-dot"></span><span>java · major 17</span><span>SCAN</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature rev reveal">
+      <div class="feature-copy">
+        <span class="mono">02 / LAUNCH</span>
+        <h2 data-zh="启动是一串能被看见的步骤">Launch is a visible sequence</h2>
+        <p data-zh="启动不是“点一下然后等”。每个阶段都会出现在任务中心：解析元数据、校验库、重建 natives、差量补齐资源、定位 Java、组装参数、拉起进程。成功或失败都写进实例日志。">Launching is not a click and a wait. Every stage shows up in the task centre: parse metadata, verify libraries, rebuild natives, top up assets, locate Java, assemble arguments, start the process. Success and failure both land in the instance log.</p>
+        <ul class="checks">
+          <li data-zh="内存、窗口尺寸、额外 JVM 参数可按实例设置">Memory, window size and extra JVM arguments per instance</li>
+          <li data-zh="每次启动全量重建 natives，避免旧 DLL 混入">Natives are rebuilt on every launch, so stale DLLs never leak in</li>
+          <li data-zh="游戏 stdout / stderr 重定向到实例日志">Game stdout and stderr are redirected into the instance log</li>
+          <li data-zh="异常退出自动进入崩溃诊断">Abnormal exits drop straight into diagnostics</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>launch / 26.3</span><b>PID 6844</b></div>
+          <div class="loglines">
+            <div><span class="t">[09:41:02]</span>loading version json</div>
+            <div><span class="t">[09:41:02]</span>74 libraries verified</div>
+            <div><span class="t">[09:41:03]</span>natives rebuilt in 0.4 s</div>
+            <div><span class="t">[09:41:05]</span>assets: 12 missing, fetched</div>
+            <div><span class="t">[09:41:06]</span>java 25.0.1 · temurin</div>
+            <div class="ok"><span class="t">[09:41:07]</span>process alive · 1.8 GB heap</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-copy">
+        <span class="mono">03 / INSTANCES &amp; MODS</span>
+        <h2 data-zh="实例是文件夹，不是数据库">Instances are folders, not a database</h2>
+        <p data-zh="每个实例在 instances/&lt;id&gt;/ 下有自己的一整套目录：meta、versions、mods、resourcepacks、shaderpacks、saves、logs、natives、crash-reports。删掉一个实例，不会影响其他实例。">Each instance owns a full tree under instances/&lt;id&gt;/: meta, versions, mods, resourcepacks, shaderpacks, saves, logs, natives, crash-reports. Removing one instance touches nothing else.</p>
+        <ul class="checks">
+          <li data-zh="模组启停通过 .jar ↔ .jar.disabled 改名完成">Mod toggling is a rename: .jar ↔ .jar.disabled</li>
+          <li data-zh="读取 fabric.mod.json / mods.toml / mcmod.info 获取真实元数据">Real metadata read from fabric.mod.json, mods.toml or mcmod.info</li>
+          <li data-zh="本地模组可直接导入，不改动原文件">Local mods import directly, leaving the original untouched</li>
+          <li data-zh="存档可打包备份，迁移时整目录复制即可">Saves can be zipped for backup; migrating is a folder copy</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>mods / 26.3</span><b>9 ACTIVE</b></div>
+          <div class="modrow"><span class="mod-name">sodium</span><span class="mod-ver">0.6.13</span><span class="switch on"></span></div>
+          <div class="modrow"><span class="mod-name">iris</span><span class="mod-ver">1.9.2</span><span class="switch on"></span></div>
+          <div class="modrow"><span class="mod-name">fabric-api</span><span class="mod-ver">0.115.0</span><span class="switch on"></span></div>
+          <div class="modrow"><span class="mod-name">modmenu</span><span class="mod-ver">11.0.3</span><span class="switch on"></span></div>
+          <div class="modrow"><span class="mod-name">lithium</span><span class="mod-ver">0.15.3</span><span class="switch"></span></div>
+          <div class="modrow"><span class="mod-name">xaero-map</span><span class="mod-ver">1.38.8</span><span class="switch on"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature rev reveal">
+      <div class="feature-copy">
+        <span class="mono">04 / MULTIPLAYER</span>
+        <h2 data-zh="联机：中继、局域网、邀请码">Multiplayer: relay, LAN, invite code</h2>
+        <p data-zh="首版本地回环 TCP 信令已经可以建房。邀请码形如 SLROOM-xxxx-xxxx，端口自动从系统中挑选，不需要手动配置转发规则。公网中继需要一台服务器，当前版本仍走本地回环。">The first version ships a local loopback TCP signalling relay. Invite codes look like SLROOM-xxxx-xxxx and the port is picked from the system, so no manual forwarding rules. A public relay needs a server; this release still runs loopback.</p>
+        <ul class="checks">
+          <li data-zh="自建房间：生成邀请码，同机或内网直接加入">Host a room and share an invite code for the same machine or LAN</li>
+          <li data-zh="局域网扫描：列出同一网段可加入的游戏">LAN scan lists joinable games on the same subnet</li>
+          <li data-zh="手动中继：填写地址即可接入已有中继">Manual relay: point at an address you already run</li>
+          <li data-zh="信令与游戏进程分离，关掉启动器不会杀掉游戏">Signalling is separate from the game process; closing the launcher leaves the game running</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>voxlink / room</span><b>SLROOM-7K3Q</b></div>
+          <div class="relay">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="22" y1="26" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
+              <line x1="78" y1="26" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
+              <line x1="22" y1="76" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
+              <line x1="78" y1="76" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
+            </svg>
+            <div class="relay-node n1"><b>host</b>pid 6844</div>
+            <div class="relay-node n2"><b>player</b>localhost</div>
+            <div class="relay-node n3"><b>lan</b>scan</div>
+            <div class="relay-node n4"><b>relay</b>manual</div>
+            <div class="relay-node hub"><b>SIGNAL</b>tcp · loopback</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-copy">
+        <span class="mono">05 / CONTENT</span>
+        <h2 data-zh="内容目录：Modrinth 三分类">Content: three Modrinth categories</h2>
+        <p data-zh="模组、光影、资源包共用同一套搜索视图，但安装目录按分类自动决定：mods、shaderpacks、resourcepacks。选中实例后，下载完成的文件会直接落到对应文件夹。">Mods, shaders and resource packs share one search view, while the install folder follows the category: mods, shaderpacks, resourcepacks. With an instance selected, finished downloads land in the right folder.</p>
+        <ul class="checks">
+          <li data-zh="按分类与游戏版本筛选，支持分面查询">Faceted search by category and game version</li>
+          <li data-zh="光影不强制绑定游戏版本，避免漏掉可用项目">Shaders are not pinned to a game version, so usable projects are not hidden</li>
+          <li data-zh="国内可切换到镜像源">A China mirror can be selected</li>
+          <li data-zh="安装前显示目标实例与目录">The target instance and folder are shown before install</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>modrinth / shaders</span><b>4 RESULTS</b></div>
+          <div class="modrow"><span class="mod-name">Complementary Reimagined</span><span class="mod-ver">r5.5</span><span class="chip">INSTALL</span></div>
+          <div class="modrow"><span class="mod-name">BSL Shaders</span><span class="mod-ver">8.4</span><span class="chip">INSTALL</span></div>
+          <div class="modrow"><span class="mod-name">Photon Shader</span><span class="mod-ver">1.2</span><span class="chip">INSTALL</span></div>
+          <div class="modrow"><span class="mod-name">Solas Shader</span><span class="mod-ver">2.1</span><span class="chip">INSTALL</span></div>
+          <div class="modrow"><span class="mod-name dim">target · 26.3 / shaderpacks</span><span class="mod-ver"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature rev reveal">
+      <div class="feature-copy">
+        <span class="mono">06 / ACCOUNTS</span>
+        <h2 data-zh="微软登录，三种方式">Microsoft sign-in, three ways</h2>
+        <p data-zh="正版登录不是只有内置浏览器一条路。设备码适合没有浏览器的环境，系统浏览器登录会在完成后把回跳链接粘回应用。离线账户数量不限，UUID 按离线规则生成。">Signing in does not depend on one embedded browser. Device code suits environments without a browser, and system-browser sign-in pastes the callback link back into the app. Offline accounts are unlimited, with UUIDs generated by the offline rule.</p>
+        <ul class="checks">
+          <li data-zh="内置浏览器授权，支持滚动查看完整登录页">Embedded browser authorisation with full-page scrolling</li>
+          <li data-zh="设备码登录：照提示在任意设备确认">Device code sign-in confirmed on any device</li>
+          <li data-zh="系统浏览器登录：自动打开默认浏览器并复制链接">System browser sign-in opens the default browser and copies the link</li>
+          <li data-zh="会话本地持久化，过期自动续签，失败退回离线并提示">Sessions persist locally, refresh automatically, and fall back to offline with a notice</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>account</span><b>MSA / OFFLINE</b></div>
+          <div class="chip-row" style="margin-bottom:14px">
+            <span class="chip on">Embedded browser</span>
+            <span class="chip">Device code</span>
+            <span class="chip">System browser</span>
+          </div>
+          <div class="modrow"><span class="mod-name">Microsoft account</span><span class="mod-ver">msa</span><span class="switch on"></span></div>
+          <div class="modrow"><span class="mod-name">Offline · Rio</span><span class="mod-ver">legacy</span><span class="switch on"></span></div>
+          <div class="modrow"><span class="mod-name">Offline · Alt1</span><span class="mod-ver">legacy</span><span class="switch"></span></div>
+          <div class="diag-box" style="border-color:rgba(127,209,165,.3);background:rgba(127,209,165,.05)">
+            <b style="color:var(--green)">SESSION</b>
+            <span>access token valid · refreshed 3 min ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature reveal">
+      <div class="feature-copy">
+        <span class="mono">07 / APPEARANCE</span>
+        <h2 data-zh="四语言、明暗主题、方块主题工坊">Four languages, two themes, one workshop</h2>
+        <p data-zh="界面支持简体中文、繁体中文、英文、日文，默认跟随系统，也可随时切换。明暗主题可跟随系统，也能手动锁定；主色调、方块主题工坊与壁纸让窗口不只是一块灰色面板。">The interface ships in Simplified Chinese, Traditional Chinese, English and Japanese, follows the system by default and switches on demand. Light and dark can follow the system or be locked; accent colour, a block-colour theme workshop and wallpapers keep the window from being a grey slab.</p>
+        <ul class="checks">
+          <li data-zh="主题令牌整体替换，切换无闪烁">Theme tokens swap as a whole, with no flicker</li>
+          <li data-zh="跟随系统时监听注册表 AppsUseLightTheme">System-follow listens to AppsUseLightTheme in the registry</li>
+          <li data-zh="自定义强调色即时应用">Custom accent applies immediately</li>
+          <li data-zh="方块配色工坊与壁纸">Block-colour workshop and wallpapers</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>appearance</span><b>DARK / ZH</b></div>
+          <div class="theme-swatches">
+            <span class="swatch on" style="--c:#ff6f5e"></span>
+            <span class="swatch" style="--c:#7fd1a5"></span>
+            <span class="swatch" style="--c:#e8c27a"></span>
+            <span class="swatch" style="--c:#8fb8ff"></span>
+            <span class="swatch" style="--c:#c49bff"></span>
+            <span class="swatch" style="--c:#f2f4f7"></span>
+          </div>
+          <div class="chip-row" style="margin-bottom:12px">
+            <span class="chip">简体中文</span>
+            <span class="chip">繁體中文</span>
+            <span class="chip on">English</span>
+            <span class="chip">日本語</span>
+          </div>
+          <div class="chip-row">
+            <span class="chip on">Dark</span>
+            <span class="chip">Light</span>
+            <span class="chip">Follow system</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature rev reveal">
+      <div class="feature-copy">
+        <span class="mono">08 / DIAGNOSTICS</span>
+        <h2 data-zh="崩溃之后，先给结论">After a crash, start with the conclusion</h2>
+        <p data-zh="诊断读取 latest.log 的尾部，用 FileStream + FileShare.ReadWrite 绕开 log4j 的文件锁。匹配模组冲突、内存不足、Java 版本不匹配、缺少依赖、OpenGL 等签名，然后给出中文解释与下一步建议。">Diagnostics read the tail of latest.log through FileStream + FileShare.ReadWrite, sidestepping log4j's file lock. Signatures cover mod conflicts, out-of-memory, Java version mismatch, missing dependencies and OpenGL, then hand back a plain-language explanation and next step.</p>
+        <ul class="checks">
+          <li data-zh="不会因为日志被占用而报 FileNotFoundException">No FileNotFoundException just because the log is held open</li>
+          <li data-zh="按签名匹配，不做关键词瞎猜">Signature matching instead of keyword guesswork</li>
+          <li data-zh="给出可执行的建议，而不是只贴堆栈">Actionable advice rather than a pasted stack trace</li>
+          <li data-zh="原始日志仍可查看与导出">The raw log stays readable and exportable</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="viz">
+          <div class="viz-head"><span>diagnostics / latest.log</span><b>1 MATCH</b></div>
+          <div class="loglines">
+            <div><span class="t">[12:04:11]</span>java.lang.OutOfMemoryError</div>
+            <div><span class="t">[12:04:11]</span>&nbsp;&nbsp;at net.minecraft.client.Main</div>
+            <div class="err"><span class="t">[12:04:12]</span>process exited with code 1</div>
+          </div>
+          <div class="diag-box">
+            <b>MATCHED · OUT OF MEMORY</b>
+            <span data-zh="分配的内存不足以加载当前整合包。建议在启动设置中把内存提高到 4096 MB 以上，或移除高占用模组。">The allocated heap is not enough for this pack. Raise memory above 4096 MB in launch settings, or remove heavy mods.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head reveal">
+        <span class="sec-num">09 —</span>
+        <h2 data-zh="边界">Boundaries</h2>
+        <span class="sec-line"></span>
+        <span class="mono" data-zh="它不做什么">What it does not do</span>
+      </div>
+      <div class="req-grid reveal">
+        <div class="req">
+          <h3 data-zh="不做的事">Not in scope</h3>
+          <ul>
+            <li data-zh="不捆绑、不修改任何 Minecraft 游戏文件">No Minecraft game files are bundled or modified</li>
+            <li data-zh="不提供盗版服务器或账号">No cracked servers or accounts are provided</li>
+            <li data-zh="不自动追踪模组更新（由你决定版本）">Mods are not auto-updated; you choose the version</li>
+            <li data-zh="公网联机中继需要自备服务器">A public relay server is not hosted for you</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3 data-zh="依赖的东西">What it relies on</h3>
+          <ul>
+            <li data-zh="首次启动需要网络读取版本清单">A network connection for the first version manifest</li>
+            <li data-zh="游戏文件来自 Mojang 官方源或公共镜像">Game files come from official sources or public mirrors</li>
+            <li data-zh="Java 默认按需下载 Eclipse Temurin">Java is downloaded on demand (Eclipse Temurin)</li>
+            <li data-zh="模组与光影版权归作者所有">Mods and shaders remain their authors' property</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <section class="cta-band reveal">
+      <div>
+        <span class="mono" data-zh="看完了">Read enough</span>
+        <h2 data-zh="装一个，试试它会不会卡住。">Install one and see if it stalls.</h2>
+        <p data-zh="59.5 MB 安装包，自带运行时，不需要额外依赖。">A 59.5 MB installer with its runtimes included, no extra dependencies.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-primary btn-lg" href="download.html" data-zh="下载 1.0.3">Download 1.0.3</a>
+        <a class="btn btn-ghost btn-lg" href="docs.html" data-zh="阅读文档">Read the docs</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html">
+          <img src="assets/img/logo.png" alt="">
+          <span class="brand-name">SalmonLauncher</span>
+        </a>
+        <p data-zh="一个开源的 Minecraft Java 版启动器：安装、启动、模组、联机、诊断，全部本地完成。">An open-source Minecraft: Java Edition launcher. Install, launch, mod, play together and diagnose — all locally.</p>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="产品">Product</h4>
+        <a href="features.html" data-zh="功能">Features</a>
+        <a href="download.html" data-zh="下载">Download</a>
+        <a href="changelog.html" data-zh="更新日志">Changelog</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="资源">Resources</h4>
+        <a href="docs.html" data-zh="文档">Documentation</a>
+        <a href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="所有版本">All releases</a>
+      </div>
+      <div class="foot-col">
+        <h4 data-zh="法律">Legal</h4>
+        <a href="about.html" data-zh="关于与许可">About &amp; licence</a>
+        <a href="about.html#disclaimer" data-zh="免责声明">Disclaimer</a>
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">GPL-3.0</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span data-year>2026</span> Hugo Mou · SalmonLauncher</span>
+      <span data-zh="非 Mojang Studios 或 Microsoft 官方产品。Minecraft 为 Mojang Studios 商标。">Not affiliated with Mojang Studios or Microsoft. Minecraft is a trademark of Mojang Studios.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>
