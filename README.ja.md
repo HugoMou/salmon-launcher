@@ -38,7 +38,7 @@
 | インストーラー(推奨) | `SL-Setup-1.0.3-win64.exe` | **简体中文 / 繁體中文 / English / 日本語** の 4 言語 UI を備えた標準の Windows セットアップウィザード。スタートメニューのショートカットとアンインストール項目を作成し、管理者権限なしで現在のユーザーにのみインストールすることもできます |
 | ポータブル版 | `SL-1.0.3-portable-win64.zip` | 解凍してすぐ使えます。レジストリに書き込まないため、USB メモリなどに入れて持ち運べます |
 
-どちらも .NET 10 と Windows App SDK のランタイムを同梱しており、**別途ランタイムをインストールする必要はありません**。ダウンロード: [GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
+どちらも .NET 10 と Windows App SDK のランタイムを同梱しており、**別途ランタイムをインストールする必要はありません**。ダウンロード: [GitHub Releases](https://github.com/HugoMou/salmonlauncher/releases)。
 
 インストーラーは未署名のため、初回起動時に Windows SmartScreen が「詳細情報 → 実行」を求める場合があります。アンインストールしても `%APPDATA%\SalmonLauncher` のインスタンスとセーブデータは保持されます。
 

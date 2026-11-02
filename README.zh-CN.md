@@ -38,7 +38,7 @@
 | 安装包（推荐） | `SL-Setup-1.0.3-win64.exe` | 标准 Windows 安装向导，**提供简体中文 / 繁體中文 / English / 日本語 四种安装界面**，自动创建开始菜单快捷方式与卸载项；可选择仅为当前用户安装（无需管理员权限） |
 | 便携版 | `SL-1.0.3-portable-win64.zip` | 解压即用，不写入注册表；适合放在移动硬盘或 U 盘 |
 
-两个文件都包含完整的 .NET 10 与 Windows App SDK 运行时，**无需单独安装任何运行库**。下载地址：[GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
+两个文件都包含完整的 .NET 10 与 Windows App SDK 运行时，**无需单独安装任何运行库**。下载地址：[GitHub Releases](https://github.com/HugoMou/salmonlauncher/releases)。
 
 安装包为未签名版本，首次运行时 Windows SmartScreen 可能提示「更多信息 → 仍要运行」。卸载程序会保留 `%APPDATA%\SalmonLauncher` 下的实例与存档。
 
