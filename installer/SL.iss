@@ -3,7 +3,7 @@
 ; SPDX-License-Identifier: GPL-3.0-or-later
 ;
 ; 构建方式:先用 dotnet publish 生成自包含产物到 artifacts\publish,
-; 再执行 ISCC.exe /DAppVersion=1.0.1 installer\SL.iss
+; 再执行 ISCC.exe /DAppVersion=1.0.2 installer\SL.iss
 ; 或直接运行 installer\build-installer.ps1。
 
 #define AppName "Salmon Launcher"
@@ -12,7 +12,7 @@
 #define AppUrl "https://github.com/HugoMou/salmon-launcher"
 
 #ifndef AppVersion
-  #define AppVersion "1.0.1"
+  #define AppVersion "1.0.2"
 #endif
 
 #define BuildDir "..\artifacts\publish"
@@ -64,8 +64,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"; IconFilename: "{app}\Assets\Logo.ico"; IconIndex: 0
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; IconFilename: "{app}\Assets\Logo.ico"; IconIndex: 0; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

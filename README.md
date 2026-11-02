@@ -4,7 +4,7 @@
 
 一个使用 **WinUI 3 / Windows App SDK** 与 **.NET 10** 构建的 Minecraft Java 版启动器。安装、启动、实例与模组、联机、皮肤预览、崩溃诊断与主题切换全部集成在一个双栏界面里。
 
-- 版本：1.0.0
+- 版本：1.0.2
 - 平台：Windows 10 (2004+) / Windows 11，x64
 - 许可：GNU General Public License v3.0 或更新版本（GPL-3.0-or-later）
 
@@ -31,12 +31,12 @@
 
 ## 下载与安装
 
-**最新版本：v1.0.0**
+**最新版本：v1.0.2**
 
 | 形式 | 文件 | 说明 |
 | --- | --- | --- |
-| 安装包（推荐） | `SL-Setup-1.0.0-win64.exe` | 标准 Windows 安装向导，自动创建开始菜单快捷方式与卸载项；可选择仅为当前用户安装（无需管理员权限） |
-| 便携版 | `SL-1.0.0-portable-win64.zip` | 解压即用，不写入注册表；适合放在移动硬盘或 U 盘 |
+| 安装包（推荐） | `SL-Setup-1.0.2-win64.exe` | 标准 Windows 安装向导，**提供简体中文 / 繁體中文 / English / 日本語 四种安装界面**，自动创建开始菜单快捷方式与卸载项；可选择仅为当前用户安装（无需管理员权限） |
+| 便携版 | `SL-1.0.2-portable-win64.zip` | 解压即用，不写入注册表；适合放在移动硬盘或 U 盘 |
 
 两个文件都包含完整的 .NET 10 与 Windows App SDK 运行时，**无需单独安装任何运行库**。下载地址：[GitHub Releases](https://github.com/HugoMou/salmon-launcher/releases)。
 
@@ -61,7 +61,7 @@ src\SL.App\bin\x64\Debug\net10.0-windows10.0.26100.0\win-x64\SL.exe
 ### 生成安装包与便携版
 
 ```powershell
-.\installer\build-installer.ps1 -Version 1.0.0
+.\installer\build-installer.ps1 -Version 1.0.2
 ```
 
 脚本会先执行 `dotnet publish`（Release、自包含），再用 Inno Setup 编译 `installer\SL.iss`，最后在 `dist\` 生成 `SL-Setup-<版本>-win64.exe` 与 `SL-<版本>-portable-win64.zip`。需要先安装 [Inno Setup 6](https://jrsoftware.org/isinfo.php)。
