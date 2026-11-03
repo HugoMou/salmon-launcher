@@ -341,14 +341,27 @@ public static class ThemeManager
         ApplyControlTokens(dark, darkSrc, accentDark);
         ApplyControlTokens(light, lightSrc, accentLight);
 
-        // When a wallpaper is present, keep the page background slightly transparent so the image shows through without hurting readability
+        // When a wallpaper is present the page background stays mostly transparent; the scrim and
+        // translucent cards carry readability so the theme image remains visible.
         var pageDark = Parse(darkSrc.TryGetValue("Brush.PageBg", out var pd) ? pd : "#13191D");
         var pageLight = Parse(lightSrc.TryGetValue("Brush.PageBg", out var pl) ? pl : "#EDF1F2");
-        Put(dark, "Brush.PageBgTrans", WithAlpha(pageDark, 0xF0));
-        Put(light, "Brush.PageBgTrans", WithAlpha(pageLight, 0xF4));
-        // Stronger scrim keeps wallpapers decorative instead of competing with text
-        Put(dark, "Brush.WallpaperScrim", Argb(0x66, 0, 0, 0));
-        Put(light, "Brush.WallpaperScrim", Argb(0x52, 0xFF, 0xFF, 0xFF));
+        Put(dark, "Brush.PageBgTrans", WithAlpha(pageDark, 0x7D));
+        Put(light, "Brush.PageBgTrans", WithAlpha(pageLight, 0x8C));
+
+        // Softer scrim: the translucent page surface already tints the image, so the scrim only
+        // removes the brightest highlights instead of flattening the picture
+        Put(dark, "Brush.WallpaperScrim", Argb(0x33, 0, 0, 0));
+        Put(light, "Brush.WallpaperScrim", Argb(0x1A, 0xFF, 0xFF, 0xFF));
+
+        // Glass surfaces: cards, tiles and the nav pane keep the theme image faintly visible behind them
+        var cardDark = Parse(darkSrc.TryGetValue("Brush.Card", out var cd) ? cd : "#1C252B");
+        var cardLight = Parse(lightSrc.TryGetValue("Brush.Card", out var cl) ? cl : "#FFFFFF");
+        var panelDark = Parse(darkSrc.TryGetValue("Brush.PanelBg", out var pnd) ? pnd : "#101519");
+        var panelLight = Parse(lightSrc.TryGetValue("Brush.PanelBg", out var pnl) ? pnl : "#E2E8EA");
+        Put(dark, "Brush.CardGlass", WithAlpha(cardDark, 0xD4));
+        Put(light, "Brush.CardGlass", WithAlpha(cardLight, 0xDF));
+        Put(dark, "Brush.PanelGlass", WithAlpha(panelDark, 0xC6));
+        Put(light, "Brush.PanelGlass", WithAlpha(panelLight, 0xC4));
 
         // Accent family (written into both dictionaries, with values depending on the theme variant)
         Put(dark, "Brush.Accent", accentDark);
@@ -532,11 +545,11 @@ public static class ThemeManager
         dict["ListViewItemForegroundSelected"] = MakeBrush(fg);
         dict["ListViewItemForegroundPointerOver"] = MakeBrush(fg);
 
-        // Navigation pane: solid readable surface (wallpapers no longer bleed through the menu)
-        var paneBg = WithAlpha(pageBg, 0xFA);
-        dict["NavigationViewDefaultPaneBackground"] = MakeBrush(paneBg);
-        dict["NavigationViewExpandedPaneBackground"] = MakeBrush(paneBg);
-        dict["NavigationViewTopPaneBackground"] = MakeBrush(paneBg);
+        // Navigation pane: translucent so the applied theme stays visible behind the menu
+        var navPane = MakeBrush(Argb(0, 0, 0, 0));
+        dict["NavigationViewDefaultPaneBackground"] = navPane;
+        dict["NavigationViewExpandedPaneBackground"] = navPane;
+        dict["NavigationViewTopPaneBackground"] = navPane;
         dict["NavigationViewItemBackground"] = MakeBrush(Argb(0, 0, 0, 0));
         dict["NavigationViewItemBackgroundPointerOver"] = MakeBrush(WithAlpha(cardHover, 0xCC));
         dict["NavigationViewItemBackgroundPressed"] = MakeBrush(cardPress);
