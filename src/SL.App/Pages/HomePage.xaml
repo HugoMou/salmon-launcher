@@ -48,20 +48,22 @@
                     <TextBlock Text="欢迎回来" Style="{StaticResource Style.PageTitle}" />
                     <TextBlock Text="准备好进入世界了吗？" Style="{StaticResource Style.PageSubtitle}" />
                 </StackPanel>
-                <Border Grid.Column="1" Style="{StaticResource Style.Pill}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Ellipse Width="7"
-                                 Height="7"
-                                 Fill="{ThemeResource Brush.Success}"
-                                 VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding StatusText}"
-                                   FontSize="11.5"
-                                   Foreground="{ThemeResource Brush.FgDim}"
-                                   MaxWidth="360"
-                                   TextTrimming="CharacterEllipsis"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
-                </Border>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Top"
+                            Margin="0,6,0,0">
+                    <Ellipse Width="6"
+                             Height="6"
+                             Fill="{ThemeResource Brush.Success}"
+                             VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding StatusText}"
+                               FontSize="11.5"
+                               Foreground="{ThemeResource Brush.FgFaint}"
+                               MaxWidth="420"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" />
+                </StackPanel>
             </Grid>
 
             <!-- Hero: instance + launch on the left, account on the right -->
