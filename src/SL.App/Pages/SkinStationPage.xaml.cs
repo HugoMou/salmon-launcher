@@ -18,6 +18,7 @@ using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Windows.Storage.Pickers;
 using SL.Core.Account;
 using SL.Core.Logging;
 using SL.App.Localization;
@@ -170,14 +171,19 @@ public sealed partial class SkinStationPage : Page
         if (_currentUser is null)
             return;
 
-        var path = await AppServices.Dialogs.PromptAsync(Loc.T("添加本地皮肤"),
-            Loc.T("粘贴 PNG 皮肤文件的完整路径(64×64 现代皮肤或 64×32 旧版皮肤)。")).ConfigureAwait(true);
-        if (path is null)
-            return;
-
         try
         {
-            var name = SkinLibrary.Import(_currentUser.Id, path.Trim('"', ' '));
+            var picker = new FileOpenPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".png");
+
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+                return;
+
+            var name = SkinLibrary.Import(_currentUser.Id, file.Path);
             AppServices.Notify.Publish(NotifyKind.Success, Loc.T("已添加皮肤:") + name);
             LoadSkins();
         }
