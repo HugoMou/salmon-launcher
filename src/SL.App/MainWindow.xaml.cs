@@ -27,6 +27,7 @@ using SL.App.Themes;
 using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using System.Runtime.InteropServices;
 
 namespace SL.App;
 
@@ -41,17 +42,28 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
         SystemBackdrop = new MicaBackdrop();
 
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var scale = GetDpiForWindow(hwnd) / 96.0;
+        if (scale <= 0)
+            scale = 1.0;
+
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
-            presenter.PreferredMinimumWidth = 980;
-            presenter.PreferredMinimumHeight = 640;
+            presenter.PreferredMinimumWidth = (int)(980 * scale);
+            presenter.PreferredMinimumHeight = (int)(640 * scale);
         }
-        AppWindow.Resize(new SizeInt32(1320, 860));
+
+        var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        var width = System.Math.Min((int)(1180 * scale), area.Width - 24);
+        var height = System.Math.Min((int)(800 * scale), area.Height - 24);
+        AppWindow.Resize(new SizeInt32(width, height));
         SetWindowIcon();
 
         BuildMenu();
         Loc.ApplyTo(RootGrid);
         NotifyHost.ItemsSource = AppServices.Notify.Items;
+        RefreshPaneAccount();
+        AppServices.Settings.Changed += _ => DispatcherQueue.TryEnqueue(RefreshPaneAccount);
 
         RootGrid.Loaded += async (_, _) =>
         {
@@ -75,6 +87,9 @@ public sealed partial class MainWindow : Window
     // ---------------------------------------------------------- Window icon
 
     /// <summary>Taskbar / Alt+Tab icon: bundled Assets\Logo.ico (with multiple sizes from 16 to 256).</summary>
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(IntPtr hwnd);
+
     private void SetWindowIcon()
     {
         try
@@ -143,13 +158,30 @@ public sealed partial class MainWindow : Window
             AppServices.Nav.Navigate(key);
     }
 
-    /// <summary>Navigation changed -> sync the breadcrumb title and NavigationView selection.</summary>
+    private void OnAccountClick(object sender, RoutedEventArgs e)
+        => AppServices.Nav.Navigate("st.launch");
+
+    /// <summary>Fill the pane footer with the active account and build version.</summary>
+    private void RefreshPaneAccount()
+    {
+        var settings = AppServices.Settings.Current;
+        var repo = SL.Core.Account.AccountStore.Load();
+        var active = repo.Accounts.FirstOrDefault(a => a.Id == repo.ActiveId);
+        PaneAccountGlyph.Glyph = active?.Kind == "msa" ? "\uE8EA" : "\uE77B";
+        PaneAccountName.Text = active?.Name ?? settings.AccountName;
+        PaneAccountDetail.Text = active is null
+            ? Loc.T("离线账户")
+            : active.Kind == "msa" ? Loc.T("正版账户") : Loc.T("离线账户");
+        PaneVersionText.Text = $"{Loc.T("版本")} {SL.Core.Boot.Runtime.AppVersion}";
+    }
+
+    /// <summary>Navigation changed -> sync the title-bar context and NavigationView selection.</summary>
     private void SyncShell()
     {
         var key = AppServices.Nav.CurrentKey;
         var spec = PageCatalog.Get(key);
 
-        PageTitleText.Text = $"· {Loc.T(spec.Title)}";
+        PageTitleText.Text = Loc.T(spec.Title);
 
         var item = FindItem(NavView.MenuItems, key);
         if (item is not null && !ReferenceEquals(NavView.SelectedItem, item))

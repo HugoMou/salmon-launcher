@@ -715,5 +715,15 @@ public static partial class Loc
         ["latest.log 尚未生成。"] = "latest.log has not been generated yet.",
         ["Minecraft {0} · 选择要一起安装的加载器"] = "Minecraft {0} · choose a loader to install alongside",
         ["saves 目录为空。"] = "The saves folder is empty.",
+        ["准备好进入世界了吗？"] = "Ready to jump back into your world?",
+        ["快捷入口"] = "Quick actions",
+        ["上手指南"] = "Getting started",
+        ["管理账户"] = "Manage account",
+        ["安装版本"] = "Install a version",
+        ["前往「下载 → 游戏版本」挑选并安装一个实例。"] = "Pick and install an instance under Download → Game versions.",
+        ["设置账户"] = "Set up an account",
+        ["正版登录或添加离线账户,随时切换。"] = "Sign in with a premium account or add an offline one, and switch anytime.",
+        ["开始游戏"] = "Start playing",
+        ["回到本页选择实例,点击启动即可。"] = "Come back here, pick an instance and press Launch.",
     };
 }

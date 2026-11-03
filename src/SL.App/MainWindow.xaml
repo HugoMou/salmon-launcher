@@ -26,7 +26,7 @@
 
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
+            <RowDefinition Height="52" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -36,48 +36,118 @@
               Visibility="Collapsed"
               IsHitTestVisible="False">
             <Grid.Background>
-                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.5" />
+                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.32" />
             </Grid.Background>
             <Border x:Name="WallpaperScrim" />
         </Grid>
 
-        <!-- Title bar drag area (ExtendsContentIntoTitleBar) -->
-        <Grid x:Name="AppTitleBar" Height="48" Background="Transparent">
+        <!-- Solid backdrop for the navigation pane: wallpapers stay in the content area -->
+        <Border x:Name="PaneBackdrop"
+                Grid.RowSpan="2"
+                Width="236"
+                HorizontalAlignment="Left"
+                Background="{ThemeResource Brush.Card}"
+                BorderBrush="{ThemeResource Brush.Border}"
+                BorderThickness="0,0,1,0" />
+
+        <!-- Title bar drag area (ExtendsContentIntoTitleBar): brand stays in the pane, the bar carries the page context -->
+        <Grid x:Name="AppTitleBar" Height="52" Background="Transparent">
             <StackPanel Orientation="Horizontal"
-                        Margin="14,0,0,0"
-                        Spacing="9"
+                        Margin="250,0,0,0"
+                        Spacing="12"
                         VerticalAlignment="Center">
-                <!-- App logo (bundled asset Assets\Logo.png) -->
-                <Image Source="ms-appx:///Assets/Logo.png"
-                       Width="26"
-                       Height="26"
-                       Stretch="Uniform"
-                       VerticalAlignment="Center" />
-                <TextBlock Text="SalmonLauncher"
-                           VerticalAlignment="Center"
-                           Foreground="{ThemeResource Brush.Fg}"
-                           FontWeight="SemiBold"
-                           FontSize="13" />
+                <Border Width="4"
+                        Height="18"
+                        CornerRadius="2"
+                        Background="{ThemeResource Brush.Accent}"
+                        VerticalAlignment="Center" />
                 <TextBlock x:Name="PageTitleText"
                            Text=""
                            VerticalAlignment="Center"
-                           Foreground="{ThemeResource Brush.FgDim}"
-                           FontSize="12.5" />
+                           Foreground="{ThemeResource Brush.Fg}"
+                           FontWeight="SemiBold"
+                           FontSize="13.5" />
             </StackPanel>
         </Grid>
 
         <NavigationView x:Name="NavView"
                         Grid.Row="1"
                         PaneDisplayMode="Left"
-                        IsPaneToggleButtonVisible="True"
+                        IsPaneToggleButtonVisible="False"
                         IsPaneOpen="True"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
-                        OpenPaneLength="212"
+                        OpenPaneLength="236"
                         ItemInvoked="OnNavItemInvoked">
             <NavigationView.Resources>
                 <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
             </NavigationView.Resources>
+
+            <!-- Brand block: the app identity lives in the pane, not in the title bar -->
+            <NavigationView.PaneHeader>
+                <Grid Margin="16,18,12,14">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Image Source="ms-appx:///Assets/Logo.png"
+                               Width="32"
+                               Height="32"
+                               Stretch="Uniform"
+                               VerticalAlignment="Center" />
+                        <StackPanel VerticalAlignment="Center" Spacing="1">
+                            <TextBlock Text="SalmonLauncher"
+                                       FontSize="14.5"
+                                       FontWeight="SemiBold"
+                                       Foreground="{ThemeResource Brush.Fg}" />
+                            <TextBlock Text="MINECRAFT JAVA EDITION"
+                                       FontSize="9.5"
+                                       CharacterSpacing="120"
+                                       Foreground="{ThemeResource Brush.FgFaint}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </NavigationView.PaneHeader>
+
+            <!-- Footer: current account + build version -->
+            <NavigationView.PaneFooter>
+                <StackPanel Margin="10,4,10,12" Spacing="6">
+                    <Button x:Name="AccountButton"
+                            Click="OnAccountClick"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            Padding="10,8"
+                            CornerRadius="10">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="32"
+                                    Height="32"
+                                    CornerRadius="16"
+                                    Background="{ThemeResource Brush.AccentSoft}">
+                                <FontIcon x:Name="PaneAccountGlyph"
+                                          Glyph="&#xE77B;"
+                                          FontSize="15"
+                                          Foreground="{ThemeResource Brush.Accent}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock x:Name="PaneAccountName"
+                                           FontSize="12.5"
+                                           FontWeight="SemiBold"
+                                           Foreground="{ThemeResource Brush.Fg}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock x:Name="PaneAccountDetail"
+                                           FontSize="10.5"
+                                           Foreground="{ThemeResource Brush.FgFaint}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <TextBlock x:Name="PaneVersionText"
+                               FontSize="10"
+                               Foreground="{ThemeResource Brush.FgFaint}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </NavigationView.PaneFooter>
 
             <NavigationView.Content>
                 <Grid x:Name="ContentRoot">
