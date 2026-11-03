@@ -337,13 +337,18 @@ public static class ThemeManager
         Fill(dark, darkSrc);
         Fill(light, lightSrc);
 
+        // Native control surfaces follow the palette so buttons, inputs and lists share one visual language
+        ApplyControlTokens(dark, darkSrc, accentDark);
+        ApplyControlTokens(light, lightSrc, accentLight);
+
         // When a wallpaper is present, keep the page background slightly transparent so the image shows through without hurting readability
         var pageDark = Parse(darkSrc.TryGetValue("Brush.PageBg", out var pd) ? pd : "#13191D");
         var pageLight = Parse(lightSrc.TryGetValue("Brush.PageBg", out var pl) ? pl : "#EDF1F2");
         Put(dark, "Brush.PageBgTrans", WithAlpha(pageDark, 0xF0));
         Put(light, "Brush.PageBgTrans", WithAlpha(pageLight, 0xF4));
-        Put(dark, "Brush.WallpaperScrim", Argb(0x3D, 0, 0, 0));
-        Put(light, "Brush.WallpaperScrim", Argb(0x2E, 0xFF, 0xFF, 0xFF));
+        // Stronger scrim keeps wallpapers decorative instead of competing with text
+        Put(dark, "Brush.WallpaperScrim", Argb(0x66, 0, 0, 0));
+        Put(light, "Brush.WallpaperScrim", Argb(0x52, 0xFF, 0xFF, 0xFF));
 
         // Accent family (written into both dictionaries, with values depending on the theme variant)
         Put(dark, "Brush.Accent", accentDark);
@@ -427,6 +432,127 @@ public static class ThemeManager
     {
         foreach (var kv in src)
             dict[kv.Key] = MakeBrush(kv.Value);
+    }
+
+    /// <summary>
+    /// Write the Fluent control tokens (button/input/list/navigation) into the theme dictionary.
+    /// Native controls then inherit the same palette and corner language as the custom cards,
+    /// which removes the mismatched default "grey box" look across every page.
+    /// </summary>
+    private static void ApplyControlTokens(ResourceDictionary dict, Dictionary<string, string> src, Color accent)
+    {
+        Color C(string key, string fallback = "#7A7A7A")
+            => Parse(src.TryGetValue(key, out var value) ? value : fallback);
+
+        var pageBg = C("Brush.PageBg", "#13191D");
+        var panelBg = C("Brush.PanelBg", "#101519");
+        var card = C("Brush.Card", "#1C252B");
+        var cardHover = C("Brush.CardHover", "#243038");
+        var cardPress = C("Brush.CardPress", "#1A2328");
+        var border = C("Brush.Border", "#29323A");
+        var borderStrong = C("Brush.BorderStrong", "#3A454F");
+        var fg = C("Brush.Fg", "#E9EEF0");
+        var fgDim = C("Brush.FgDim", "#9FB0B7");
+        var fgFaint = C("Brush.FgFaint", "#6E7C84");
+        var accentFg = C("Brush.AccentFg", "#0B0F12");
+
+        var isDark = pageBg.R + pageBg.G + pageBg.B < 360;
+        var accentHover = isDark ? Lighten(accent, 0.14) : Darken(accent, 0.10);
+        var accentPress = isDark ? Darken(accent, 0.10) : Darken(accent, 0.20);
+        var accentSoft = WithAlpha(accent, 0x2E);
+        var accentSoftHover = WithAlpha(accent, 0x3D);
+        var accentSoftPress = WithAlpha(accent, 0x4D);
+
+        // Rounded corner language
+        dict["ControlCornerRadius"] = new CornerRadius(8);
+        dict["OverlayCornerRadius"] = new CornerRadius(12);
+
+        // Buttons: quiet card surface with a hairline border (no more flat grey rectangles)
+        dict["ButtonBackground"] = MakeBrush(card);
+        dict["ButtonBackgroundPointerOver"] = MakeBrush(cardHover);
+        dict["ButtonBackgroundPressed"] = MakeBrush(cardPress);
+        dict["ButtonBackgroundDisabled"] = MakeBrush(panelBg);
+        dict["ButtonBorderBrush"] = MakeBrush(border);
+        dict["ButtonBorderBrushPointerOver"] = MakeBrush(borderStrong);
+        dict["ButtonBorderBrushPressed"] = MakeBrush(borderStrong);
+        dict["ButtonBorderBrushDisabled"] = MakeBrush(border);
+        dict["ButtonForeground"] = MakeBrush(fg);
+        dict["ButtonForegroundPointerOver"] = MakeBrush(fg);
+        dict["ButtonForegroundPressed"] = MakeBrush(fg);
+        dict["ButtonForegroundDisabled"] = MakeBrush(fgFaint);
+
+        dict["AccentButtonBackground"] = MakeBrush(accent);
+        dict["AccentButtonBackgroundPointerOver"] = MakeBrush(accentHover);
+        dict["AccentButtonBackgroundPressed"] = MakeBrush(accentPress);
+        dict["AccentButtonBackgroundDisabled"] = MakeBrush(WithAlpha(accent, 0x66));
+        dict["AccentButtonForeground"] = MakeBrush(accentFg);
+        dict["AccentButtonForegroundPointerOver"] = MakeBrush(accentFg);
+        dict["AccentButtonForegroundPressed"] = MakeBrush(accentFg);
+        dict["AccentButtonForegroundDisabled"] = MakeBrush(WithAlpha(accentFg, 0x99));
+
+        // Inputs
+        dict["TextControlBackground"] = MakeBrush(card);
+        dict["TextControlBackgroundPointerOver"] = MakeBrush(cardHover);
+        dict["TextControlBackgroundFocused"] = MakeBrush(card);
+        dict["TextControlBackgroundDisabled"] = MakeBrush(panelBg);
+        dict["TextControlBorderBrush"] = MakeBrush(border);
+        dict["TextControlBorderBrushPointerOver"] = MakeBrush(borderStrong);
+        dict["TextControlBorderBrushFocused"] = MakeBrush(accent);
+        dict["TextControlBorderBrushDisabled"] = MakeBrush(border);
+        dict["TextControlForeground"] = MakeBrush(fg);
+        dict["TextControlForegroundPointerOver"] = MakeBrush(fg);
+        dict["TextControlForegroundFocused"] = MakeBrush(fg);
+        dict["TextControlForegroundDisabled"] = MakeBrush(fgFaint);
+        dict["TextControlPlaceholderForeground"] = MakeBrush(fgFaint);
+        dict["TextControlPlaceholderForegroundPointerOver"] = MakeBrush(fgDim);
+        dict["TextControlPlaceholderForegroundFocused"] = MakeBrush(fgFaint);
+
+        dict["ComboBoxBackground"] = MakeBrush(card);
+        dict["ComboBoxBackgroundPointerOver"] = MakeBrush(cardHover);
+        dict["ComboBoxBackgroundPressed"] = MakeBrush(cardPress);
+        dict["ComboBoxBackgroundDisabled"] = MakeBrush(panelBg);
+        dict["ComboBoxBorderBrush"] = MakeBrush(border);
+        dict["ComboBoxBorderBrushPointerOver"] = MakeBrush(borderStrong);
+        dict["ComboBoxBorderBrushPressed"] = MakeBrush(borderStrong);
+        dict["ComboBoxBorderBrushDisabled"] = MakeBrush(border);
+        dict["ComboBoxForeground"] = MakeBrush(fg);
+        dict["ComboBoxForegroundPointerOver"] = MakeBrush(fg);
+        dict["ComboBoxForegroundPressed"] = MakeBrush(fg);
+        dict["ComboBoxForegroundDisabled"] = MakeBrush(fgFaint);
+        dict["ComboBoxPlaceholderTextForeground"] = MakeBrush(fgFaint);
+
+        // Lists
+        dict["ListViewItemBackground"] = MakeBrush(Argb(0, 0, 0, 0));
+        dict["ListViewItemBackgroundPointerOver"] = MakeBrush(cardHover);
+        dict["ListViewItemBackgroundPressed"] = MakeBrush(cardPress);
+        dict["ListViewItemBackgroundSelected"] = MakeBrush(accentSoft);
+        dict["ListViewItemBackgroundSelectedPointerOver"] = MakeBrush(accentSoftHover);
+        dict["ListViewItemBackgroundSelectedPressed"] = MakeBrush(accentSoftPress);
+        dict["ListViewItemForeground"] = MakeBrush(fg);
+        dict["ListViewItemForegroundSelected"] = MakeBrush(fg);
+        dict["ListViewItemForegroundPointerOver"] = MakeBrush(fg);
+
+        // Navigation pane: solid readable surface (wallpapers no longer bleed through the menu)
+        var paneBg = WithAlpha(pageBg, 0xFA);
+        dict["NavigationViewDefaultPaneBackground"] = MakeBrush(paneBg);
+        dict["NavigationViewExpandedPaneBackground"] = MakeBrush(paneBg);
+        dict["NavigationViewTopPaneBackground"] = MakeBrush(paneBg);
+        dict["NavigationViewItemBackground"] = MakeBrush(Argb(0, 0, 0, 0));
+        dict["NavigationViewItemBackgroundPointerOver"] = MakeBrush(WithAlpha(cardHover, 0xCC));
+        dict["NavigationViewItemBackgroundPressed"] = MakeBrush(cardPress);
+        dict["NavigationViewItemBackgroundSelected"] = MakeBrush(accentSoft);
+        dict["NavigationViewItemBackgroundSelectedPointerOver"] = MakeBrush(accentSoftHover);
+        dict["NavigationViewItemBackgroundSelectedPressed"] = MakeBrush(accentSoftPress);
+        dict["NavigationViewItemForeground"] = MakeBrush(fgDim);
+        dict["NavigationViewItemForegroundPointerOver"] = MakeBrush(fg);
+        dict["NavigationViewItemForegroundPressed"] = MakeBrush(fg);
+        dict["NavigationViewItemForegroundSelected"] = MakeBrush(accent);
+        dict["NavigationViewItemForegroundSelectedPointerOver"] = MakeBrush(accent);
+        dict["NavigationViewItemForegroundSelectedPressed"] = MakeBrush(accent);
+        dict["NavigationViewItemBorderBrush"] = MakeBrush(Argb(0, 0, 0, 0));
+        dict["NavigationViewItemCornerRadius"] = new CornerRadius(8);
+        dict["NavigationSelectionIndicatorForeground"] = MakeBrush(accent);
+        dict["NavigationViewSelectionIndicatorForeground"] = MakeBrush(accent);
     }
 
     private static void Put(ResourceDictionary dict, string key, Color color)

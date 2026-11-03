@@ -116,6 +116,196 @@
                 <Setter Property="Foreground" Value="{ThemeResource Brush.Fg}" />
                 <Setter Property="TextWrapping" Value="NoWrap" />
             </Style>
+
+            <!-- Standard surface: cards share one radius and padding so pages feel consistent -->
+            <Style x:Key="Style.Card" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource Brush.Card}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="20" />
+            </Style>
+
+            <!-- Nested/secondary surface used inside a card -->
+            <Style x:Key="Style.SubCard" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource Brush.PanelBg}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Padding" Value="14" />
+            </Style>
+
+            <Style x:Key="Style.PageTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="26" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.Fg}" />
+                <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
+
+            <Style x:Key="Style.PageSubtitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12.5" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.FgDim}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="Style.SectionTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.FgFaint}" />
+                <Setter Property="CharacterSpacing" Value="90" />
+            </Style>
+
+            <!-- Small status pill -->
+            <Style x:Key="Style.Pill" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource Brush.Card}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="999" />
+                <Setter Property="Padding" Value="12,5" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
+            <!-- Quick-entry tile: card-like button with hover/pressed surfaces -->
+            <Style x:Key="Style.Tile" TargetType="Button">
+                <Setter Property="MinHeight" Value="80" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Border x:Name="TileRoot"
+                                        Background="{ThemeResource Brush.Card}"
+                                        BorderBrush="{ThemeResource Brush.Border}"
+                                        BorderThickness="1"
+                                        CornerRadius="{TemplateBinding CornerRadius}"
+                                        Padding="{TemplateBinding Padding}" />
+                                <ContentPresenter x:Name="TileContent"
+                                                  Content="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Center"
+                                                  Padding="{TemplateBinding Padding}" />
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="TileRoot.Background" Value="{ThemeResource Brush.CardHover}" />
+                                                <Setter Target="TileRoot.BorderBrush" Value="{ThemeResource Brush.BorderStrong}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="TileRoot.Background" Value="{ThemeResource Brush.CardPress}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="TileContent.Opacity" Value="0.45" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Primary launch action: large accent surface with a soft top highlight -->
+            <Style x:Key="Style.LaunchButton" TargetType="Button">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="20,14" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.AccentFg}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Border x:Name="LaunchRoot"
+                                        Background="{ThemeResource Brush.Accent}"
+                                        CornerRadius="{TemplateBinding CornerRadius}" />
+                                <Border Background="#26FFFFFF" CornerRadius="14" Margin="1,1,1,58" IsHitTestVisible="False" />
+                                <ContentPresenter x:Name="LaunchContent"
+                                                  Content="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Padding="{TemplateBinding Padding}"
+                                                  Foreground="{TemplateBinding Foreground}" />
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="LaunchRoot.Background" Value="{ThemeResource Brush.AccentHover}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="LaunchRoot.Background" Value="{ThemeResource Brush.AccentPress}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="LaunchContent.Opacity" Value="0.45" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Low-emphasis text button -->
+            <Style x:Key="Style.Ghost" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="10,6" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Border x:Name="GhostRoot"
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="{TemplateBinding CornerRadius}" />
+                                <ContentPresenter x:Name="GhostContent"
+                                                  Content="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Left"
+                                                  VerticalAlignment="Center"
+                                                  Padding="{TemplateBinding Padding}" />
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="GhostRoot.Background" Value="{ThemeResource Brush.AccentSoft}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="GhostRoot.Background" Value="{ThemeResource Brush.CardPress}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="GhostContent.Opacity" Value="0.4" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
