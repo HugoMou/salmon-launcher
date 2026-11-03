@@ -1,0 +1,44 @@
+{
+  "repo": "HugoMou/salmonlauncher",
+  "syncedAt": "2026-11-03T11:16:08Z",
+  "releases": [
+    {
+      "tag": "v1.0.3",
+      "date": "2026-11-02",
+      "pre": false,
+      "assets": [
+        {
+          "name": "SL-1.0.3-portable-win64.zip",
+          "size": 91275506,
+          "sha256": "F3BF1B257FC23B677FDD459BB4F65C1AC0E9062356733925C3819F422B36E38D",
+          "url": "downloads/v1.0.3/SL-1.0.3-portable-win64.zip"
+        },
+        {
+          "name": "SL-Setup-1.0.3-win64.exe",
+          "size": 62419026,
+          "sha256": "E3F26AC075C42F4422DFE0E548F8E6A80E19732A88A192B028C64B45519B1D7E",
+          "url": "downloads/v1.0.3/SL-Setup-1.0.3-win64.exe"
+        }
+      ]
+    },
+    {
+      "tag": "v1.0.2",
+      "date": "2026-11-02",
+      "pre": false,
+      "assets": [
+        {
+          "name": "SL-1.0.2-portable-win64.zip",
+          "size": 91275555,
+          "sha256": "AF71961871DF56FF231ADAEA506C801298FE2465D1F0DD64CB1347F0B90A96F6",
+          "url": "downloads/v1.0.2/SL-1.0.2-portable-win64.zip"
+        },
+        {
+          "name": "SL-Setup-1.0.2-win64.exe",
+          "size": 62422972,
+          "sha256": "D8F4BECB6F12F8A74A327306E61E0B37AFB619D3B9E9D84370E0E3C7E8BB4D91",
+          "url": "downloads/v1.0.2/SL-Setup-1.0.2-win64.exe"
+        }
+      ]
+    }
+  ]
+}

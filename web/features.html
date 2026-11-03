@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-zh-title="功能 — SalmonLauncher">Features — SalmonLauncher</title>
-<meta name="description" data-zh-content="SalmonLauncher 功能详解：版本安装、启动流水线、实例与模组、联机中继、Modrinth 内容、账户、外观与崩溃诊断。" content="What SalmonLauncher does: version installs, the launch pipeline, instances and mods, multiplayer relay, Modrinth content, accounts, appearance and crash diagnostics.">
+<meta name="description" data-zh-content="SalmonLauncher 功能详解：版本安装、启动流水线、实例与模组、本机开服与局域网联机、Modrinth 内容、账户、外观与崩溃诊断。" content="What SalmonLauncher does: version installs, the launch pipeline, instances and mods, local hosting and LAN multiplayer, Modrinth content, accounts, appearance and crash diagnostics.">
 <meta name="theme-color" content="#0B0D10">
 <link rel="icon" href="assets/img/favicon.ico">
 <script>try{if(localStorage.getItem("sl-theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
@@ -152,18 +152,18 @@
     <div class="feature rev reveal">
       <div class="feature-copy">
         <span class="mono">04 / MULTIPLAYER</span>
-        <h2 data-zh="联机：中继、局域网、邀请码">Multiplayer: relay, LAN, invite code</h2>
-        <p data-zh="首版本地回环 TCP 信令已经可以建房。邀请码形如 SLROOM-xxxx-xxxx，端口自动从系统中挑选，不需要手动配置转发规则。公网中继需要一台服务器，当前版本仍走本地回环。">The first version ships a local loopback TCP signalling relay. Invite codes look like SLROOM-xxxx-xxxx and the port is picked from the system, so no manual forwarding rules. A public relay needs a server; this release still runs loopback.</p>
+        <h2 data-zh="联机：本机开服与局域网">Multiplayer: local hosting and LAN</h2>
+        <p data-zh="只提供两种联机方式：在自己的电脑上开服，或与同一局域网内的玩家直接联机。启动器负责挑选端口与检查 Java，不需要公网中继，也不需要邀请码。">Two routes only: host the server on your own PC, or play with people on the same LAN. The launcher picks the port and checks Java for you — no public relay and no invite codes.</p>
         <ul class="checks">
-          <li data-zh="自建房间：生成邀请码，同机或内网直接加入">Host a room and share an invite code for the same machine or LAN</li>
-          <li data-zh="局域网扫描：列出同一网段可加入的游戏">LAN scan lists joinable games on the same subnet</li>
-          <li data-zh="手动中继：填写地址即可接入已有中继">Manual relay: point at an address you already run</li>
-          <li data-zh="信令与游戏进程分离，关掉启动器不会杀掉游戏">Signalling is separate from the game process; closing the launcher leaves the game running</li>
+          <li data-zh="本机开服：用你自己的电脑作为服务端，朋友直接连到这台机器">Host on your own PC: your machine runs the server and friends connect to it directly</li>
+          <li data-zh="局域网联机：同一网段内自动发现可加入的世界">LAN play: worlds on the same subnet are discovered automatically</li>
+          <li data-zh="端口自动挑选，冲突时自动换到下一个可用端口">The port is picked automatically, with a free one chosen on conflict</li>
+          <li data-zh="不提供公网中继，也不生成邀请码">No public relay and no invite codes</li>
         </ul>
       </div>
       <div class="feature-visual">
         <div class="viz">
-          <div class="viz-head"><span>voxlink / room</span><b>SLROOM-7K3Q</b></div>
+          <div class="viz-head"><span>multiplayer / modes</span><b>2 ROUTES</b></div>
           <div class="relay">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
               <line x1="22" y1="26" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
@@ -171,11 +171,11 @@
               <line x1="22" y1="76" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
               <line x1="78" y1="76" x2="50" y2="50" stroke="rgba(255,255,255,.18)"/>
             </svg>
-            <div class="relay-node n1"><b>host</b>pid 6844</div>
-            <div class="relay-node n2"><b>player</b>localhost</div>
-            <div class="relay-node n3"><b>lan</b>scan</div>
-            <div class="relay-node n4"><b>relay</b>manual</div>
-            <div class="relay-node hub"><b>SIGNAL</b>tcp · loopback</div>
+            <div class="relay-node n1"><b>player</b>lan</div>
+            <div class="relay-node n2"><b>player</b>lan</div>
+            <div class="relay-node n3"><b>world</b>local</div>
+            <div class="relay-node n4"><b>port</b>auto</div>
+            <div class="relay-node hub"><b>SERVER</b>your pc</div>
           </div>
         </div>
       </div>
@@ -316,7 +316,7 @@
             <li data-zh="不捆绑、不修改任何 Minecraft 游戏文件">No Minecraft game files are bundled or modified</li>
             <li data-zh="不提供盗版服务器或账号">No cracked servers or accounts are provided</li>
             <li data-zh="不自动追踪模组更新（由你决定版本）">Mods are not auto-updated; you choose the version</li>
-            <li data-zh="公网联机中继需要自备服务器">A public relay server is not hosted for you</li>
+            <li data-zh="不提供公网中继；联机限于本机与同一局域网">No public relay; multiplayer stays local or on the same LAN</li>
           </ul>
         </div>
         <div class="req">
@@ -365,7 +365,7 @@
         <h4 data-zh="资源">Resources</h4>
         <a href="docs.html" data-zh="文档">Documentation</a>
         <a href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="所有版本">All releases</a>
+        <a href="download.html#history" data-zh="所有版本">All releases</a>
       </div>
       <div class="foot-col">
         <h4 data-zh="法律">Legal</h4>

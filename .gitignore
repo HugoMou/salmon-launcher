@@ -27,6 +27,9 @@ minecraft-java.json
 # ---------- Release artifacts ----------
 dist/
 
+# ---------- Website release mirror (generated on the server) ----------
+web/downloads/
+
 # ---------- Misc ----------
 Thumbs.db
 Desktop.ini
