@@ -98,23 +98,35 @@
 
                         <Button Command="{Binding LaunchCommand}"
                                 Style="{StaticResource Style.LaunchButton}"
-                                Height="72">
-                            <StackPanel Orientation="Horizontal" Spacing="14">
-                                <FontIcon Glyph="&#xE768;"
-                                          FontSize="24"
-                                          Foreground="{ThemeResource Brush.AccentFg}"
-                                          VerticalAlignment="Center" />
-                                <StackPanel Spacing="1" VerticalAlignment="Center">
+                                Height="76">
+                            <Grid ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="36"
+                                        Height="36"
+                                        CornerRadius="9"
+                                        Background="#2EFFFFFF"
+                                        VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE768;"
+                                              FontSize="18"
+                                              Foreground="{ThemeResource Brush.AccentFg}" />
+                                </Border>
+                                <StackPanel Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            Spacing="2">
                                     <TextBlock Text="启动 Minecraft"
-                                               FontSize="18"
+                                               FontSize="17.5"
                                                FontWeight="Bold"
                                                Foreground="{ThemeResource Brush.AccentFg}" />
                                     <TextBlock Text="{Binding LaunchHint}"
                                                FontSize="11.5"
                                                Opacity="0.82"
+                                               TextTrimming="CharacterEllipsis"
                                                Foreground="{ThemeResource Brush.AccentFg}" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                         </Button>
 
                         <ProgressBar IsIndeterminate="True"
@@ -127,6 +139,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <FontIcon Glyph="&#xE946;"
                                       FontSize="13"
@@ -143,6 +156,7 @@
                                        FontSize="11.5"
                                        TextWrapping="Wrap"
                                        TextAlignment="Right"
+                                       MaxWidth="360"
                                        Foreground="{ThemeResource Brush.FgFaint}"
                                        VerticalAlignment="Center" />
                         </Grid>
