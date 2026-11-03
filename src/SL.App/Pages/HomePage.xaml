@@ -68,7 +68,7 @@
             <Border Grid.Row="1"
                     Style="{StaticResource Style.Card}"
                     Padding="0"
-                    CornerRadius="16">
+                    CornerRadius="18">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -165,8 +165,8 @@
                     <Rectangle Grid.Column="1" Fill="{ThemeResource Brush.Border}" />
 
                     <Border Grid.Column="2"
-                            Background="{ThemeResource Brush.PanelBg}"
-                            CornerRadius="0,15,15,0"
+                            Background="{ThemeResource Brush.PanelGlass}"
+                            CornerRadius="0,17,17,0"
                             Padding="24">
                         <StackPanel Spacing="14" VerticalAlignment="Center">
                             <TextBlock Text="账户" Style="{StaticResource Style.SectionTitle}" />
@@ -214,7 +214,13 @@
 
             <!-- Quick entries -->
             <StackPanel Grid.Row="2" Spacing="10">
-                <TextBlock Text="快捷入口" Style="{StaticResource Style.SectionTitle}" />
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Border Width="3"
+                            Height="12"
+                            CornerRadius="1.5"
+                            Background="{ThemeResource Brush.Accent}" />
+                    <TextBlock Text="快捷入口" Style="{StaticResource Style.SectionTitle}" />
+                </StackPanel>
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -270,7 +276,7 @@
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                                 <TextBlock Text="联机" FontSize="13" FontWeight="SemiBold" />
-                                <TextBlock Text="与好友联机 · 三种接入方式"
+                                <TextBlock Text="与好友联机 · 本机开服或局域网"
                                            FontSize="11"
                                            Foreground="{ThemeResource Brush.FgDim}"
                                            TextWrapping="Wrap"
@@ -345,7 +351,13 @@
 
             <!-- First-run guide -->
             <StackPanel Grid.Row="3" Spacing="10">
-                <TextBlock Text="上手指南" Style="{StaticResource Style.SectionTitle}" />
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Border Width="3"
+                            Height="12"
+                            CornerRadius="1.5"
+                            Background="{ThemeResource Brush.Accent}" />
+                    <TextBlock Text="上手指南" Style="{StaticResource Style.SectionTitle}" />
+                </StackPanel>
                 <Border Style="{StaticResource Style.Card}" Padding="20,16">
                     <Grid ColumnSpacing="28">
                         <Grid.ColumnDefinitions>

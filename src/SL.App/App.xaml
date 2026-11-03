@@ -117,18 +117,18 @@
                 <Setter Property="TextWrapping" Value="NoWrap" />
             </Style>
 
-            <!-- Standard surface: cards share one radius and padding so pages feel consistent -->
+            <!-- Standard surface: translucent card so the applied theme image stays visible behind it -->
             <Style x:Key="Style.Card" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource Brush.Card}" />
+                <Setter Property="Background" Value="{ThemeResource Brush.CardGlass}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
                 <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="CornerRadius" Value="14" />
                 <Setter Property="Padding" Value="20" />
             </Style>
 
             <!-- Nested/secondary surface used inside a card -->
             <Style x:Key="Style.SubCard" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource Brush.PanelBg}" />
+                <Setter Property="Background" Value="{ThemeResource Brush.PanelGlass}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="10" />
@@ -136,7 +136,7 @@
             </Style>
 
             <Style x:Key="Style.PageTitle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="26" />
+                <Setter Property="FontSize" Value="28" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="Foreground" Value="{ThemeResource Brush.Fg}" />
                 <Setter Property="TextWrapping" Value="NoWrap" />
@@ -149,15 +149,15 @@
             </Style>
 
             <Style x:Key="Style.SectionTitle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontSize" Value="12.5" />
                 <Setter Property="FontWeight" Value="SemiBold" />
-                <Setter Property="Foreground" Value="{ThemeResource Brush.FgFaint}" />
-                <Setter Property="CharacterSpacing" Value="90" />
+                <Setter Property="Foreground" Value="{ThemeResource Brush.FgDim}" />
+                <Setter Property="CharacterSpacing" Value="60" />
             </Style>
 
             <!-- Small status pill -->
             <Style x:Key="Style.Pill" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource Brush.Card}" />
+                <Setter Property="Background" Value="{ThemeResource Brush.CardGlass}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource Brush.Border}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="999" />
@@ -165,19 +165,19 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
 
-            <!-- Quick-entry tile: card-like button with hover/pressed surfaces -->
+            <!-- Quick-entry tile: glass card with hover/pressed surfaces -->
             <Style x:Key="Style.Tile" TargetType="Button">
-                <Setter Property="MinHeight" Value="80" />
+                <Setter Property="MinHeight" Value="86" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                <Setter Property="Padding" Value="14" />
-                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Padding" Value="15" />
+                <Setter Property="CornerRadius" Value="14" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Grid>
                                 <Border x:Name="TileRoot"
-                                        Background="{ThemeResource Brush.Card}"
+                                        Background="{ThemeResource Brush.CardGlass}"
                                         BorderBrush="{ThemeResource Brush.Border}"
                                         BorderThickness="1"
                                         CornerRadius="{TemplateBinding CornerRadius}"

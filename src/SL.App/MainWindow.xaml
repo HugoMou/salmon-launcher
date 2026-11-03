@@ -36,17 +36,17 @@
               Visibility="Collapsed"
               IsHitTestVisible="False">
             <Grid.Background>
-                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.32" />
+                <ImageBrush x:Name="WallpaperBrush" Stretch="UniformToFill" Opacity="0.94" />
             </Grid.Background>
             <Border x:Name="WallpaperScrim" />
         </Grid>
 
-        <!-- Solid backdrop for the navigation pane: wallpapers stay in the content area -->
+        <!-- Translucent navigation surface: the theme image stays visible behind the menu -->
         <Border x:Name="PaneBackdrop"
                 Grid.RowSpan="2"
                 Width="236"
                 HorizontalAlignment="Left"
-                Background="{ThemeResource Brush.Card}"
+                Background="{ThemeResource Brush.PanelGlass}"
                 BorderBrush="{ThemeResource Brush.Border}"
                 BorderThickness="0,0,1,0" />
 
