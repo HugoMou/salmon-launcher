@@ -18,6 +18,7 @@ using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Windows.Storage.Pickers;
 using SL.Core.Instances;
 using SL.Core.Logging;
 using SL.App.Localization;
@@ -155,14 +156,19 @@ public sealed partial class InstanceModsPage : Page
             return;
         }
 
-        var path = await AppServices.Dialogs.PromptAsync(Loc.T("导入模组"),
-            Loc.T("粘贴模组 .jar 的完整路径(同名文件会自动追加序号,不会覆盖)。")).ConfigureAwait(true);
-        if (path is null)
-            return;
-
         try
         {
-            var name = InstanceRegistry.ImportMod(InstanceContext.CurrentId, path.Trim('"'));
+            var picker = new FileOpenPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.SuggestedStartLocation = PickerLocationId.Downloads;
+            picker.FileTypeFilter.Add(".jar");
+
+            var file = await picker.PickSingleFileAsync();
+            if (file is null)
+                return;
+
+            var name = InstanceRegistry.ImportMod(InstanceContext.CurrentId, file.Path);
             AppServices.Notify.Publish(NotifyKind.Success, Loc.T("已导入:") + name);
         }
         catch (Exception ex)
