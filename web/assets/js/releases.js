@@ -1,41 +1,26 @@
-/* SalmonLauncher website — release sync from GitHub
+/* SalmonLauncher website — release data mirrored by the site server
    Copyright (C) 2026 Hugo Mou — GPL-3.0-or-later */
 (function () {
   "use strict";
 
-  var API =
-    "https://api.github.com/repos/HugoMou/salmonlauncher/releases?per_page=100";
-  var CACHE_KEY = "sl-releases-v1";
-  var TTL = 60 * 60 * 1000;
-  var ASSET_PREFIX =
-    "https://github.com/HugoMou/salmonlauncher/releases/download/";
-
-  function escapeRegExp(value) {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  }
-
-  /* release notes list each file next to its SHA-256 */
-  function hashFor(body, name) {
-    if (!body || !name) return "";
-    var re = new RegExp(
-      "^\\s*" + escapeRegExp(name) + "\\s+([A-Fa-f0-9]{64})\\s*$",
-      "m"
-    );
-    var match = body.match(re);
-    return match ? match[1].toUpperCase() : "";
-  }
+  /* Written by scripts/sync-web-releases.sh on the server; all asset URLs are
+     local mirrors under downloads/, so visitors never leave the site. */
+  var DATA_URL = "assets/data/releases.json";
+  var CACHE_KEY = "sl-releases-v2";
+  var TTL = 30 * 60 * 1000;
+  var ASSET_PREFIX = "downloads/";
 
   function normalize(release) {
     return {
-      tag: release.tag_name || "",
-      date: (release.published_at || "").slice(0, 10),
-      pre: !!release.prerelease,
-      assets: (release.assets || []).map(function (asset) {
+      tag: (release && release.tag) || "",
+      date: (release && release.date) || "",
+      pre: !!(release && release.pre),
+      assets: ((release && release.assets) || []).map(function (asset) {
         return {
           name: asset.name || "",
           size: asset.size || 0,
-          url: asset.browser_download_url || "",
-          sha256: hashFor(release.body, asset.name || "")
+          url: asset.url || "",
+          sha256: asset.sha256 || ""
         };
       })
     };
@@ -46,17 +31,21 @@
       var raw = localStorage.getItem(CACHE_KEY);
       if (!raw) return null;
       var box = JSON.parse(raw);
-      if (!box || !box.data || !box.data.length) return null;
+      if (!box || !box.payload || !box.payload.releases) return null;
+      if (!box.payload.releases.length) return null;
       if (!ignoreAge && Date.now() - (box.at || 0) > TTL) return null;
-      return box.data;
+      return box.payload;
     } catch (e) {
       return null;
     }
   }
 
-  function writeCache(data) {
+  function writeCache(payload) {
     try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: data }));
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({ at: Date.now(), payload: payload })
+      );
     } catch (e) {
       /* storage may be unavailable */
     }
@@ -69,8 +58,15 @@
     return text.replace(/\.0$/, "") + " MB";
   }
 
+  /* Only same-origin mirrors written by the sync script are accepted. */
   function safeUrl(url) {
-    return typeof url === "string" && url.indexOf(ASSET_PREFIX) === 0;
+    return (
+      typeof url === "string" &&
+      url.indexOf(ASSET_PREFIX) === 0 &&
+      url.indexOf("..") === -1 &&
+      url.indexOf("\\") === -1 &&
+      url.indexOf("://") === -1
+    );
   }
 
   function pickAsset(release, kind) {
@@ -97,6 +93,14 @@
     if (!value) return;
     document.querySelectorAll(selector).forEach(function (el) {
       el.textContent = value;
+    });
+  }
+
+  function renderSynced(syncedAt) {
+    if (!syncedAt) return;
+    document.querySelectorAll("[data-sl-synced]").forEach(function (el) {
+      el.textContent = "SYNCED " + syncedAt.slice(0, 10);
+      el.removeAttribute("hidden");
     });
   }
 
@@ -189,7 +193,12 @@
     });
   }
 
-  function render(releases) {
+  function render(payload) {
+    var releases = ((payload && payload.releases) || [])
+      .map(normalize)
+      .filter(function (release) {
+        return release.tag && release.assets.length;
+      });
     if (!releases.length) return;
 
     var latest = null;
@@ -201,6 +210,7 @@
     }
     if (!latest) latest = releases[0];
 
+    renderSynced(payload.syncedAt);
     renderLatest(latest);
     renderHistory(releases);
   }
@@ -216,21 +226,17 @@
 
     var stale = readCache(true);
 
-    fetch(API, { cache: "no-store" })
+    fetch(DATA_URL, { cache: "no-store" })
       .then(function (res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
       })
-      .then(function (list) {
-        var data = (Array.isArray(list) ? list : [])
-          .filter(function (release) {
-            return !release.draft;
-          })
-          .map(normalize);
-
-        if (!data.length) throw new Error("empty release list");
-        writeCache(data);
-        render(data);
+      .then(function (payload) {
+        if (!payload || !payload.releases || !payload.releases.length) {
+          throw new Error("empty release list");
+        }
+        writeCache(payload);
+        render(payload);
       })
       .catch(function () {
         if (stale) render(stale);

@@ -164,16 +164,14 @@
 
       <section id="multiplayer">
         <h2><span class="n">06</span><span data-zh="联机">Multiplayer</span></h2>
-        <p data-zh="VoxLink 提供三种方式：自建房间、局域网扫描、手动中继。房间邀请码以 SLROOM 开头，端口由系统挑选，避免撞上常见端口。">VoxLink offers three routes: host a room, scan the LAN, or point at a relay manually. Room invite codes start with SLROOM, and the port is chosen by the system to avoid common conflicts.</p>
+        <p data-zh="联机只提供两种方式：在自己的电脑上开服，或与同一局域网内的玩家直接联机。端口由系统挑选，避免撞上常见端口；不提供公网中继，也不生成邀请码。">There are two routes only: host the server on your own PC, or play with people on the same LAN. The port is chosen by the system to avoid common conflicts; there is no public relay and no invite code.</p>
         <ol class="steps">
-          <li data-zh="建房：选择“自建房间”，应用生成邀请码并开始监听。">Host: choose “Host a room”; the app generates an invite code and starts listening.</li>
-          <li data-zh="加入：对方在同一台机器或同一局域网内输入邀请码。">Join: the other player enters the invite code on the same machine or the same LAN.</li>
-          <li data-zh="局域网扫描：选择“扫描”，列出当前网段可加入的游戏。">LAN scan: choose “Scan” to list joinable games on the current subnet.</li>
-          <li data-zh="手动中继：已有中继地址时直接填写，跳过建房。">Manual relay: if you already run a relay, enter its address and skip hosting.</li>
+          <li data-zh="本机开服：在你的电脑上启动服务端，记下局域网内的地址与端口。">Host: start the server on your PC and note the LAN address and port.</li>
+          <li data-zh="局域网联机：同一网段的朋友在多人游戏里直接加入，或让启动器扫描局域网世界。">LAN play: friends on the same subnet join directly in Multiplayer, or let the launcher scan for LAN worlds.</li>
         </ol>
         <div class="note">
-          <b data-zh="当前版本的边界：">Scope in this release:</b>
-          <span data-zh="1.0.3 的信令仍是本地回环（loopback），适合同机与同内网。跨公网联机需要自建中继服务器，公网中继尚未内置。">Signalling in 1.0.3 is still loopback, which covers the same machine and the same LAN. Playing across the internet needs your own relay server; a public relay is not bundled yet.</span>
+          <b data-zh="联机范围：">Scope:</b>
+          <span data-zh="只覆盖这台电脑与同一局域网。启动器不提供公网中继，也不生成邀请码。">Only your computer and the same LAN are covered. The launcher provides no public relay and generates no invite codes.</span>
         </div>
       </section>
 
@@ -237,8 +235,8 @@ Get-ChildItem "$root\cache\meta"
             <p data-zh="确认三件事：模组与游戏版本匹配、加载器类型匹配（Fabric 的模组不能放进 Forge 实例）、文件没有被改成 .jar.disabled。">Check three things: the mod matches the game version, it matches the loader (a Fabric mod will not run in a Forge instance), and the file is not renamed to .jar.disabled.</p>
           </details>
           <details>
-            <summary data-zh="联机加入失败">Joining a room fails</summary>
-            <p data-zh="1.0.3 的中继是本地回环，只有同机或同内网可用。跨公网需要一个可访问的中继地址。确认双方版本一致，并检查防火墙是否放行应用。">The 1.0.3 relay is loopback, so it only works on the same machine or LAN. Across the internet you need a reachable relay address. Make sure both sides run the same version and that the firewall allows the app.</p>
+            <summary data-zh="联机加入失败">Joining a LAN world fails</summary>
+            <p data-zh="联机只支持本机开服与同一局域网。确认对方与你在同一网段、双方版本一致；本机开服时，检查防火墙是否放行 Java 与启动器。">Multiplayer only covers local hosting and the same LAN. Make sure you are on the same subnet and both sides run the same version; when hosting, allow Java and the launcher through the firewall.</p>
           </details>
           <details>
             <summary data-zh="日志文件打不开，提示被占用">The log cannot be opened because it is in use</summary>
@@ -270,7 +268,7 @@ Get-ChildItem "$root\cache\meta"
         <h4 data-zh="资源">Resources</h4>
         <a href="docs.html" data-zh="文档">Documentation</a>
         <a href="https://github.com/HugoMou/salmonlauncher" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/HugoMou/salmonlauncher/releases" target="_blank" rel="noopener" data-zh="所有版本">All releases</a>
+        <a href="download.html#history" data-zh="所有版本">All releases</a>
       </div>
       <div class="foot-col">
         <h4 data-zh="法律">Legal</h4>

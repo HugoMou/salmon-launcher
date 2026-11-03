@@ -927,19 +927,33 @@ main {
   margin: -18px 0 42px;
 }
 
-/* ---------- cards ---------- */
+/* ---------- cards (bento grid) ---------- */
 .cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
+}
+@media (min-width: 1181px) {
+  .cards > .card:nth-child(1),
+  .cards > .card:nth-child(5) {
+    grid-column: span 2;
+    min-height: 240px;
+  }
+  .cards > .card:nth-child(1) h3,
+  .cards > .card:nth-child(5) h3 {
+    font-size: clamp(23px, 2.1vw, 30px);
+    max-width: 20ch;
+  }
 }
 .card {
   position: relative;
   background: var(--ink-2);
   padding: 28px 26px 30px;
   min-height: 220px;
+  display: flex;
+  flex-direction: column;
   transition: background 0.3s;
 }
 .card:hover {
@@ -1316,18 +1330,19 @@ main {
   border-color: var(--text);
 }
 
-/* ---------- split CTA ---------- */
+/* ---------- split CTA (card) ---------- */
 .cta-band {
-  margin-top: clamp(56px, 7vw, 92px);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  padding: clamp(44px, 6vw, 70px) 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  flex-wrap: wrap;
+  position: relative;
+  margin-top: clamp(48px, 6vw, 76px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: clamp(26px, 3.4vw, 42px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px 36px;
   background: linear-gradient(100deg, rgba(255, 111, 94, 0.07), transparent 55%);
+  overflow: hidden;
 }
 .cta-band h2 {
   font-size: clamp(25px, 3.2vw, 40px);
@@ -1337,6 +1352,10 @@ main {
   color: var(--muted);
   margin-top: 8px;
   font-size: 14px;
+  max-width: 46ch;
+}
+.cta-band .btn-row {
+  justify-content: flex-end;
 }
 
 /* ---------- page header ---------- */
@@ -2210,8 +2229,12 @@ main {
     margin-bottom: 22px;
   }
   .cta-band {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+  }
+  .cta-band .btn-row {
+    justify-content: flex-start;
   }
   .foot-grid {
     grid-template-columns: 1fr 1fr;
@@ -2492,8 +2515,6 @@ h2 {
 
 /* CTA band */
 .cta-band {
-  position: relative;
-  overflow: hidden;
   background: linear-gradient(
     100deg,
     rgba(255, 111, 94, 0.11),
@@ -2503,7 +2524,8 @@ h2 {
       620px 240px at 88% 118%,
       rgba(255, 111, 94, 0.1),
       transparent 70%
-    );
+    ),
+    var(--ink-2);
 }
 .cta-band::before {
   content: "";

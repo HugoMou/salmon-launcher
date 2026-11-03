@@ -4,7 +4,8 @@
   "use strict";
 
   var LANGS = ["en", "zh", "zh-hant", "ja"];
-  var LANG_KEY = "sl-lang";
+  /* Only an explicit choice is remembered; otherwise every load follows the system. */
+  var LANG_KEY = "sl-lang-choice";
   var HTML_LANG = { en: "en", zh: "zh-CN", "zh-hant": "zh-Hant", ja: "ja" };
   var DICT = window.SL_I18N || {};
   var nodes = [];
@@ -105,7 +106,7 @@
     }
   }
 
-  function applyLang(lang) {
+  function applyLang(lang, remember) {
     if (LANGS.indexOf(lang) === -1) lang = "en";
 
     document.documentElement.dataset.lang = lang;
@@ -119,10 +120,12 @@
       btn.setAttribute("aria-pressed", String(btn.dataset.setLang === lang));
     });
 
-    try {
-      localStorage.setItem(LANG_KEY, lang);
-    } catch (e) {
-      /* storage may be unavailable */
+    if (remember) {
+      try {
+        localStorage.setItem(LANG_KEY, lang);
+      } catch (e) {
+        /* storage may be unavailable */
+      }
     }
   }
 
@@ -158,7 +161,7 @@
 
     document.querySelectorAll("[data-set-lang]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        applyLang(btn.dataset.setLang);
+        applyLang(btn.dataset.setLang, true);
       });
     });
   }
