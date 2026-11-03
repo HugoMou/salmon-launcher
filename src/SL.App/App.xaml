@@ -228,10 +228,17 @@
                                 <Border x:Name="LaunchRoot"
                                         Background="{ThemeResource Brush.Accent}"
                                         CornerRadius="{TemplateBinding CornerRadius}" />
-                                <Border Background="#26FFFFFF" CornerRadius="14" Margin="1,1,1,58" IsHitTestVisible="False" />
+                                <Border CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#1FFFFFFF" Offset="0" />
+                                            <GradientStop Color="#00FFFFFF" Offset="0.7" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
                                 <ContentPresenter x:Name="LaunchContent"
                                                   Content="{TemplateBinding Content}"
-                                                  HorizontalAlignment="Center"
+                                                  HorizontalAlignment="Stretch"
                                                   VerticalAlignment="Center"
                                                   Padding="{TemplateBinding Padding}"
                                                   Foreground="{TemplateBinding Foreground}" />
