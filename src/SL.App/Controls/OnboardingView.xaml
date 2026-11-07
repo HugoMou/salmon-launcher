@@ -53,10 +53,11 @@
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Step indicator: four dots (ticked when finished) + progress bar below -->
+                    <!-- Step indicator: five dots (ticked when finished) + progress bar below -->
                     <StackPanel Spacing="9">
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
                                 <ColumnDefinition />
                                 <ColumnDefinition />
                                 <ColumnDefinition />
@@ -93,7 +94,7 @@
                                     <TextBlock x:Name="DotNum2" Text="3" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource Brush.FgDim}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     <FontIcon x:Name="DotTick2" Glyph="&#xE73E;" FontSize="13" Foreground="{ThemeResource Brush.AccentFg}" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Grid>
-                                <TextBlock x:Name="DotLabel2" Text="账户" FontSize="11" Foreground="{ThemeResource Brush.FgFaint}" HorizontalAlignment="Center" />
+                                <TextBlock x:Name="DotLabel2" Text="迁移" FontSize="11" Foreground="{ThemeResource Brush.FgFaint}" HorizontalAlignment="Center" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="3" Spacing="5" HorizontalAlignment="Center">
@@ -104,13 +105,24 @@
                                     <TextBlock x:Name="DotNum3" Text="4" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource Brush.FgDim}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     <FontIcon x:Name="DotTick3" Glyph="&#xE73E;" FontSize="13" Foreground="{ThemeResource Brush.AccentFg}" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Grid>
-                                <TextBlock x:Name="DotLabel3" Text="主题" FontSize="11" Foreground="{ThemeResource Brush.FgFaint}" HorizontalAlignment="Center" />
+                                <TextBlock x:Name="DotLabel3" Text="账户" FontSize="11" Foreground="{ThemeResource Brush.FgFaint}" HorizontalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4" Spacing="5" HorizontalAlignment="Center">
+                                <Grid Width="32" Height="32">
+                                    <Ellipse x:Name="DotPending4" Width="32" Height="32" Fill="{ThemeResource Brush.PanelBg}" Stroke="{ThemeResource Brush.Border}" StrokeThickness="2" />
+                                    <Ellipse x:Name="DotCurrent4" Width="32" Height="32" Fill="Transparent" Stroke="{ThemeResource Brush.Accent}" StrokeThickness="2" Visibility="Collapsed" />
+                                    <Ellipse x:Name="DotDone4" Width="32" Height="32" Fill="{ThemeResource Brush.Accent}" Visibility="Collapsed" />
+                                    <TextBlock x:Name="DotNum4" Text="5" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource Brush.FgDim}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <FontIcon x:Name="DotTick4" Glyph="&#xE73E;" FontSize="13" Foreground="{ThemeResource Brush.AccentFg}" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock x:Name="DotLabel4" Text="主题" FontSize="11" Foreground="{ThemeResource Brush.FgFaint}" HorizontalAlignment="Center" />
                             </StackPanel>
                         </Grid>
 
-                        <ProgressBar x:Name="StepBar" Minimum="0" Maximum="4" Value="0" Height="6" />
+                        <ProgressBar x:Name="StepBar" Minimum="0" Maximum="5" Value="0" Height="6" />
                         <TextBlock x:Name="ProgressText"
-                                   Text="已完成 0/4"
+                                   Text="已完成 0/5"
                                    FontSize="11"
                                    Foreground="{ThemeResource Brush.FgFaint}"
                                    HorizontalAlignment="Center" />
@@ -172,7 +184,35 @@
                                           Unchecked="OnTermsToggled" />
                             </StackPanel>
 
-                            <!-- Page 3: Sign in with a premium account or create an offline account -->
+                            <!-- Page 3: Migrate from an existing launcher (HMCL / MultiMC / Official) -->
+                            <StackPanel x:Name="PanelMigrate" Spacing="14" Visibility="Collapsed">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="从旧启动器迁移"
+                                               FontSize="19"
+                                               FontWeight="SemiBold"
+                                               Foreground="{ThemeResource Brush.Fg}" />
+                                    <TextBlock Text="检测到你之前可能用其他启动器开过 Minecraft,SalmonLauncher 可以帮你把账户导入进来;这一步是可选的,随时可以跳过。"
+                                               FontSize="12.5"
+                                               Foreground="{ThemeResource Brush.FgDim}"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <Border Background="{ThemeResource Brush.PageBg}"
+                                        BorderBrush="{ThemeResource Brush.Border}"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="16">
+                                    <StackPanel x:Name="MigrateList" Spacing="10" />
+                                </Border>
+
+                                <TextBlock x:Name="MigrateHint"
+                                           Text="如果检测不到旧启动器,可以跳过这一步,直接开始使用 SalmonLauncher。"
+                                           FontSize="11.5"
+                                           Foreground="{ThemeResource Brush.FgFaint}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <!-- Page 4: Sign in with a premium account or create an offline account -->
                             <StackPanel x:Name="PanelAccount" Spacing="14" Visibility="Collapsed">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="登录账户"

@@ -80,6 +80,9 @@
                                 <TextBlock Text="用户协议" />
                             </StackPanel>
                         </Button>
+                        <HyperlinkButton NavigateUri="https://sl.hugomou.com/"
+                                         Content="官方主站"
+                                         Style="{StaticResource Style.Link}" />
                     </StackPanel>
                 </StackPanel>
             </Border>

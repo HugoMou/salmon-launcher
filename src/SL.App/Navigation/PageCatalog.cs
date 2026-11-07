@@ -68,27 +68,30 @@ public static class NavGroups
             new("inst.overview", "概览", "\uE7FC"),
             new("inst.mods", "模组管理", "\uE7B8"),
             new("inst.saves", "存档", "\uE74E"),
-            new("inst.packs", "资源包", "\uE8F1"),
-            new("inst.shaders", "光影", "\uE706"),
-            new("inst.logs", "实例日志", "\uE8A5"),
             new("inst.cfg", "实例设置", "\uE713"),
+            new("inst.logs", "实例日志", "\uE8A5"),
         ]),
-        new("下载", [
+        new("资源", [
             new("dl.game", "游戏版本", "\uE7FC"),
+            new("dl.loaders", "加载器选择", "\uE950"),
+            new("dl.install", "安装概览", "\uE895"),
             new("dl.pack", "模组仓库", "\uE7B8"),
             new("dl.shaders", "光影仓库", "\uE706"),
             new("dl.packs", "资源包仓库", "\uE8F1"),
+            new("inst.packs", "资源包", "\uE8F1"),
+            new("inst.shaders", "光影", "\uE706"),
         ]),
-        new("工具", [
+        new("联机", [
             new("tools.online", "联机", "\uE716"),
-            new("tools.skins", "皮肤站", "\uE77B"),
+        ]),
+        new("系统", [
+            new("st.global", "全局偏好", "\uE90F"),
             new("tools.diag", "崩溃诊断", "\uE7BA"),
             new("tools.log", "应用日志", "\uE8A5"),
         ]),
         new("设置", [
             new("st.launch", "外观与设置", "\uE713"),
-            new("st.global", "全局偏好", "\uE90F"),
-            new("st.theme", "主题工坊", "\uE790"),
+            new("tools.skins", "皮肤站", "\uE77B"),
             new("st.about", "关于", "\uE946"),
             new("st.terms", "用户协议", "\uE8A5"),
         ]),

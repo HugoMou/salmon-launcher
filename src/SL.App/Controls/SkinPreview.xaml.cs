@@ -174,27 +174,34 @@ public sealed partial class SkinPreview : UserControl
             var v = part.V;
             var d = (int)part.D;
 
+            // Minecraft official 64x64 UV layout for each cuboid:
+            //   front:  (U+D,        V+D) W×H
+            //   back:   (U+D+W+D,    V+D) W×H
+            //   right:  (U,          V+D) D×H        ← depth edge
+            //   left:   (U+W+D,      V+D) D×H        ← depth edge (mirrored)
+            //   top:    (U+D,        V)   W×D
+            //   bottom: (U+D+W,      V)   W×D
             var faceDefs = new (string Name, (double X, double Y, double Z)[] Corners,
-                int U0, int V0, int UW, int VH, (double X, double Y, double Z) Normal)[]
+                int U0, int V0, int UW, int VH, bool FlipU, (double X, double Y, double Z) Normal)[]
             {
                 ("front",
                     [(-hx, -hy, hz), (hx, -hy, hz), (hx, hy, hz), (-hx, hy, hz)],
-                    u + d, v + d, (int)part.W, (int)part.H, (0, 0, 1)),
+                    u + d, v + d, (int)part.W, (int)part.H, false, (0, 0, 1)),
                 ("back",
                     [(hx, -hy, -hz), (-hx, -hy, -hz), (-hx, hy, -hz), (hx, hy, -hz)],
-                    u + d + (int)part.W + d, v + d, (int)part.W, (int)part.H, (0, 0, -1)),
+                    u + d + (int)part.W + d, v + d, (int)part.W, (int)part.H, false, (0, 0, -1)),
                 ("right",
                     [(hx, -hy, hz), (hx, -hy, -hz), (hx, hy, -hz), (hx, hy, hz)],
-                    u + d + (int)part.W, v + d, d, (int)part.H, (1, 0, 0)),
+                    u, v + d, d, (int)part.H, false, (1, 0, 0)),
                 ("left",
                     [(-hx, -hy, -hz), (-hx, -hy, hz), (-hx, hy, hz), (-hx, hy, -hz)],
-                    u, v + d, d, (int)part.H, (-1, 0, 0)),
+                    u + (int)part.W + d, v + d, d, (int)part.H, true, (-1, 0, 0)),
                 ("top",
                     [(-hx, -hy, -hz), (hx, -hy, -hz), (hx, -hy, hz), (-hx, -hy, hz)],
-                    u + d, v, (int)part.W, d, (0, -1, 0)),
+                    u + d, v, (int)part.W, d, false, (0, -1, 0)),
                 ("bottom",
                     [(-hx, hy, hz), (hx, hy, hz), (hx, hy, -hz), (-hx, hy, -hz)],
-                    u + d + (int)part.W, v, (int)part.W, d, (0, 1, 0)),
+                    u + d + (int)part.W, v, (int)part.W, d, false, (0, 1, 0)),
             };
 
             foreach (var face in faceDefs)
@@ -223,6 +230,11 @@ public sealed partial class SkinPreview : UserControl
                         var s1 = (iu + 1) / (double)cellsU;
                         var t0 = iv / (double)cellsV;
                         var t1 = (iv + 1) / (double)cellsV;
+                        if (face.FlipU)
+                        {
+                            s0 = 1 - s0;
+                            s1 = 1 - s1;
+                        }
 
                         var a = Bilinear(p0, p1, p2, p3, s0, t0);
                         var b = Bilinear(p0, p1, p2, p3, s1, t0);
